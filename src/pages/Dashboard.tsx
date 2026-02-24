@@ -57,33 +57,44 @@ export default function Dashboard() {
 
   const createProject = useMutation({
     mutationFn: async () => {
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError || !authData.user) {
+        throw new Error("Sesión no válida. Vuelve a iniciar sesión.");
+      }
+
+      const currentUserId = authData.user.id;
+
       // Create org if needed
-      const { data: org } = await supabase
+      const { data: org, error: orgError } = await supabase
         .from("organizations")
         .insert({ name: "Mi organización" })
         .select()
         .single();
 
+      if (orgError || !org) throw orgError ?? new Error("No se pudo crear la organización");
+
       const { data: project, error } = await supabase
         .from("projects")
         .insert({
           title: "Nuevo Proyecto",
-          organization_id: org!.id,
-          created_by: user!.id,
+          organization_id: org.id,
+          created_by: currentUserId,
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error || !project) throw error ?? new Error("No se pudo crear el proyecto");
 
       // Add creator as FORMULADOR + owner
-      await supabase.from("project_members").insert({
-        project_id: project!.id,
-        user_id: user!.id,
-        role: "FORMULADOR" as any,
+      const { error: memberError } = await supabase.from("project_members").insert({
+        project_id: project.id,
+        user_id: currentUserId,
+        role: "FORMULADOR",
         is_owner: true,
         joined_at: new Date().toISOString(),
       });
+
+      if (memberError) throw memberError;
 
       return project;
     },
