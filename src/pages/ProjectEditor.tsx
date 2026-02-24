@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { EditorSidebar } from "@/components/editor/EditorSidebar";
 import { QuestionBlock } from "@/components/editor/QuestionBlock";
 import { DynamicTable } from "@/components/editor/DynamicTable";
-import { CommentsSidebar } from "@/components/editor/CommentsSidebar";
+import { CommentBubble } from "@/components/editor/CommentBubble";
 import { FORM_SECTIONS, REQUIRED_FIELDS, type FormField, type TableConfig } from "@/lib/formSections";
 import { Save, ArrowLeft, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -25,17 +25,12 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const queryClient = useQueryClient();
 
   const [activeSection, setActiveSection] = useState(FORM_SECTIONS[0].id);
-  const [role, setRole] = useState<"FORMULADOR" | "CONSULTOR">(reviewMode ? "CONSULTOR" : "FORMULADOR");
   const [title, setTitle] = useState("");
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
-  const [showComments, setShowComments] = useState(false);
   const [activeCommentField, setActiveCommentField] = useState<string | null>(null);
   const pendingChanges = useRef<Set<string>>(new Set());
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const isReadOnly = role === "CONSULTOR";
-  const isConsultor = role === "CONSULTOR";
 
   // Build field labels map
   const fieldLabels = useMemo(() => {
@@ -77,6 +72,25 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     },
     enabled: !!projectId && !!user,
   });
+
+  // Check if user is a global consultor (has CONSULTOR role on any project)
+  const { data: isGlobalConsultor } = useQuery({
+    queryKey: ["isConsultor", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("project_members")
+        .select("role")
+        .eq("user_id", user!.id)
+        .eq("role", "CONSULTOR")
+        .limit(1);
+      return data && data.length > 0;
+    },
+    enabled: !!user,
+  });
+
+  // Determine role: from membership on this project, or global consultor, or reviewMode
+  const isConsultor = reviewMode || membership?.role === "CONSULTOR" || (isGlobalConsultor && !membership);
+  const isReadOnly = isConsultor;
 
   // Fetch responses
   const { data: formResponses } = useQuery({
@@ -133,18 +147,19 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     }
   }, [formResponses]);
 
-  useEffect(() => {
-    if (membership) {
-      setRole(reviewMode ? "CONSULTOR" : (membership.role as any));
-    }
-  }, [membership, reviewMode]);
-
   // Comment counts
   const commentCounts: Record<string, number> = {};
   comments.forEach((c: any) => {
     if (c.status === "PENDING") {
       commentCounts[c.field_key] = (commentCounts[c.field_key] || 0) + 1;
     }
+  });
+
+  // Group comments by field
+  const commentsByField: Record<string, any[]> = {};
+  comments.forEach((c: any) => {
+    if (!commentsByField[c.field_key]) commentsByField[c.field_key] = [];
+    commentsByField[c.field_key].push(c);
   });
 
   const totalPendingComments = Object.values(commentCounts).reduce((a, b) => a + b, 0);
@@ -239,15 +254,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   };
 
   const handleFieldComment = (fieldKey: string) => {
-    setActiveCommentField(fieldKey);
-    setShowComments(true);
-  };
-
-  const handleCommentFieldClick = (fieldKey: string) => {
-    setActiveCommentField(fieldKey);
-    // Scroll to the field in the editor
-    const el = document.getElementById(`field-${fieldKey}`);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setActiveCommentField(activeCommentField === fieldKey ? null : fieldKey);
   };
 
   const saveStatusDisplay = {
@@ -255,6 +262,30 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     saving: { text: "Guardando...", className: "text-muted-foreground animate-pulse" },
     error: { text: "Error ⚠️", className: "text-destructive" },
     unsaved: { text: "Sin guardar", className: "text-muted-foreground" },
+  };
+
+  // Render a comment bubble for a field (positioned to the right)
+  const renderFieldComments = (fieldKey: string) => {
+    const fieldComments = commentsByField[fieldKey] || [];
+    const hasComments = fieldComments.length > 0;
+    const isActive = activeCommentField === fieldKey;
+
+    if (!hasComments && !isActive) return null;
+
+    return (
+      <div className="absolute top-0 left-[calc(100%+1.5rem)] w-[260px] z-10">
+        <CommentBubble
+          comments={fieldComments}
+          currentUserId={user!.id}
+          onAdd={(text) => addComment(fieldKey, text)}
+          onResolve={resolveComment}
+          onDelete={deleteComment}
+          canCreate={isConsultor}
+          isActive={isActive}
+          onActivate={() => handleFieldComment(fieldKey)}
+        />
+      </div>
+    );
   };
 
   return (
@@ -273,50 +304,33 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           placeholder="Título del proyecto"
         />
 
-        <div className="flex items-center gap-1 ml-2 bg-muted rounded-md p-0.5">
-          <Button
-            variant={role === "FORMULADOR" ? "default" : "ghost"}
-            size="sm"
-            className="text-xs h-7"
-            onClick={() => setRole("FORMULADOR")}
-          >
-            Formulador
-          </Button>
-          <Button
-            variant={role === "CONSULTOR" ? "default" : "ghost"}
-            size="sm"
-            className="text-xs h-7"
-            onClick={() => setRole("CONSULTOR")}
-          >
-            Consultor
-          </Button>
-        </div>
+        {/* Role badge */}
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+          isConsultor
+            ? "bg-amber-bg text-amber border border-amber/30"
+            : "bg-accent text-accent-foreground"
+        }`}>
+          {isConsultor ? "Consultor" : "Formulador"}
+        </span>
 
         <div className="flex-1" />
+
+        {totalPendingComments > 0 && (
+          <span className="flex items-center gap-1 text-xs text-amber">
+            <MessageSquare className="h-3.5 w-3.5" />
+            {totalPendingComments} pendiente{totalPendingComments !== 1 ? "s" : ""}
+          </span>
+        )}
 
         <span className={`text-xs ${saveStatusDisplay[saveStatus].className}`}>
           {saveStatusDisplay[saveStatus].text}
         </span>
 
-        <Button variant="outline" size="sm" onClick={flushSave} disabled={saveStatus === "saving"}>
-          <Save className="h-3.5 w-3.5 mr-1" /> Guardar
-        </Button>
-
-        {/* Comments toggle */}
-        <Button
-          variant={showComments ? "default" : "outline"}
-          size="sm"
-          onClick={() => setShowComments(!showComments)}
-          className="relative"
-        >
-          <MessageSquare className="h-3.5 w-3.5 mr-1" />
-          Comentarios
-          {totalPendingComments > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber text-[9px] font-bold text-primary-foreground px-0.5">
-              {totalPendingComments}
-            </span>
-          )}
-        </Button>
+        {!isReadOnly && (
+          <Button variant="outline" size="sm" onClick={flushSave} disabled={saveStatus === "saving"}>
+            <Save className="h-3.5 w-3.5 mr-1" /> Guardar
+          </Button>
+        )}
 
         <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
           <Link to="/dashboard">
@@ -334,11 +348,17 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           commentCounts={commentCounts}
         />
 
-        {/* Main content - document style */}
-        <main className="flex-1 overflow-y-auto bg-background">
-          <div className="mx-auto max-w-[820px] px-8 py-10">
+        {/* Main content */}
+        <main
+          className="flex-1 overflow-y-auto bg-background"
+          onClick={() => setActiveCommentField(null)}
+        >
+          <div className="py-10 px-8" style={{ paddingRight: 'max(2rem, calc(50% - 520px))' }}>
             {/* Document paper */}
-            <div className="bg-card rounded-xl shadow-goblab-sm border border-border/50 px-10 py-8">
+            <div
+              className="bg-card rounded-xl shadow-goblab-sm border border-border/50 px-10 py-8"
+              style={{ maxWidth: '680px', overflow: 'visible' }}
+            >
               {FORM_SECTIONS.map((section, sIdx) => (
                 <section
                   key={section.id}
@@ -366,12 +386,15 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                       if (isTable) {
                         const tableConfig = field as TableConfig;
                         return (
-                          <div key={field.key} id={`field-${field.key}`} className="space-y-2 py-3">
+                          <div key={field.key} id={`field-${field.key}`} className="relative group space-y-2 py-3">
                             <div className="flex items-center justify-between">
                               <h3 className="font-medium text-sm text-foreground">{tableConfig.label}</h3>
                               {isConsultor && (
                                 <button
-                                  onClick={() => handleFieldComment(field.key)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleFieldComment(field.key);
+                                  }}
                                   className={`p-1 rounded transition-opacity ${
                                     commentCounts[field.key] ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                                   }`}
@@ -393,13 +416,14 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                               onChange={(data) => updateField(field.key, data)}
                               readOnly={isReadOnly}
                             />
+                            {renderFieldComments(field.key)}
                           </div>
                         );
                       }
 
                       const formField = field as FormField;
                       return (
-                        <div key={field.key} id={`field-${field.key}`}>
+                        <div key={field.key} id={`field-${field.key}`} className="relative">
                           <QuestionBlock
                             field={formField}
                             value={(responses[field.key] as string) || formField.defaultValue || ""}
@@ -410,6 +434,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                             onComment={() => handleFieldComment(field.key)}
                             isCommentActive={activeCommentField === field.key}
                           />
+                          {renderFieldComments(field.key)}
                         </div>
                       );
                     })}
@@ -419,27 +444,11 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
             </div>
 
             {/* Footer */}
-            <footer className="mt-8 pb-8 text-[11px] text-muted-foreground text-center leading-relaxed">
+            <footer className="mt-8 pb-8 text-[11px] text-muted-foreground text-center leading-relaxed max-w-[680px]">
               Esta ficha fue desarrollada originalmente por el Center for Data Science and Public Policy de la Universidad de Chicago y el GobLab UAI, en colaboración con CMU, ITAM y CoDaTecs/Universidad Nacional del Rosario. Licencia CC BY-SA 3.0 · goblab.uai.cl
             </footer>
           </div>
         </main>
-
-        {/* Right Comments Sidebar */}
-        {showComments && (
-          <CommentsSidebar
-            comments={comments as any}
-            currentUserId={user!.id}
-            activeFieldKey={activeCommentField}
-            fieldLabels={fieldLabels}
-            onAdd={addComment}
-            onResolve={resolveComment}
-            onDelete={deleteComment}
-            onClose={() => { setShowComments(false); setActiveCommentField(null); }}
-            onFieldClick={handleCommentFieldClick}
-            canCreate={isConsultor}
-          />
-        )}
       </div>
     </div>
   );

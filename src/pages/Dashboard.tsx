@@ -26,33 +26,93 @@ export default function Dashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: projects = [], isLoading } = useQuery({
-    queryKey: ["projects"],
+  // Check if user is a global consultor
+  const { data: isConsultor } = useQuery({
+    queryKey: ["isConsultor", user?.id],
     queryFn: async () => {
-      const { data: memberships } = await supabase
+      const { data } = await supabase
         .from("project_members")
-        .select("project_id, role")
-        .eq("user_id", user!.id);
-
-      if (!memberships?.length) return [];
-
-      const projectIds = memberships.map((m) => m.project_id);
-      const roleMap = Object.fromEntries(memberships.map((m) => [m.project_id, m.role]));
-
-      const { data: projects } = await supabase
-        .from("projects")
-        .select("*, organizations(name)")
-        .in("id", projectIds)
-        .is("deleted_at", null)
-        .order("updated_at", { ascending: false });
-
-      return (projects || []).map((p) => ({
-        ...p,
-        role: roleMap[p.id],
-        organizationName: (p as any).organizations?.name,
-      }));
+        .select("role")
+        .eq("user_id", user!.id)
+        .eq("role", "CONSULTOR")
+        .limit(1);
+      return data && data.length > 0;
     },
     enabled: !!user,
+  });
+
+  const { data: projects = [], isLoading } = useQuery({
+    queryKey: ["projects", isConsultor],
+    queryFn: async () => {
+      if (isConsultor) {
+        // Consultors see ALL projects
+        const { data: allProjects } = await supabase
+          .from("projects")
+          .select("*, organizations(name)")
+          .is("deleted_at", null)
+          .order("updated_at", { ascending: false });
+
+        // Fetch comment counts per project to show who commented
+        const projectIds = (allProjects || []).map((p) => p.id);
+        const { data: commentsData } = await supabase
+          .from("comments")
+          .select("project_id, author_id, status")
+          .in("project_id", projectIds)
+          .is("deleted_at", null)
+          .eq("status", "PENDING");
+
+        const commentCountMap: Record<string, number> = {};
+        (commentsData || []).forEach((c) => {
+          commentCountMap[c.project_id] = (commentCountMap[c.project_id] || 0) + 1;
+        });
+
+        return (allProjects || []).map((p) => ({
+          ...p,
+          role: "CONSULTOR" as const,
+          organizationName: (p as any).organizations?.name,
+          commentCount: commentCountMap[p.id] || 0,
+        }));
+      } else {
+        // Formuladores see only their projects
+        const { data: memberships } = await supabase
+          .from("project_members")
+          .select("project_id, role")
+          .eq("user_id", user!.id);
+
+        if (!memberships?.length) return [];
+
+        const projectIds = memberships.map((m) => m.project_id);
+        const roleMap = Object.fromEntries(memberships.map((m) => [m.project_id, m.role]));
+
+        const { data: projects } = await supabase
+          .from("projects")
+          .select("*, organizations(name)")
+          .in("id", projectIds)
+          .is("deleted_at", null)
+          .order("updated_at", { ascending: false });
+
+        // Fetch comment counts
+        const { data: commentsData } = await supabase
+          .from("comments")
+          .select("project_id, status")
+          .in("project_id", projectIds)
+          .is("deleted_at", null)
+          .eq("status", "PENDING");
+
+        const commentCountMap: Record<string, number> = {};
+        (commentsData || []).forEach((c) => {
+          commentCountMap[c.project_id] = (commentCountMap[c.project_id] || 0) + 1;
+        });
+
+        return (projects || []).map((p) => ({
+          ...p,
+          role: roleMap[p.id],
+          organizationName: (p as any).organizations?.name,
+          commentCount: commentCountMap[p.id] || 0,
+        }));
+      }
+    },
+    enabled: !!user && isConsultor !== undefined,
   });
 
   const createProject = useMutation({
@@ -64,7 +124,6 @@ export default function Dashboard() {
 
       const currentUserId = authData.user.id;
 
-      // Create org if needed
       const { data: org, error: orgError } = await supabase
         .from("organizations")
         .insert({ name: "Mi organización" })
@@ -85,7 +144,6 @@ export default function Dashboard() {
 
       if (error || !project) throw error ?? new Error("No se pudo crear el proyecto");
 
-      // Add creator as FORMULADOR + owner
       const { error: memberError } = await supabase.from("project_members").insert({
         project_id: project.id,
         user_id: currentUserId,
@@ -119,13 +177,21 @@ export default function Dashboard() {
       <main className="mx-auto max-w-6xl px-6 py-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-display text-foreground">Mis Proyectos</h1>
-            <p className="text-muted-foreground mt-1">Gestiona y formula tus proyectos de IA y ciencia de datos</p>
+            <h1 className="text-3xl font-display text-foreground">
+              {isConsultor ? "Todos los Proyectos" : "Mis Proyectos"}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {isConsultor
+                ? "Revisa y comenta los proyectos formulados"
+                : "Gestiona y formula tus proyectos de IA y ciencia de datos"}
+            </p>
           </div>
-          <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo proyecto
-          </Button>
+          {!isConsultor && (
+            <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
+              <Plus className="mr-2 h-4 w-4" />
+              Nuevo proyecto
+            </Button>
+          )}
         </div>
 
         {/* Search and filters */}
@@ -168,11 +234,15 @@ export default function Dashboard() {
             </div>
             <h3 className="font-display text-xl text-foreground mb-2">No hay proyectos</h3>
             <p className="text-muted-foreground mb-4 max-w-sm">
-              Crea tu primer proyecto para comenzar a formular con la metodología GobLab UAI.
+              {isConsultor
+                ? "Aún no hay proyectos formulados para revisar."
+                : "Crea tu primer proyecto para comenzar a formular con la metodología GobLab UAI."}
             </p>
-            <Button onClick={() => createProject.mutate()}>
-              <Plus className="mr-2 h-4 w-4" /> Crear proyecto
-            </Button>
+            {!isConsultor && (
+              <Button onClick={() => createProject.mutate()}>
+                <Plus className="mr-2 h-4 w-4" /> Crear proyecto
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -185,6 +255,7 @@ export default function Dashboard() {
                 status={p.status}
                 completionPct={p.completion_pct}
                 updatedAt={p.updated_at}
+                commentCount={p.commentCount}
                 role={p.role}
               />
             ))}
