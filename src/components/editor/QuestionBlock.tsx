@@ -13,32 +13,44 @@ interface QuestionBlockProps {
   showCommentButton: boolean;
   pendingComments?: number;
   onComment?: () => void;
+  isCommentActive?: boolean;
 }
 
 export function QuestionBlock({
-  field, value, onChange, readOnly, showCommentButton, pendingComments = 0, onComment,
+  field, value, onChange, readOnly, showCommentButton, pendingComments = 0, onComment, isCommentActive = false,
 }: QuestionBlockProps) {
   return (
-    <div className="group space-y-2 animate-fade-in">
-      <div className="flex items-start justify-between gap-2">
-        <Label className="text-sm font-semibold text-foreground leading-relaxed">
+    <div
+      className={`group relative rounded-lg transition-all duration-200 px-1 py-3 ${
+        isCommentActive ? "bg-accent/20 ring-1 ring-primary/20" : "hover:bg-muted/20"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <Label className="text-sm font-medium text-foreground leading-relaxed">
           {field.label}
           {field.required && <span className="text-destructive ml-1">*</span>}
         </Label>
         {showCommentButton && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={onComment}
-            className={pendingComments > 0 ? "text-amber hover:text-amber" : "text-muted-foreground"}
+            className={`shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded ${
+              pendingComments > 0 ? "opacity-100" : ""
+            }`}
+            title="Agregar comentario"
           >
-            <MessageSquare className="h-4 w-4 mr-1" />
-            {pendingComments > 0 ? pendingComments : "Comentar"}
-          </Button>
+            <MessageSquare
+              className={`h-4 w-4 ${pendingComments > 0 ? "text-amber fill-amber/20" : "text-muted-foreground"}`}
+            />
+            {pendingComments > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber text-[9px] font-bold text-primary-foreground px-0.5">
+                {pendingComments}
+              </span>
+            )}
+          </button>
         )}
       </div>
       {field.hint && (
-        <p className="text-xs text-muted-foreground bg-accent/50 rounded-md px-3 py-2">
+        <p className="text-xs text-muted-foreground mb-2 pl-0.5">
           💡 {field.hint}
         </p>
       )}
@@ -48,7 +60,9 @@ export function QuestionBlock({
           onChange={(e) => onChange(e.target.value)}
           readOnly={readOnly}
           placeholder={readOnly ? "Sin respuesta" : "Escribe tu respuesta aquí..."}
-          className={`min-h-[120px] resize-y ${readOnly ? "bg-muted/50 cursor-not-allowed" : ""}`}
+          className={`min-h-[100px] resize-y border-0 border-b border-border rounded-none bg-transparent focus-visible:ring-0 focus-visible:border-primary px-0.5 text-sm ${
+            readOnly ? "text-muted-foreground cursor-not-allowed" : ""
+          }`}
         />
       ) : field.type === "date" ? (
         <Input
@@ -56,7 +70,9 @@ export function QuestionBlock({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           readOnly={readOnly}
-          className={readOnly ? "bg-muted/50 cursor-not-allowed" : ""}
+          className={`border-0 border-b border-border rounded-none bg-transparent focus-visible:ring-0 focus-visible:border-primary px-0.5 ${
+            readOnly ? "text-muted-foreground cursor-not-allowed" : ""
+          }`}
         />
       ) : (
         <Input
@@ -64,7 +80,9 @@ export function QuestionBlock({
           onChange={(e) => onChange(e.target.value)}
           readOnly={readOnly}
           placeholder={readOnly ? "Sin respuesta" : "Escribe aquí..."}
-          className={readOnly ? "bg-muted/50 cursor-not-allowed" : ""}
+          className={`border-0 border-b border-border rounded-none bg-transparent focus-visible:ring-0 focus-visible:border-primary px-0.5 ${
+            readOnly ? "text-muted-foreground cursor-not-allowed" : ""
+          }`}
         />
       )}
     </div>
