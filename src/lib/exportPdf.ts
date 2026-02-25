@@ -169,6 +169,77 @@ export function generateProjectPDF(
     y += 4;
   }
 
+  // ── Attribution box ──
+  y = checkPageBreak(doc, y, 80);
+  if (y + 80 > doc.internal.pageSize.getHeight() - MARGIN) {
+    doc.addPage();
+    y = MARGIN + 5;
+  }
+
+  const boxX = MARGIN;
+  const boxW = CONTENT_WIDTH;
+  const boxPadding = 5;
+  const lineHeight = 3.8;
+  const fontSize = 7;
+
+  const attributionParagraphs = [
+    "Esta ficha está bajo Licencia Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), los términos y condiciones están disponibles en https://creativecommons.org/licenses/by-sa/3.0/. Debes citar esta licencia al utilizarla.",
+    "Esta ficha fue desarrollada originalmente por el Center for Data Science and Public Policy de la Universidad de Chicago. Para más información sobre nuestros programas y trabajo, por favor visita http://datasciencepublicpolicy.org o escríbenos a info@datascienceforsocialgood.org",
+    "Esta versión de la ficha ha sido actualizada a través de una colaboración entre el GobLab UAI, Carnegie Mellon University y el Instituto Tecnológico de Monterrey. Posteriormente se actualizó a partir de un trabajo con el Laboratorio de Gobierno de Chile y a través de una colaboración con CoDaTecs de la Universidad Nacional del Rosario.",
+    "El GobLab UAI es el laboratorio de innovación de la Escuela de Gobierno de la Universidad Adolfo Ibáñez. Su misión es contribuir a la innovación en políticas públicas para beneficiar a la sociedad. Trabaja con organismos públicos, organizaciones de la sociedad civil e investigadores para lograr políticas públicas más eficaces, eficientes y equitativas mediante la ciencia de datos. Para obtener más información, visita https://goblab.uai.cl o envía un correo electrónico a goblab@uai.cl.",
+  ];
+
+  // Calculate total height
+  doc.setFontSize(fontSize);
+  let totalTextHeight = 0;
+  const wrappedParagraphs: string[][] = [];
+  for (const para of attributionParagraphs) {
+    const lines = doc.splitTextToSize(para, boxW - boxPadding * 2);
+    wrappedParagraphs.push(lines);
+    totalTextHeight += lines.length * lineHeight + 3;
+  }
+  totalTextHeight += 6; // for the CC BY-SA label at the bottom
+
+  const boxH = totalTextHeight + boxPadding * 2 + 2;
+
+  // Check if we need a new page for the box
+  y = checkPageBreak(doc, y, boxH + 5);
+
+  // Draw box border
+  doc.setDrawColor(...COLORS.lightBorder);
+  doc.setLineWidth(0.3);
+  doc.setFillColor(245, 247, 250);
+  doc.roundedRect(boxX, y, boxW, boxH, 1.5, 1.5, "FD");
+
+  let textY = y + boxPadding + 3;
+  doc.setTextColor(100, 100, 100);
+
+  for (let pi = 0; pi < wrappedParagraphs.length; pi++) {
+    const lines = wrappedParagraphs[pi];
+    if (pi === 0) {
+      // First paragraph: bold the first part
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(fontSize);
+    } else {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(fontSize);
+    }
+    for (const line of lines) {
+      doc.text(line, boxX + boxPadding, textY);
+      textY += lineHeight;
+    }
+    if (pi === 0) {
+      doc.setFont("helvetica", "normal");
+    }
+    textY += 2;
+  }
+
+  // CC BY-SA centered label
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
+  doc.text("Attribution ShareAlike (CC BY-SA)", PAGE_WIDTH / 2, textY, { align: "center" });
+
   addFooter(doc);
 
   const safeName = (title || "proyecto").replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g, "").trim().replace(/\s+/g, "_");

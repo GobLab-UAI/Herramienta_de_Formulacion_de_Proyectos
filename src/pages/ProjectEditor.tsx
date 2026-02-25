@@ -475,9 +475,28 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
               ))}
             </div>
 
-            {/* Footer */}
-            <footer className="mt-8 pb-8 text-[11px] text-muted-foreground text-center leading-relaxed max-w-[860px]">
-              Esta ficha fue desarrollada originalmente por el Center for Data Science and Public Policy de la Universidad de Chicago y el GobLab UAI, en colaboración con CMU, ITAM y CoDaTecs/Universidad Nacional del Rosario. Licencia CC BY-SA 3.0 · goblab.uai.cl
+            {/* Attribution Box */}
+            <footer className="mt-10 mb-8 max-w-[860px] border border-border/60 rounded-lg bg-muted/40 px-6 py-5 text-[11px] text-muted-foreground/80 leading-relaxed space-y-3">
+              <p>
+                <strong>Esta ficha está bajo Licencia Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)</strong>, los términos y condiciones están disponibles{" "}
+                <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener noreferrer" className="underline text-primary/70 hover:text-primary">aquí</a>. Debes citar esta licencia al utilizarla.
+              </p>
+              <p>
+                Esta ficha fue desarrollada originalmente por el <em>Center for Data Science and Public Policy</em> de la Universidad de Chicago. Para más información sobre nuestros programas y trabajo, por favor visita{" "}
+                <a href="http://datasciencepublicpolicy.org" target="_blank" rel="noopener noreferrer" className="underline text-primary/70 hover:text-primary">datasciencepublicpolicy.org</a>{" "}
+                o escríbenos a{" "}
+                <a href="mailto:info@datascienceforsocialgood.org" className="underline text-primary/70 hover:text-primary">info@datascienceforsocialgood.org</a>
+              </p>
+              <p>
+                Esta versión de la ficha ha sido actualizada a través de una colaboración entre el GobLab UAI, Carnegie Mellon University y el Instituto Tecnológico de Monterrey. Posteriormente se actualizó a partir de un trabajo con el Laboratorio de Gobierno de Chile y a través de una colaboración con CoDaTecs de la Universidad Nacional del Rosario.
+              </p>
+              <p>
+                El GobLab UAI es el laboratorio de innovación de la Escuela de Gobierno de la Universidad Adolfo Ibáñez. Su misión es contribuir a la innovación en políticas públicas para beneficiar a la sociedad. Trabaja con organismos públicos, organizaciones de la sociedad civil e investigadores para lograr políticas públicas más eficaces, eficientes y equitativas mediante la ciencia de datos. Para obtener más información, visita{" "}
+                <a href="https://goblab.uai.cl" target="_blank" rel="noopener noreferrer" className="underline text-primary/70 hover:text-primary">https://goblab.uai.cl</a>{" "}
+                o envía un correo electrónico a{" "}
+                <a href="mailto:goblab@uai.cl" className="underline text-primary/70 hover:text-primary">goblab@uai.cl</a>.
+              </p>
+              <p className="text-center font-semibold pt-1">Attribution ShareAlike (CC BY-SA)</p>
             </footer>
           </div>
         </main>
