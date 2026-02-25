@@ -15,10 +15,15 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
   const getInitialData = () => {
     if (data) return data;
     if (config.type === "dynamic-rows") {
-      const rows = config.prefillRows || Array.from({ length: config.initialRows || 3 }, () =>
-        Array.from({ length: (config.headers?.length || 3) }, () => "")
+      const headers = config.headers || [];
+      const rows = config.prefillRows || Array.from({ length: config.initialRows || 3 }, (_, ri) =>
+        headers.map((h, ci) => h === "#" ? String(ri + 1) : "")
       );
-      return { headers: config.headers || [], rows };
+      // Ensure "#" columns are filled for prefillRows too
+      const numberedRows = rows.map((row, ri) =>
+        row.map((cell, ci) => headers[ci] === "#" ? String(ri + 1) : cell)
+      );
+      return { headers, rows: numberedRows };
     }
     if (config.type === "dynamic-cols") {
       const colCount = config.initialCols || 2;
@@ -79,7 +84,9 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                   {!readOnly && (
                     <td className="px-1">
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
-                        const newRows = td.rows.filter((_, i) => i !== ri);
+                        const newRows = td.rows.filter((_, i) => i !== ri).map((row, i) =>
+                          row.map((cell, ci) => td.headers[ci] === "#" ? String(i + 1) : cell)
+                        );
                         updateAndNotify({ ...td, rows: newRows });
                       }}>
                         <Trash2 className="h-3 w-3 text-muted-foreground" />
