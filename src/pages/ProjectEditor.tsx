@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useRole } from "@/contexts/RoleContext";
 import { useToast } from "@/hooks/use-toast";
 import { GobLabLogo } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,17 @@ import { Link } from "react-router-dom";
 
 type SaveStatus = "saved" | "saving" | "error" | "unsaved";
 
+const ANON_USER_ID = "00000000-0000-0000-0000-000000000000";
+
 export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boolean }) {
   const { id: projectId } = useParams<{ id: string }>();
-  const { user, profile } = useAuth();
+  const { isConsultor: roleIsConsultor } = useRole();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const isConsultor = reviewMode || roleIsConsultor;
+  const isReadOnly = isConsultor;
 
   const [activeSection, setActiveSection] = useState(FORM_SECTIONS[0].id);
   const [title, setTitle] = useState("");
@@ -58,40 +63,6 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     enabled: !!projectId,
   });
 
-  // Fetch member role
-  const { data: membership } = useQuery({
-    queryKey: ["membership", projectId, user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("project_members")
-        .select("role, is_owner")
-        .eq("project_id", projectId!)
-        .eq("user_id", user!.id)
-        .single();
-      return data;
-    },
-    enabled: !!projectId && !!user,
-  });
-
-  // Check if user is a global consultor (has CONSULTOR role on any project)
-  const { data: isGlobalConsultor } = useQuery({
-    queryKey: ["isConsultor", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("project_members")
-        .select("role")
-        .eq("user_id", user!.id)
-        .eq("role", "CONSULTOR")
-        .limit(1);
-      return data && data.length > 0;
-    },
-    enabled: !!user,
-  });
-
-  // Determine role: from membership on this project, or global consultor, or reviewMode
-  const isConsultor = reviewMode || membership?.role === "CONSULTOR" || (isGlobalConsultor && !membership);
-  const isReadOnly = isConsultor;
-
   // Fetch responses
   const { data: formResponses } = useQuery({
     queryKey: ["responses", projectId],
@@ -116,17 +87,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         .is("deleted_at", null)
         .order("created_at", { ascending: true });
 
-      if (!data?.length) return [];
-      const authorIds = [...new Set(data.map((c) => c.author_id))];
-      const resolverIds = [...new Set(data.filter((c) => c.resolved_by).map((c) => c.resolved_by!))];
-      const allIds = [...new Set([...authorIds, ...resolverIds])];
-      const { data: profiles } = await supabase.from("profiles").select("id, full_name").in("id", allIds);
-      const nameMap = Object.fromEntries((profiles || []).map((p) => [p.id, p.full_name || "Usuario"]));
-
-      return data.map((c) => ({
+      return (data || []).map((c) => ({
         ...c,
-        author_name: nameMap[c.author_id] || "Usuario",
-        resolved_by_name: c.resolved_by ? nameMap[c.resolved_by] : undefined,
+        author_name: "Usuario",
+        resolved_by_name: c.resolved_by ? "Usuario" : undefined,
       }));
     },
     enabled: !!projectId,
@@ -155,7 +119,6 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     }
   });
 
-  // Group comments by field
   const commentsByField: Record<string, any[]> = {};
   comments.forEach((c: any) => {
     if (!commentsByField[c.field_key]) commentsByField[c.field_key] = [];
@@ -178,7 +141,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           field_key: key,
           field_value: isTable ? null : (value as string) || null,
           table_data: isTable ? value : null,
-          updated_by: user!.id,
+          updated_by: ANON_USER_ID,
         };
       });
       for (const upsert of upserts) {
@@ -229,12 +192,12 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   // Comments
   const addComment = async (fieldKey: string, text: string) => {
-    await supabase.from("comments").insert({ project_id: projectId!, field_key: fieldKey, author_id: user!.id, text });
+    await supabase.from("comments").insert({ project_id: projectId!, field_key: fieldKey, author_id: ANON_USER_ID, text });
     queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
   };
 
   const resolveComment = async (commentId: string) => {
-    await supabase.from("comments").update({ status: "RESOLVED" as any, resolved_by: user!.id, resolved_at: new Date().toISOString() }).eq("id", commentId);
+    await supabase.from("comments").update({ status: "RESOLVED" as any, resolved_by: ANON_USER_ID, resolved_at: new Date().toISOString() }).eq("id", commentId);
     queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
   };
 
@@ -264,7 +227,6 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     unsaved: { text: "Sin guardar", className: "text-muted-foreground" },
   };
 
-  // Render a comment bubble for a field (positioned to the right)
   const renderFieldComments = (fieldKey: string) => {
     const fieldComments = commentsByField[fieldKey] || [];
     const hasComments = fieldComments.length > 0;
@@ -276,7 +238,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       <div className="absolute top-0 left-[calc(100%+1.5rem)] w-[260px] z-10">
         <CommentBubble
           comments={fieldComments}
-          currentUserId={user!.id}
+          currentUserId={ANON_USER_ID}
           onAdd={(text) => addComment(fieldKey, text)}
           onResolve={resolveComment}
           onDelete={deleteComment}

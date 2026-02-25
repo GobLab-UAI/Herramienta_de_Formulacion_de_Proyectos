@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useRole } from "@/contexts/RoleContext";
 import { Topbar } from "@/components/Topbar";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
@@ -18,112 +18,50 @@ const STATUS_FILTERS = [
   { value: "APPROVED", label: "Aprobado" },
 ];
 
+const ANON_USER_ID = "00000000-0000-0000-0000-000000000000";
+
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { isConsultor } = useRole();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Check if user is a global consultor
-  const { data: isConsultor } = useQuery({
-    queryKey: ["isConsultor", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("project_members")
-        .select("role")
-        .eq("user_id", user!.id)
-        .eq("role", "CONSULTOR")
-        .limit(1);
-      return data && data.length > 0;
-    },
-    enabled: !!user,
-  });
-
   const { data: projects = [], isLoading } = useQuery({
-    queryKey: ["projects", isConsultor],
+    queryKey: ["projects"],
     queryFn: async () => {
-      if (isConsultor) {
-        // Consultors see ALL projects
-        const { data: allProjects } = await supabase
-          .from("projects")
-          .select("*, organizations(name)")
-          .is("deleted_at", null)
-          .order("updated_at", { ascending: false });
+      const { data: allProjects } = await supabase
+        .from("projects")
+        .select("*, organizations(name)")
+        .is("deleted_at", null)
+        .order("updated_at", { ascending: false });
 
-        // Fetch comment counts per project to show who commented
-        const projectIds = (allProjects || []).map((p) => p.id);
-        const { data: commentsData } = await supabase
-          .from("comments")
-          .select("project_id, author_id, status")
-          .in("project_id", projectIds)
-          .is("deleted_at", null)
-          .eq("status", "PENDING");
+      const projectIds = (allProjects || []).map((p) => p.id);
+      if (projectIds.length === 0) return [];
 
-        const commentCountMap: Record<string, number> = {};
-        (commentsData || []).forEach((c) => {
-          commentCountMap[c.project_id] = (commentCountMap[c.project_id] || 0) + 1;
-        });
+      const { data: commentsData } = await supabase
+        .from("comments")
+        .select("project_id, status")
+        .in("project_id", projectIds)
+        .is("deleted_at", null)
+        .eq("status", "PENDING");
 
-        return (allProjects || []).map((p) => ({
-          ...p,
-          role: "CONSULTOR" as const,
-          organizationName: (p as any).organizations?.name,
-          commentCount: commentCountMap[p.id] || 0,
-        }));
-      } else {
-        // Formuladores see only their projects
-        const { data: memberships } = await supabase
-          .from("project_members")
-          .select("project_id, role")
-          .eq("user_id", user!.id);
+      const commentCountMap: Record<string, number> = {};
+      (commentsData || []).forEach((c) => {
+        commentCountMap[c.project_id] = (commentCountMap[c.project_id] || 0) + 1;
+      });
 
-        if (!memberships?.length) return [];
-
-        const projectIds = memberships.map((m) => m.project_id);
-        const roleMap = Object.fromEntries(memberships.map((m) => [m.project_id, m.role]));
-
-        const { data: projects } = await supabase
-          .from("projects")
-          .select("*, organizations(name)")
-          .in("id", projectIds)
-          .is("deleted_at", null)
-          .order("updated_at", { ascending: false });
-
-        // Fetch comment counts
-        const { data: commentsData } = await supabase
-          .from("comments")
-          .select("project_id, status")
-          .in("project_id", projectIds)
-          .is("deleted_at", null)
-          .eq("status", "PENDING");
-
-        const commentCountMap: Record<string, number> = {};
-        (commentsData || []).forEach((c) => {
-          commentCountMap[c.project_id] = (commentCountMap[c.project_id] || 0) + 1;
-        });
-
-        return (projects || []).map((p) => ({
-          ...p,
-          role: roleMap[p.id],
-          organizationName: (p as any).organizations?.name,
-          commentCount: commentCountMap[p.id] || 0,
-        }));
-      }
+      return (allProjects || []).map((p) => ({
+        ...p,
+        organizationName: (p as any).organizations?.name,
+        commentCount: commentCountMap[p.id] || 0,
+      }));
     },
-    enabled: !!user && isConsultor !== undefined,
   });
 
   const createProject = useMutation({
     mutationFn: async () => {
-      const { data: authData, error: authError } = await supabase.auth.getUser();
-      if (authError || !authData.user) {
-        throw new Error("Sesión no válida. Vuelve a iniciar sesión.");
-      }
-
-      const currentUserId = authData.user.id;
-
       const { data: org, error: orgError } = await supabase
         .from("organizations")
         .insert({ name: "Mi organización" })
@@ -137,23 +75,12 @@ export default function Dashboard() {
         .insert({
           title: "Nuevo Proyecto",
           organization_id: org.id,
-          created_by: currentUserId,
+          created_by: ANON_USER_ID,
         })
         .select()
         .single();
 
       if (error || !project) throw error ?? new Error("No se pudo crear el proyecto");
-
-      const { error: memberError } = await supabase.from("project_members").insert({
-        project_id: project.id,
-        user_id: currentUserId,
-        role: "FORMULADOR",
-        is_owner: true,
-        joined_at: new Date().toISOString(),
-      });
-
-      if (memberError) throw memberError;
-
       return project;
     },
     onSuccess: (project) => {
@@ -256,7 +183,7 @@ export default function Dashboard() {
                 completionPct={p.completion_pct}
                 updatedAt={p.updated_at}
                 commentCount={p.commentCount}
-                role={p.role}
+                role={isConsultor ? "CONSULTOR" : "FORMULADOR"}
               />
             ))}
           </div>
