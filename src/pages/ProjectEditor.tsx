@@ -11,8 +11,9 @@ import { EditorSidebar } from "@/components/editor/EditorSidebar";
 import { QuestionBlock } from "@/components/editor/QuestionBlock";
 import { DynamicTable } from "@/components/editor/DynamicTable";
 import { CommentBubble } from "@/components/editor/CommentBubble";
+import { CommentHistorySidebar } from "@/components/editor/CommentHistorySidebar";
 import { FORM_SECTIONS, REQUIRED_FIELDS, type FormField, type TableConfig } from "@/lib/formSections";
-import { Save, ArrowLeft, MessageSquare } from "lucide-react";
+import { Save, ArrowLeft, MessageSquare, PanelRightOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type SaveStatus = "saved" | "saving" | "error" | "unsaved";
@@ -34,6 +35,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const [responses, setResponses] = useState<Record<string, any>>({});
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
   const [activeCommentField, setActiveCommentField] = useState<string | null>(null);
+  const [showHistorySidebar, setShowHistorySidebar] = useState(false);
   const pendingChanges = useRef<Set<string>>(new Set());
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -76,7 +78,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     enabled: !!projectId,
   });
 
-  // Fetch comments
+  // Fetch active comments (not deleted)
   const { data: comments = [] } = useQuery({
     queryKey: ["comments", projectId],
     queryFn: async () => {
@@ -85,6 +87,25 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         .select("id, field_key, author_id, text, status, resolved_by, resolved_at, created_at, parent_id, deleted_at")
         .eq("project_id", projectId!)
         .is("deleted_at", null)
+        .order("created_at", { ascending: true });
+
+      return (data || []).map((c) => ({
+        ...c,
+        author_name: isConsultor ? "Consultor" : "Formulador",
+        resolved_by_name: c.resolved_by ? "Usuario" : undefined,
+      }));
+    },
+    enabled: !!projectId,
+  });
+
+  // Fetch ALL comments for history (including deleted and resolved)
+  const { data: allComments = [] } = useQuery({
+    queryKey: ["allComments", projectId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("comments")
+        .select("id, field_key, author_id, text, status, resolved_by, resolved_at, created_at, parent_id, deleted_at")
+        .eq("project_id", projectId!)
         .order("created_at", { ascending: true });
 
       return (data || []).map((c) => ({
@@ -114,7 +135,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   // Comment counts
   const commentCounts: Record<string, number> = {};
   comments.forEach((c: any) => {
-    if (c.status === "PENDING") {
+    if (c.status === "PENDING" && !c.parent_id) {
       commentCounts[c.field_key] = (commentCounts[c.field_key] || 0) + 1;
     }
   });
@@ -194,16 +215,31 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const addComment = async (fieldKey: string, text: string) => {
     await supabase.from("comments").insert({ project_id: projectId!, field_key: fieldKey, author_id: ANON_USER_ID, text });
     queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["allComments", projectId] });
+  };
+
+  const replyToComment = async (parentId: string, fieldKey: string, text: string) => {
+    await supabase.from("comments").insert({
+      project_id: projectId!,
+      field_key: fieldKey,
+      author_id: ANON_USER_ID,
+      text,
+      parent_id: parentId,
+    });
+    queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["allComments", projectId] });
   };
 
   const resolveComment = async (commentId: string) => {
     await supabase.from("comments").update({ status: "RESOLVED" as any, resolved_by: ANON_USER_ID, resolved_at: new Date().toISOString() }).eq("id", commentId);
     queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["allComments", projectId] });
   };
 
   const deleteComment = async (commentId: string) => {
     await supabase.from("comments").update({ deleted_at: new Date().toISOString() }).eq("id", commentId);
     queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["allComments", projectId] });
   };
 
   const updateTitle = async (newTitle: string) => {
@@ -240,9 +276,11 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           comments={fieldComments}
           currentUserId={ANON_USER_ID}
           onAdd={(text) => addComment(fieldKey, text)}
+          onReply={(parentId, text) => replyToComment(parentId, fieldKey, text)}
           onResolve={resolveComment}
           onDelete={deleteComment}
           canCreate={isConsultor}
+          canReply={!isConsultor}
           isActive={isActive}
           onActivate={() => handleFieldComment(fieldKey)}
         />
@@ -293,6 +331,16 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
             <Save className="h-3.5 w-3.5 mr-1" /> Guardar
           </Button>
         )}
+
+        <Button
+          variant={showHistorySidebar ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowHistorySidebar(!showHistorySidebar)}
+          className="text-xs"
+        >
+          <PanelRightOpen className="h-3.5 w-3.5 mr-1" />
+          Historial
+        </Button>
 
         <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
           <Link to="/dashboard">
@@ -406,11 +454,29 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
             </div>
 
             {/* Footer */}
-            <footer className="mt-8 pb-8 text-[11px] text-muted-foreground text-center leading-relaxed max-w-[680px]">
+            <footer className="mt-8 pb-8 text-[11px] text-muted-foreground text-center leading-relaxed max-w-[860px]">
               Esta ficha fue desarrollada originalmente por el Center for Data Science and Public Policy de la Universidad de Chicago y el GobLab UAI, en colaboración con CMU, ITAM y CoDaTecs/Universidad Nacional del Rosario. Licencia CC BY-SA 3.0 · goblab.uai.cl
             </footer>
           </div>
         </main>
+
+        {/* History Sidebar */}
+        {showHistorySidebar && (
+          <CommentHistorySidebar
+            comments={comments}
+            allComments={allComments}
+            fieldLabels={fieldLabels}
+            onReply={(parentId, fieldKey, text) => replyToComment(parentId, fieldKey, text)}
+            onResolve={resolveComment}
+            onDelete={deleteComment}
+            onClose={() => setShowHistorySidebar(false)}
+            onFieldClick={(fieldKey) => {
+              const el = document.getElementById(`field-${fieldKey}`);
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+            canReply={!isConsultor}
+          />
+        )}
       </div>
     </div>
   );
