@@ -191,7 +191,7 @@ export default function Dashboard() {
 
         {/* Footer */}
         <footer className="mt-16 border-t pt-6 pb-8 text-xs text-muted-foreground text-center">
-          Esta ficha fue desarrollada originalmente por el Center for Data Science and Public Policy de la Universidad de Chicago y el GobLab UAI, en colaboración con CMU, ITAM y CoDaTecs/Universidad Nacional del Rosario. Licencia CC BY-SA 3.0 · goblab.uai.cl
+          Fue creada en 2019 en el marco de un proyecto de innovación del GobLab titulado "Ciencia de Datos para Directivos Públicos" con financiamiento del Laboratorio de Gobierno y Servicio Civil, en colaboración con el Center for Data Science and Public Policy de la Universidad de Chicago. Licencia CC BY-SA 3.0 · goblab.uai.cl
         </footer>
       </main>
     </div>
