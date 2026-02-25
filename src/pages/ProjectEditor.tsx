@@ -13,7 +13,8 @@ import { DynamicTable } from "@/components/editor/DynamicTable";
 import { CommentBubble } from "@/components/editor/CommentBubble";
 import { CommentHistorySidebar } from "@/components/editor/CommentHistorySidebar";
 import { FORM_SECTIONS, REQUIRED_FIELDS, type FormField, type TableConfig } from "@/lib/formSections";
-import { Save, ArrowLeft, MessageSquare, PanelRightOpen } from "lucide-react";
+import { Save, ArrowLeft, MessageSquare, PanelRightOpen, FileDown } from "lucide-react";
+import { generateProjectPDF } from "@/lib/exportPdf";
 import { Link } from "react-router-dom";
 
 type SaveStatus = "saved" | "saving" | "error" | "unsaved";
@@ -342,6 +343,16 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
             <Save className="h-3.5 w-3.5 mr-1" /> Guardar
           </Button>
         )}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => generateProjectPDF(title, responses)}
+          className="text-xs"
+        >
+          <FileDown className="h-3.5 w-3.5 mr-1" />
+          Exportar PDF
+        </Button>
 
         <Button
           variant={showHistorySidebar ? "default" : "outline"}
