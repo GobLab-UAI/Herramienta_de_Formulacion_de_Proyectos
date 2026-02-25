@@ -54,7 +54,21 @@ export function QuestionBlock({
       </div>
       {field.hint && (
         <p className="text-xs text-muted-foreground mb-2 pl-0.5">
-          💡 {field.hint}
+          {field.hint.split(/(https?:\/\/[^\s,)]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}[^\s,)]*)/).map((part, i) =>
+            /^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/.test(part) ? (
+              <a
+                key={i}
+                href={part.startsWith("http") ? part : `https://${part}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline hover:text-primary/80"
+              >
+                {part}
+              </a>
+            ) : (
+              <span key={i}>{part}</span>
+            )
+          )}
         </p>
       )}
       {field.type === "textarea" ? (
