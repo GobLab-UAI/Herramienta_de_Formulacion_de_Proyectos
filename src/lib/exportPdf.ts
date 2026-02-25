@@ -145,7 +145,10 @@ export function generateProjectPDF(
           group.prefixes.some((p) => f.key.startsWith(p))
         );
         for (const field of groupFields) {
-          y = renderTextField(doc, field as FormField, responses[field.key], y);
+          const rawLabel = (field as FormField).label;
+          const dashIdx = rawLabel.indexOf("—");
+          const cleanLabel = dashIdx !== -1 ? rawLabel.substring(dashIdx + 1).trim() : rawLabel;
+          y = renderTextField(doc, field as FormField, responses[field.key], y, cleanLabel);
         }
       }
     } else {
@@ -176,7 +179,8 @@ function renderTextField(
   doc: jsPDF,
   field: FormField,
   value: string | undefined,
-  y: number
+  y: number,
+  labelOverride?: string
 ): number {
   y = checkPageBreak(doc, y, 18);
 
@@ -184,7 +188,8 @@ function renderTextField(
   doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
-  const labelLines = doc.splitTextToSize(field.label, CONTENT_WIDTH - 4);
+  const labelText = labelOverride || field.label;
+  const labelLines = doc.splitTextToSize(labelText, CONTENT_WIDTH - 4);
   doc.text(labelLines, MARGIN + 1, y);
   y += labelLines.length * 4.5 + 2;
 
