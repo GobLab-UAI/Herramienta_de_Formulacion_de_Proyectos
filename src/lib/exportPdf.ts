@@ -119,16 +119,47 @@ export function generateProjectPDF(
     doc.text(`${section.number}. ${section.title}`, MARGIN + 5, y + 2);
     y += 12;
 
-    for (const field of section.fields) {
-      const isTable =
-        "headers" in field ||
-        "rowLabels" in field ||
-        ("type" in field && ["dynamic-rows", "dynamic-cols", "activities"].includes((field as any).type));
+    if (section.id === "seccion-10") {
+      // Group ethics fields by subsection
+      const ethicsGroups: { title: string; prefixes: string[] }[] = [
+        { title: "Proporcionalidad", prefixes: ["eth-prop", "eth-imp"] },
+        { title: "Licencia Social", prefixes: ["eth-lic"] },
+        { title: "Protección de Datos", prefixes: ["eth-dat"] },
+        { title: "Transparencia", prefixes: ["eth-tra"] },
+        { title: "Discriminación / Equidad", prefixes: ["eth-eq"] },
+        { title: "Responsabilidad", prefixes: ["eth-res"] },
+      ];
 
-      if (isTable) {
-        y = renderTable(doc, field as TableConfig, responses[field.key], y);
-      } else {
-        y = renderTextField(doc, field as FormField, responses[field.key], y);
+      for (const group of ethicsGroups) {
+        // Subsection header
+        y = checkPageBreak(doc, y, 16);
+        doc.setFillColor(235, 240, 245);
+        doc.roundedRect(MARGIN, y - 4, CONTENT_WIDTH, 9, 1, 1, "F");
+        doc.setFontSize(9.5);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...COLORS.primary);
+        doc.text(group.title, MARGIN + 4, y + 1.5);
+        y += 10;
+
+        const groupFields = section.fields.filter((f) =>
+          group.prefixes.some((p) => f.key.startsWith(p))
+        );
+        for (const field of groupFields) {
+          y = renderTextField(doc, field as FormField, responses[field.key], y);
+        }
+      }
+    } else {
+      for (const field of section.fields) {
+        const isTable =
+          "headers" in field ||
+          "rowLabels" in field ||
+          ("type" in field && ["dynamic-rows", "dynamic-cols", "activities"].includes((field as any).type));
+
+        if (isTable) {
+          y = renderTable(doc, field as TableConfig, responses[field.key], y);
+        } else {
+          y = renderTextField(doc, field as FormField, responses[field.key], y);
+        }
       }
     }
 
