@@ -2,19 +2,23 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { FORM_SECTIONS, type FormField, type TableConfig } from "./formSections";
 
-const MARGIN = 20;
+const MARGIN = 18;
 const PAGE_WIDTH = 210;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 
 const COLORS = {
-  primary: [0, 82, 136] as [number, number, number],       // UAI blue
-  sectionBg: [230, 240, 250] as [number, number, number],
+  primary: [0, 82, 136] as [number, number, number],
+  sectionBg: [0, 82, 136] as [number, number, number],
+  sectionText: [255, 255, 255] as [number, number, number],
   text: [30, 30, 30] as [number, number, number],
-  hint: [100, 100, 100] as [number, number, number],
-  lightBorder: [200, 210, 220] as [number, number, number],
+  muted: [120, 120, 120] as [number, number, number],
+  lightBorder: [210, 218, 226] as [number, number, number],
   headerBg: [0, 82, 136] as [number, number, number],
   headerText: [255, 255, 255] as [number, number, number],
-  altRow: [245, 248, 252] as [number, number, number],
+  altRow: [243, 247, 251] as [number, number, number],
+  rowLabelBg: [235, 240, 245] as [number, number, number],
+  momentBg: [0, 60, 100] as [number, number, number],
+  momentText: [255, 255, 255] as [number, number, number],
 };
 
 function checkPageBreak(doc: jsPDF, y: number, needed: number): number {
@@ -30,10 +34,10 @@ function addFooter(doc: jsPDF) {
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     const h = doc.internal.pageSize.getHeight();
-    doc.setFontSize(8);
-    doc.setTextColor(...COLORS.hint);
+    doc.setFontSize(7);
+    doc.setTextColor(...COLORS.muted);
     doc.text(
-      "Ficha de diseño y factibilidad de proyecto · GobLab UAI · CC BY-SA 3.0",
+      "Ficha de diseño y factibilidad de proyecto · GobLab UAI",
       PAGE_WIDTH / 2,
       h - 8,
       { align: "center" }
@@ -47,37 +51,36 @@ export function generateProjectPDF(
   responses: Record<string, any>
 ) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  let y = MARGIN;
 
   // ── Cover page ──
-  y = 40;
   doc.setFillColor(...COLORS.primary);
-  doc.rect(0, 0, PAGE_WIDTH, 12, "F");
-
-  doc.setFontSize(11);
+  doc.rect(0, 0, PAGE_WIDTH, 14, "F");
+  doc.setFontSize(10);
   doc.setTextColor(255, 255, 255);
-  doc.text("UNIVERSIDAD ADOLFO IBÁÑEZ · GOBLAB", PAGE_WIDTH / 2, 8, { align: "center" });
+  doc.text("UNIVERSIDAD ADOLFO IBÁÑEZ · GOBLAB", PAGE_WIDTH / 2, 9, { align: "center" });
 
+  let y = 50;
   doc.setTextColor(...COLORS.primary);
-  doc.setFontSize(22);
+  doc.setFontSize(24);
+  doc.setFont("helvetica", "bold");
   doc.text("Ficha de diseño y factibilidad", PAGE_WIDTH / 2, y, { align: "center" });
-  y += 9;
+  y += 10;
   doc.text("de proyecto", PAGE_WIDTH / 2, y, { align: "center" });
+  y += 18;
+
+  doc.setDrawColor(...COLORS.primary);
+  doc.setLineWidth(0.6);
+  doc.line(MARGIN + 40, y, PAGE_WIDTH - MARGIN - 40, y);
   y += 16;
 
-  // Separator line
-  doc.setDrawColor(...COLORS.primary);
-  doc.setLineWidth(0.8);
-  doc.line(MARGIN + 30, y, PAGE_WIDTH - MARGIN - 30, y);
-  y += 14;
-
   // Project title
-  doc.setFontSize(16);
-  doc.setTextColor(...COLORS.text);
   const titleText = title || responses["portada-nombre"] || "Sin título";
-  const titleLines = doc.splitTextToSize(titleText, CONTENT_WIDTH - 20);
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.text);
+  const titleLines = doc.splitTextToSize(titleText, CONTENT_WIDTH - 30);
   doc.text(titleLines, PAGE_WIDTH / 2, y, { align: "center" });
-  y += titleLines.length * 8 + 10;
+  y += titleLines.length * 9 + 14;
 
   // Cover fields
   const coverFields = [
@@ -91,50 +94,36 @@ export function generateProjectPDF(
     const val = responses[cf.key] || "—";
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...COLORS.primary);
-    doc.text(`${cf.label}:`, MARGIN + 10, y);
+    doc.text(`${cf.label}:`, MARGIN + 20, y);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...COLORS.text);
-    const valLines = doc.splitTextToSize(String(val), CONTENT_WIDTH - 50);
-    doc.text(valLines, MARGIN + 55, y);
-    y += valLines.length * 6 + 4;
+    const valLines = doc.splitTextToSize(String(val), CONTENT_WIDTH - 65);
+    doc.text(valLines, MARGIN + 60, y);
+    y += valLines.length * 6 + 5;
   }
 
   // ── Content pages ──
   doc.addPage();
   y = MARGIN + 5;
 
-  // Skip portada section (index 0)
   for (let sIdx = 1; sIdx < FORM_SECTIONS.length; sIdx++) {
     const section = FORM_SECTIONS[sIdx];
 
-    // Section header
-    y = checkPageBreak(doc, y, 20);
+    // Section header bar
+    y = checkPageBreak(doc, y, 22);
     doc.setFillColor(...COLORS.sectionBg);
-    doc.roundedRect(MARGIN, y - 4, CONTENT_WIDTH, 12, 2, 2, "F");
-    doc.setFontSize(13);
+    doc.roundedRect(MARGIN, y - 5, CONTENT_WIDTH, 11, 1.5, 1.5, "F");
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(...COLORS.primary);
-    doc.text(`${section.number}. ${section.title}`, MARGIN + 4, y + 4);
-    y += 14;
-
-    if (section.globalHint) {
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "italic");
-      doc.setTextColor(...COLORS.hint);
-      const hintLines = doc.splitTextToSize(`💡 ${section.globalHint}`, CONTENT_WIDTH - 8);
-      y = checkPageBreak(doc, y, hintLines.length * 4 + 4);
-      doc.text(hintLines, MARGIN + 4, y);
-      y += hintLines.length * 4 + 4;
-    }
+    doc.setTextColor(...COLORS.sectionText);
+    doc.text(`${section.number}. ${section.title}`, MARGIN + 5, y + 2);
+    y += 12;
 
     for (const field of section.fields) {
       const isTable =
         "headers" in field ||
         "rowLabels" in field ||
-        ("type" in field &&
-          ["dynamic-rows", "dynamic-cols", "activities"].includes(
-            (field as any).type
-          ));
+        ("type" in field && ["dynamic-rows", "dynamic-cols", "activities"].includes((field as any).type));
 
       if (isTable) {
         y = renderTable(doc, field as TableConfig, responses[field.key], y);
@@ -143,13 +132,11 @@ export function generateProjectPDF(
       }
     }
 
-    y += 6;
+    y += 4;
   }
 
-  // Footer on all pages
   addFooter(doc);
 
-  // Download
   const safeName = (title || "proyecto").replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g, "").trim().replace(/\s+/g, "_");
   doc.save(`Ficha_${safeName}.pdf`);
 }
@@ -160,36 +147,35 @@ function renderTextField(
   value: string | undefined,
   y: number
 ): number {
-  y = checkPageBreak(doc, y, 20);
+  y = checkPageBreak(doc, y, 18);
 
   // Label
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
-  const labelLines = doc.splitTextToSize(field.label, CONTENT_WIDTH - 6);
-  doc.text(labelLines, MARGIN + 2, y);
-  y += labelLines.length * 5 + 2;
+  const labelLines = doc.splitTextToSize(field.label, CONTENT_WIDTH - 4);
+  doc.text(labelLines, MARGIN + 1, y);
+  y += labelLines.length * 4.5 + 2;
 
   // Value
   const val = value || "—";
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(val === "—" ? 160 : 30, val === "—" ? 160 : 30, val === "—" ? 160 : 30);
-  const valLines = doc.splitTextToSize(String(val), CONTENT_WIDTH - 6);
+  doc.setFontSize(9.5);
+  const isEmpty = val === "—";
+  doc.setTextColor(isEmpty ? 170 : 30, isEmpty ? 170 : 30, isEmpty ? 170 : 30);
+  const valLines = doc.splitTextToSize(String(val), CONTENT_WIDTH - 4);
 
-  // Check if we need multiple page breaks for very long text
   for (let i = 0; i < valLines.length; i++) {
-    y = checkPageBreak(doc, y, 6);
-    doc.text(valLines[i], MARGIN + 2, y);
-    y += 5;
+    y = checkPageBreak(doc, y, 5);
+    doc.text(valLines[i], MARGIN + 1, y);
+    y += 4.5;
   }
 
-  // Separator line
-  y += 2;
+  y += 3;
   doc.setDrawColor(...COLORS.lightBorder);
-  doc.setLineWidth(0.2);
+  doc.setLineWidth(0.15);
   doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-  y += 5;
+  y += 4;
 
   return y;
 }
@@ -200,61 +186,55 @@ function renderTable(
   data: any,
   y: number
 ): number {
-  y = checkPageBreak(doc, y, 25);
+  y = checkPageBreak(doc, y, 20);
 
   // Table label
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
-  doc.text(config.label, MARGIN + 2, y);
+  doc.text(config.label, MARGIN + 1, y);
   y += 6;
 
-  if (config.hint) {
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "italic");
-    doc.setTextColor(...COLORS.hint);
-    const hintLines = doc.splitTextToSize(`💡 ${config.hint}`, CONTENT_WIDTH - 8);
-    doc.text(hintLines, MARGIN + 4, y);
-    y += hintLines.length * 4 + 2;
-  }
-
-  if (!data || (Array.isArray(data) && data.length === 0)) {
+  if (!data) {
     doc.setFontSize(9);
     doc.setFont("helvetica", "italic");
-    doc.setTextColor(160, 160, 160);
+    doc.setTextColor(170, 170, 170);
     doc.text("Sin datos ingresados", MARGIN + 4, y);
     y += 8;
     return y;
   }
 
   try {
-    if (config.type === "dynamic-rows" && config.headers) {
-      const rows = Array.isArray(data) ? data : [];
+    if (config.type === "dynamic-rows") {
+      const td = data as { headers: string[]; rows: string[][] };
+      if (!td.headers || !td.rows || td.rows.length === 0) {
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(170, 170, 170);
+        doc.text("Sin datos ingresados", MARGIN + 4, y);
+        y += 8;
+        return y;
+      }
       autoTable(doc, {
         startY: y,
-        head: [config.headers],
-        body: rows.map((row: string[]) => row || []),
+        head: [td.headers],
+        body: td.rows.map((row) => row || []),
         margin: { left: MARGIN, right: MARGIN },
-        styles: { fontSize: 8, cellPadding: 2, textColor: COLORS.text },
-        headStyles: {
-          fillColor: COLORS.headerBg,
-          textColor: COLORS.headerText,
-          fontStyle: "bold",
-          fontSize: 8,
-        },
+        styles: { fontSize: 8, cellPadding: 2.5, textColor: COLORS.text, lineColor: COLORS.lightBorder, lineWidth: 0.15 },
+        headStyles: { fillColor: COLORS.headerBg, textColor: COLORS.headerText, fontStyle: "bold", fontSize: 8 },
         alternateRowStyles: { fillColor: COLORS.altRow },
         theme: "grid",
       });
       y = (doc as any).lastAutoTable.finalY + 6;
-    } else if (config.type === "dynamic-cols" && config.rowLabels) {
-      // Transpose: rowLabels are the first column, data columns follow
-      const cols = Array.isArray(data) ? data : [];
-      const numCols = cols.length || config.initialCols || 2;
-      const head = ["", ...Array.from({ length: numCols }, (_, i) => `${i + 1}`)];
-      const body = config.rowLabels.map((label, rowIdx) => {
+    } else if (config.type === "dynamic-cols") {
+      const td = data as { rowLabels: string[]; colCount: number; cells: Record<string, string> };
+      const colCount = td.colCount || config.initialCols || 2;
+      const head = ["Campo", ...Array.from({ length: colCount }, (_, i) => `Fuente ${i + 1}`)];
+      const labels = td.rowLabels || config.rowLabels || [];
+      const body = labels.map((label, ri) => {
         const cells = [label];
-        for (let c = 0; c < numCols; c++) {
-          cells.push(cols[c]?.[rowIdx] || "");
+        for (let c = 0; c < colCount; c++) {
+          cells.push(td.cells?.[`${ri}-${c}`] || "");
         }
         return cells;
       });
@@ -264,74 +244,62 @@ function renderTable(
         head: [head],
         body,
         margin: { left: MARGIN, right: MARGIN },
-        styles: { fontSize: 7, cellPadding: 2, textColor: COLORS.text },
-        headStyles: {
-          fillColor: COLORS.headerBg,
-          textColor: COLORS.headerText,
-          fontStyle: "bold",
-          fontSize: 7,
-        },
-        columnStyles: { 0: { fontStyle: "bold", cellWidth: 45 } },
+        styles: { fontSize: 7.5, cellPadding: 2.5, textColor: COLORS.text, lineColor: COLORS.lightBorder, lineWidth: 0.15 },
+        headStyles: { fillColor: COLORS.headerBg, textColor: COLORS.headerText, fontStyle: "bold", fontSize: 7.5 },
+        columnStyles: { 0: { fontStyle: "bold", fillColor: COLORS.rowLabelBg, cellWidth: 42 } },
         alternateRowStyles: { fillColor: COLORS.altRow },
         theme: "grid",
       });
       y = (doc as any).lastAutoTable.finalY + 6;
     } else if (config.type === "activities") {
-      // Activities table: structured data
-      const activities = Array.isArray(data) ? data : [];
-      if (activities.length === 0) {
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "italic");
-        doc.setTextColor(160, 160, 160);
-        doc.text("Sin actividades ingresadas", MARGIN + 4, y);
-        y += 8;
-      } else {
-        const activityLabels = [
-          "Momento",
-          "Nombre actividad",
-          "¿Qué insumo se necesita?",
-          "¿Quién entrega el insumo?",
-          "¿En qué consiste?",
-          "¿Quién la realiza?",
-          "¿Con qué frecuencia?",
-          "¿Dónde se realiza?",
-          "¿Cuál es el resultado?",
-          "¿Quién recibe el resultado?",
-          "¿Qué hacen con el resultado?",
-          "¿Cómo queremos cambiar la actividad?",
-        ];
-        const head = ["", ...activities.map((_: any, i: number) => `Act. ${i + 1}`)];
-        const body = activityLabels.map((label, rowIdx) => {
-          const cells = [label];
-          for (const act of activities) {
-            cells.push(Array.isArray(act) ? act[rowIdx] || "" : "");
-          }
-          return cells;
-        });
+      const td = data as { activityCount: number; activityNames: string[]; cells: Record<string, string> };
+      const actCount = td.activityCount || config.initialCols || 2;
 
-        autoTable(doc, {
-          startY: y,
-          head: [head],
-          body,
-          margin: { left: MARGIN, right: MARGIN },
-          styles: { fontSize: 7, cellPadding: 2, textColor: COLORS.text },
-          headStyles: {
-            fillColor: COLORS.headerBg,
-            textColor: COLORS.headerText,
-            fontStyle: "bold",
-            fontSize: 7,
-          },
-          columnStyles: { 0: { fontStyle: "bold", cellWidth: 42 } },
-          alternateRowStyles: { fillColor: COLORS.altRow },
-          theme: "grid",
-        });
-        y = (doc as any).lastAutoTable.finalY + 6;
+      const momentRows = [
+        { moment: "ANTES", questions: ["¿Qué insumo se necesita?", "¿Quién entrega el insumo?"] },
+        { moment: "DURANTE", questions: ["¿En qué consiste la actividad?", "¿Quién realiza?", "¿Con qué frecuencia?", "¿Dónde se realiza?", "¿Cuál es el resultado?"] },
+        { moment: "DESPUÉS", questions: ["¿Quién recibe el resultado?", "¿Qué hacen con él?", "¿Cómo queremos cambiar la actividad?"] },
+      ];
+
+      const head = ["Momento", "Pregunta", ...td.activityNames.slice(0, actCount)];
+      const body: any[][] = [];
+      let rowIdx = 0;
+
+      for (const m of momentRows) {
+        for (let qi = 0; qi < m.questions.length; qi++) {
+          const row: any[] = [];
+          if (qi === 0) {
+            row.push({ content: m.moment, rowSpan: m.questions.length, styles: { fillColor: COLORS.momentBg, textColor: COLORS.momentText, fontStyle: "bold", halign: "center", valign: "middle", fontSize: 7 } });
+          }
+          row.push(m.questions[qi]);
+          for (let ci = 0; ci < actCount; ci++) {
+            row.push(td.cells?.[`${rowIdx}-${ci}`] || "");
+          }
+          body.push(row);
+          rowIdx++;
+        }
       }
+
+      autoTable(doc, {
+        startY: y,
+        head: [head],
+        body,
+        margin: { left: MARGIN, right: MARGIN },
+        styles: { fontSize: 7, cellPadding: 2, textColor: COLORS.text, lineColor: COLORS.lightBorder, lineWidth: 0.15 },
+        headStyles: { fillColor: COLORS.headerBg, textColor: COLORS.headerText, fontStyle: "bold", fontSize: 7 },
+        columnStyles: {
+          0: { cellWidth: 18 },
+          1: { fontStyle: "bold", fillColor: COLORS.rowLabelBg, cellWidth: 38 },
+        },
+        alternateRowStyles: { fillColor: COLORS.altRow },
+        theme: "grid",
+      });
+      y = (doc as any).lastAutoTable.finalY + 6;
     }
   } catch {
     doc.setFontSize(9);
     doc.setFont("helvetica", "italic");
-    doc.setTextColor(160, 160, 160);
+    doc.setTextColor(170, 170, 170);
     doc.text("Error al renderizar tabla", MARGIN + 4, y);
     y += 8;
   }
