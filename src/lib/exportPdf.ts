@@ -208,11 +208,14 @@ export function generateProjectPDF(
     ],
   ];
 
-  // Flatten each block to plain text to measure height
+  // Flatten each block to plain text to measure height (set correct font for measurement)
   doc.setFontSize(fontSize);
   let totalTextHeight = 0;
   const blockWrapped: string[][] = [];
-  for (const block of attributionBlocks) {
+  for (let bi = 0; bi < attributionBlocks.length; bi++) {
+    const block = attributionBlocks[bi];
+    const isBold = block.some((s) => s.bold);
+    doc.setFont("helvetica", isBold ? "bold" : "normal");
     const plain = block.map((s) => s.text).join("");
     const lines = doc.splitTextToSize(plain, innerW);
     blockWrapped.push(lines);
@@ -236,9 +239,8 @@ export function generateProjectPDF(
     const segments = attributionBlocks[bi];
     const isBoldBlock = segments.some((s) => s.bold);
 
-    // Concatenate to get wrapped lines
-    const fullText = segments.map((s) => s.text).join("");
-    const wrappedLines = doc.splitTextToSize(fullText, innerW);
+    // Use pre-wrapped lines (measured with correct font)
+    const wrappedLines = blockWrapped[bi];
 
     doc.setFont("helvetica", isBoldBlock ? "bold" : "normal");
     doc.setFontSize(fontSize);
