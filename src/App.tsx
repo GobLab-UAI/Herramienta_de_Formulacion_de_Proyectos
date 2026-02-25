@@ -1,4 +1,3 @@
-import { forwardRef } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,32 +15,40 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const RootRedirect = forwardRef<HTMLDivElement>(function RootRedirect(_props, _ref) {
+function RootRedirect() {
   const { user, loading } = useAuth();
   if (loading) return null;
   return <Navigate to={user ? "/dashboard" : "/login"} replace />;
-});
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<RootRedirect />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEditor /></ProtectedRoute>} />
+      <Route path="/projects/:id/review" element={<ProtectedRoute><ProjectEditor reviewMode /></ProtectedRoute>} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<RootRedirect />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEditor /></ProtectedRoute>} />
-            <Route path="/projects/:id/review" element={<ProtectedRoute><ProjectEditor reviewMode /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+      <div>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </BrowserRouter>
+      </div>
     </TooltipProvider>
   </QueryClientProvider>
 );
