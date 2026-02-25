@@ -319,7 +319,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
             {/* Document paper */}
             <div
               className="bg-card rounded-xl shadow-goblab-sm border border-border/50 px-10 py-8"
-              style={{ maxWidth: '680px', overflow: 'visible' }}
+              style={{ maxWidth: '860px', overflow: 'visible' }}
             >
               {FORM_SECTIONS.map((section, sIdx) => (
                 <section
