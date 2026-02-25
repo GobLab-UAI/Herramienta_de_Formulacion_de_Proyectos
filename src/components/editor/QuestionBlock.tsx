@@ -32,7 +32,10 @@ export function QuestionBlock({
         </Label>
         {showCommentButton && (
           <button
-            onClick={onComment}
+            onClick={(e) => {
+              e.stopPropagation();
+              onComment?.();
+            }}
             className={`shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded ${
               pendingComments > 0 ? "opacity-100" : ""
             }`}
