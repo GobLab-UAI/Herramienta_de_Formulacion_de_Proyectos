@@ -54,7 +54,7 @@ export function QuestionBlock({
       </div>
       {field.hint && (
         <p className="text-xs text-muted-foreground mb-2 pl-0.5">
-          {field.hint.split(/(https?:\/\/[^\s,)]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}[^\s,)]*)/).map((part, i) =>
+          💡 {field.hint.split(/(https?:\/\/[^\s,)]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}[^\s,)]*)/).map((part, i) =>
             /^(https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/.test(part) ? (
               <a
                 key={i}
