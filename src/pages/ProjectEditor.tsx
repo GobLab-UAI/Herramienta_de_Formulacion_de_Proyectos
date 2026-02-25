@@ -119,7 +119,15 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   // Initialize state
   useEffect(() => {
-    if (project) setTitle(project.title);
+    if (project) {
+      setTitle(project.title);
+      setResponses((prev) => {
+        if (!prev["portada-nombre"] && project.title) {
+          return { ...prev, "portada-nombre": project.title };
+        }
+        return prev;
+      });
+    }
   }, [project]);
 
   useEffect(() => {
@@ -209,6 +217,9 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     setResponses((prev) => ({ ...prev, [key]: value }));
     pendingChanges.current.add(key);
     setSaveStatus("unsaved");
+    if (key === "portada-nombre" && typeof value === "string") {
+      updateTitle(value);
+    }
   };
 
   // Comments
