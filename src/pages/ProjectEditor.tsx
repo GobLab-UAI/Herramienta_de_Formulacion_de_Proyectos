@@ -13,7 +13,8 @@ import { DynamicTable } from "@/components/editor/DynamicTable";
 import { CommentBubble } from "@/components/editor/CommentBubble";
 import { CommentHistorySidebar } from "@/components/editor/CommentHistorySidebar";
 import { FORM_SECTIONS, REQUIRED_FIELDS, type FormField, type TableConfig } from "@/lib/formSections";
-import { Save, ArrowLeft, MessageSquare, PanelRightOpen, FileDown } from "lucide-react";
+import { Save, ArrowLeft, MessageSquare, PanelRightOpen, FileDown, Send, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { generateProjectPDF } from "@/lib/exportPdf";
 import { Link } from "react-router-dom";
 
@@ -267,6 +268,33 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     setActiveCommentField(activeCommentField === fieldKey ? null : fieldKey);
   };
 
+  const statusConfig: Record<string, { label: string; className: string }> = {
+    DRAFT: { label: "Borrador", className: "bg-muted text-muted-foreground" },
+    IN_REVIEW: { label: "En revisión", className: "bg-amber-bg text-amber border-amber/30" },
+    WITH_OBSERVATIONS: { label: "Con observaciones", className: "bg-status-red-bg text-status-red border-status-red/30" },
+    APPROVED: { label: "Aprobado", className: "bg-status-green-bg text-status-green border-status-green/30" },
+    ARCHIVED: { label: "Archivado", className: "bg-muted text-muted-foreground" },
+  };
+
+  const projectStatus = project?.status || "DRAFT";
+  const statusInfo = statusConfig[projectStatus] || statusConfig.DRAFT;
+  const canSendToReview = !isConsultor && (projectStatus === "DRAFT" || projectStatus === "WITH_OBSERVATIONS");
+  const canApprove = isConsultor && projectStatus === "IN_REVIEW";
+
+  const changeStatusMutation = useMutation({
+    mutationFn: async (newStatus: "DRAFT" | "IN_REVIEW" | "WITH_OBSERVATIONS" | "APPROVED" | "ARCHIVED") => {
+      const { error } = await supabase
+        .from("projects")
+        .update({ status: newStatus })
+        .eq("id", projectId!);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      toast({ title: "Estado actualizado" });
+    },
+  });
+
   const saveStatusDisplay = {
     saved: { text: "Guardado ✓", className: "text-primary" },
     saving: { text: "Guardando...", className: "text-muted-foreground animate-pulse" },
@@ -323,6 +351,23 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         }`}>
           {isConsultor ? "Consultor" : "Formulador"}
         </span>
+
+        {/* Project status + action */}
+        <Badge variant="outline" className={statusInfo.className + " text-xs shrink-0"}>
+          {statusInfo.label}
+        </Badge>
+
+        {canSendToReview && (
+          <Button size="sm" variant="outline" onClick={() => changeStatusMutation.mutate("IN_REVIEW")} disabled={changeStatusMutation.isPending} className="text-xs shrink-0">
+            <Send className="h-3.5 w-3.5 mr-1" /> Enviar a revisión
+          </Button>
+        )}
+
+        {canApprove && (
+          <Button size="sm" variant="default" onClick={() => changeStatusMutation.mutate("APPROVED")} disabled={changeStatusMutation.isPending} className="text-xs shrink-0">
+            <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Aprobar
+          </Button>
+        )}
 
         <div className="flex-1" />
 
