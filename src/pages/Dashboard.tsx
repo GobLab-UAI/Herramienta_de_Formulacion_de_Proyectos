@@ -19,7 +19,7 @@ const STATUS_FILTERS = [
 ];
 
 export default function Dashboard() {
-  const { user, isConsultor } = useAuth();
+  const { user, isConsultor, profile } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const navigate = useNavigate();
@@ -84,9 +84,10 @@ export default function Dashboard() {
 
   const createProject = useMutation({
     mutationFn: async () => {
+      const orgName = profile?.entidad?.trim() || "Mi organización";
       const { data: org, error: orgError } = await supabase
         .from("organizations")
-        .insert({ name: "Mi organización" })
+        .insert({ name: orgName })
         .select()
         .single();
 
