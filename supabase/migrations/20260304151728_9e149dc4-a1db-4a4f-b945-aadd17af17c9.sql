@@ -1,0 +1,4 @@
+
+-- Add FORMULADOR and CONSULTOR to app_role enum
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'FORMULADOR';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'CONSULTOR';

@@ -1,1 +1,4 @@
 project_id = "sdxwjenheoveabaqqwef"
+
+[functions.seed-consultor]
+verify_jwt = false

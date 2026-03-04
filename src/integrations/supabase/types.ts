@@ -221,30 +221,36 @@ export type Database = {
           cargo: string | null
           created_at: string | null
           email: string
+          entidad: string | null
           full_name: string
           id: string
           is_verified: boolean | null
           last_login_at: string | null
+          username: string
         }
         Insert: {
           avatar_url?: string | null
           cargo?: string | null
           created_at?: string | null
           email: string
+          entidad?: string | null
           full_name?: string
           id: string
           is_verified?: boolean | null
           last_login_at?: string | null
+          username: string
         }
         Update: {
           avatar_url?: string | null
           cargo?: string | null
           created_at?: string | null
           email?: string
+          entidad?: string | null
           full_name?: string
           id?: string
           is_verified?: boolean | null
           last_login_at?: string | null
+          username?: string
         }
         Relationships: []
       }
@@ -370,7 +376,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "ADMIN" | "USER"
+      app_role: "ADMIN" | "USER" | "FORMULADOR" | "CONSULTOR"
       comment_status: "PENDING" | "RESOLVED"
       notification_type:
         | "COMMENT_ADDED"
@@ -513,7 +519,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["ADMIN", "USER"],
+      app_role: ["ADMIN", "USER", "FORMULADOR", "CONSULTOR"],
       comment_status: ["PENDING", "RESOLVED"],
       notification_type: [
         "COMMENT_ADDED",
