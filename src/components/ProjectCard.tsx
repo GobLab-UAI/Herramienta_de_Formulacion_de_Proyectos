@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Calendar, MessageSquare } from "lucide-react";
+import { Calendar, MessageSquare, User } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -21,10 +21,11 @@ interface ProjectCardProps {
   updatedAt: string;
   commentCount?: number;
   role?: string;
+  creatorName?: string;
 }
 
 export function ProjectCard({
-  id, title, organizationName, status, completionPct, updatedAt, commentCount = 0, role,
+  id, title, organizationName, status, completionPct, updatedAt, commentCount = 0, role, creatorName,
 }: ProjectCardProps) {
   const statusInfo = statusConfig[status] || statusConfig.DRAFT;
   const editUrl = role === "CONSULTOR" ? `/projects/${id}/review` : `/projects/${id}/edit`;
@@ -43,6 +44,12 @@ export function ProjectCard({
           </div>
           {organizationName && (
             <p className="text-sm text-muted-foreground">{organizationName}</p>
+          )}
+          {creatorName && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+              <User className="h-3 w-3" />
+              {creatorName}
+            </p>
           )}
         </CardHeader>
         <CardContent className="space-y-3">

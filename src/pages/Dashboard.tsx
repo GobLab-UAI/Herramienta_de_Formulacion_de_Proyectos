@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useRole } from "@/contexts/RoleContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Topbar } from "@/components/Topbar";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,8 @@ const STATUS_FILTERS = [
   { value: "APPROVED", label: "Aprobado" },
 ];
 
-const ANON_USER_ID = "00000000-0000-0000-0000-000000000000";
-
 export default function Dashboard() {
-  const { isConsultor } = useRole();
+  const { user, isConsultor } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const navigate = useNavigate();
@@ -29,13 +27,20 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
 
   const { data: projects = [], isLoading } = useQuery({
-    queryKey: ["projects"],
+    queryKey: ["projects", user?.id, isConsultor],
     queryFn: async () => {
-      const { data: allProjects } = await supabase
+      let query = supabase
         .from("projects")
         .select("*, organizations(name)")
         .is("deleted_at", null)
         .order("updated_at", { ascending: false });
+
+      // RLS handles filtering, but for formulador we also filter client-side for safety
+      if (!isConsultor && user) {
+        query = query.eq("created_by", user.id);
+      }
+
+      const { data: allProjects } = await query;
 
       const projectIds = (allProjects || []).map((p) => p.id);
       if (projectIds.length === 0) return [];
@@ -52,12 +57,29 @@ export default function Dashboard() {
         commentCountMap[c.project_id] = (commentCountMap[c.project_id] || 0) + 1;
       });
 
+      // For consultor, fetch creator profiles
+      let creatorMap: Record<string, string> = {};
+      if (isConsultor) {
+        const creatorIds = [...new Set((allProjects || []).map((p) => p.created_by))];
+        if (creatorIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, full_name, username")
+            .in("id", creatorIds);
+          (profiles || []).forEach((p) => {
+            creatorMap[p.id] = p.full_name || p.username;
+          });
+        }
+      }
+
       return (allProjects || []).map((p) => ({
         ...p,
         organizationName: (p as any).organizations?.name,
         commentCount: commentCountMap[p.id] || 0,
+        creatorName: creatorMap[p.created_by] || undefined,
       }));
     },
+    enabled: !!user,
   });
 
   const createProject = useMutation({
@@ -75,7 +97,7 @@ export default function Dashboard() {
         .insert({
           title: "Nuevo Proyecto",
           organization_id: org.id,
-          created_by: ANON_USER_ID,
+          created_by: user!.id,
         })
         .select()
         .single();
@@ -180,10 +202,11 @@ export default function Dashboard() {
                 title={p.title}
                 organizationName={p.organizationName}
                 status={p.status}
-                completionPct={p.completion_pct}
+                completionPct={p.completionPct ?? p.completion_pct}
                 updatedAt={p.updated_at}
                 commentCount={p.commentCount}
                 role={isConsultor ? "CONSULTOR" : "FORMULADOR"}
+                creatorName={p.creatorName}
               />
             ))}
           </div>

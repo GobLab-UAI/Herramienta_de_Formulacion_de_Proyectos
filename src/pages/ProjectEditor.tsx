@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useRole } from "@/contexts/RoleContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { GobLabLogo } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,10 @@ import { Link } from "react-router-dom";
 
 type SaveStatus = "saved" | "saving" | "error" | "unsaved";
 
-const ANON_USER_ID = "00000000-0000-0000-0000-000000000000";
-
 export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boolean }) {
   const { id: projectId } = useParams<{ id: string }>();
-  const { isConsultor: roleIsConsultor } = useRole();
+  const { user, isConsultor: roleIsConsultor } = useAuth();
+  const currentUserId = user?.id || "";
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -171,7 +170,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           field_key: key,
           field_value: isTable ? null : (value as string) || null,
           table_data: isTable ? value : null,
-          updated_by: ANON_USER_ID,
+          updated_by: currentUserId,
         };
       });
       for (const upsert of upserts) {
@@ -225,7 +224,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   // Comments
   const addComment = async (fieldKey: string, text: string) => {
-    await supabase.from("comments").insert({ project_id: projectId!, field_key: fieldKey, author_id: ANON_USER_ID, text });
+    await supabase.from("comments").insert({ project_id: projectId!, field_key: fieldKey, author_id: currentUserId, text });
     queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
     queryClient.invalidateQueries({ queryKey: ["allComments", projectId] });
   };
@@ -234,7 +233,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     await supabase.from("comments").insert({
       project_id: projectId!,
       field_key: fieldKey,
-      author_id: ANON_USER_ID,
+      author_id: currentUserId,
       text,
       parent_id: parentId,
     });
@@ -243,7 +242,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   };
 
   const resolveComment = async (commentId: string) => {
-    await supabase.from("comments").update({ status: "RESOLVED" as any, resolved_by: ANON_USER_ID, resolved_at: new Date().toISOString() }).eq("id", commentId);
+    await supabase.from("comments").update({ status: "RESOLVED" as any, resolved_by: currentUserId, resolved_at: new Date().toISOString() }).eq("id", commentId);
     queryClient.invalidateQueries({ queryKey: ["comments", projectId] });
     queryClient.invalidateQueries({ queryKey: ["allComments", projectId] });
   };
@@ -286,7 +285,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       <div className="absolute top-0 left-[calc(100%+1.5rem)] w-[260px] z-10">
         <CommentBubble
           comments={fieldComments}
-          currentUserId={ANON_USER_ID}
+          currentUserId={currentUserId}
           onAdd={(text) => addComment(fieldKey, text)}
           onReply={(parentId, text) => replyToComment(parentId, fieldKey, text)}
           onResolve={resolveComment}
