@@ -53,6 +53,11 @@ export default function Register() {
       if (error) {
         toast({ title: "Error al registrarse", description: error.message, variant: "destructive" });
       } else {
+        // Register in tool_users (ignore duplicate)
+        await supabase.from("tool_users" as any).insert({
+          email: form.email.trim().toLowerCase(),
+          tool_name: "herramienta formulacion",
+        } as any);
         toast({ title: "¡Cuenta creada!", description: "Bienvenido/a a GobLab Ficha." });
         navigate("/dashboard");
       }
