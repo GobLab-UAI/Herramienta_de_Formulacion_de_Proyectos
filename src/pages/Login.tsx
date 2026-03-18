@@ -48,6 +48,11 @@ export default function Login() {
       if (error) {
         toast({ title: "Error al iniciar sesión", description: "Credenciales incorrectas.", variant: "destructive" });
       } else {
+        // Register in tool_users (ignore duplicate)
+        await supabase.from("tool_users" as any).insert({
+          email: email.trim().toLowerCase(),
+          tool_name: "herramienta formulacion",
+        } as any);
         navigate("/dashboard");
       }
     } catch {
