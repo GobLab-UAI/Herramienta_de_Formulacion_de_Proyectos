@@ -339,6 +339,27 @@ export type Database = {
           },
         ]
       }
+      tool_users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          tool_name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          tool_name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          tool_name?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
