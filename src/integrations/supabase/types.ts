@@ -339,6 +339,36 @@ export type Database = {
           },
         ]
       }
+      tool_feedback: {
+        Row: {
+          created_at: string
+          description: string
+          email: string
+          feedback_type: Database["public"]["Enums"]["feedback_type"]
+          id: string
+          organization: string | null
+          tool: Database["public"]["Enums"]["tool_name"]
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          email: string
+          feedback_type: Database["public"]["Enums"]["feedback_type"]
+          id?: string
+          organization?: string | null
+          tool: Database["public"]["Enums"]["tool_name"]
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          email?: string
+          feedback_type?: Database["public"]["Enums"]["feedback_type"]
+          id?: string
+          organization?: string | null
+          tool?: Database["public"]["Enums"]["tool_name"]
+        }
+        Relationships: []
+      }
       tool_users: {
         Row: {
           created_at: string
@@ -399,6 +429,12 @@ export type Database = {
     Enums: {
       app_role: "ADMIN" | "USER" | "FORMULADOR" | "CONSULTOR"
       comment_status: "PENDING" | "RESOLVED"
+      feedback_type:
+        | "Comentario general"
+        | "Reporte de error"
+        | "Sugerencia de mejora"
+        | "Pregunta"
+        | "Otro"
       notification_type:
         | "COMMENT_ADDED"
         | "COMMENT_RESOLVED"
@@ -413,6 +449,11 @@ export type Database = {
         | "WITH_OBSERVATIONS"
         | "APPROVED"
         | "ARCHIVED"
+      tool_name:
+        | "evaluacion de impacto"
+        | "herramienta de sesgos"
+        | "herramienta de transparencia"
+        | "herramienta de formulacion"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -542,6 +583,13 @@ export const Constants = {
     Enums: {
       app_role: ["ADMIN", "USER", "FORMULADOR", "CONSULTOR"],
       comment_status: ["PENDING", "RESOLVED"],
+      feedback_type: [
+        "Comentario general",
+        "Reporte de error",
+        "Sugerencia de mejora",
+        "Pregunta",
+        "Otro",
+      ],
       notification_type: [
         "COMMENT_ADDED",
         "COMMENT_RESOLVED",
@@ -557,6 +605,12 @@ export const Constants = {
         "WITH_OBSERVATIONS",
         "APPROVED",
         "ARCHIVED",
+      ],
+      tool_name: [
+        "evaluacion de impacto",
+        "herramienta de sesgos",
+        "herramienta de transparencia",
+        "herramienta de formulacion",
       ],
     },
   },
