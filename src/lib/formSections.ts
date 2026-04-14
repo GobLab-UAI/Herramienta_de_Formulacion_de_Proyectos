@@ -44,8 +44,8 @@ export const FORM_SECTIONS: FormSection[] = [
     fields: [
       { key: "portada-nombre", label: "Nombre del proyecto", type: "text", required: true },
       { key: "portada-org", label: "Organización", type: "text", required: true },
-      { key: "portada-fecha", label: "Fecha", type: "date", defaultValue: new Date().toISOString().split("T")[0] },
-      { key: "portada-equipo", label: "Equipo formulador", type: "textarea" },
+      { key: "portada-fecha", label: "Fecha", type: "date", defaultValue: new Date().toISOString().split("T")[0], hint: "Fecha inicio de formulación de proyecto" },
+      { key: "portada-equipo", label: "Equipo formulador", type: "textarea", hint: "Escribe los nombres y apellidos de los integrantes del equipo que está formulando el proyecto" },
     ],
   },
   {
@@ -71,7 +71,7 @@ export const FORM_SECTIONS: FormSection[] = [
       } as TableConfig,
       { key: "ans-4-6", label: "2.6 ¿Cuánto les afecta?", type: "textarea", required: true, hint: "Describe la intensidad o severidad del problema usando un indicador cuantitativo cuando sea posible." },
       { key: "ans-4-7", label: "2.7 ¿Cuáles son las medidas actuales para abordar el problema y sus deficiencias?", type: "textarea", required: true, hint: "Explica qué acciones existen hoy para enfrentar el problema y por qué no son suficientes." },
-      { key: "ans-4-8", label: "2.8 ¿Cómo otros proyectos han utilizado la ciencia de datos o IA para resolver problemas similares?", type: "textarea", hint: "Revisar Algoritmos Públicos y Data Science for Social Good." },
+      { key: "ans-4-8", label: "2.8 ¿Cómo otros proyectos han utilizado la ciencia de datos o IA para resolver problemas similares?", type: "textarea", hint: "Revisar Algoritmos Públicos (algoritmospublicos.cl/repositorio), Data Science for Social Good (dssgfellowship.org/projects) y Algoritmos de IA en América Latina (algoritmos.uniandes.edu.co)." },
     ],
   },
   {
@@ -80,9 +80,9 @@ export const FORM_SECTIONS: FormSection[] = [
     title: "Análisis de Prefactibilidad",
     fields: [
       { key: "ans-5-1", label: "3.1 ¿Qué facultades tiene la institución para actuar sobre el problema?", type: "textarea", required: true, hint: "Cita la norma legal que habilita la intervención." },
-      { key: "ans-5-2", label: "3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas?", type: "textarea" },
+      { key: "ans-5-2", label: "3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas? ¿Cuáles?", type: "textarea" },
       { key: "ans-5-3", label: "3.3 ¿Dónde se ha manifestado que es prioritario resolver el problema?", type: "textarea", hint: "Programa de gobierno, plan estratégico, discursos, compromisos internacionales." },
-      { key: "ans-5-4", label: "3.4 ¿Existen, y podemos acceder a los datos relevantes?", type: "textarea", required: true, hint: "¿Están desagregados por género, edad, etnia, territorio?" },
+      { key: "ans-5-4", label: "3.4 ¿Existen, y podemos acceder a los datos relevantes? ¿Están desagregados según las dimensiones de la población afectada?", type: "textarea", required: true },
       { key: "ans-5-5", label: "3.5 ¿Tenemos los recursos humanos y financieros para llevar a cabo el proyecto?", type: "textarea" },
       { key: "ans-5-6", label: "3.6 ¿Cuáles son los riesgos del proyecto?", type: "textarea", required: true, hint: "Considera: éticos (sesgos, privacidad), licencia social, implementación, datos, técnicos y políticos." },
     ],
@@ -103,7 +103,7 @@ export const FORM_SECTIONS: FormSection[] = [
   {
     id: "section-5",
     number: "5",
-    title: "Actividades",
+    title: "Actividades del proceso",
     globalHint: "Las actividades son tareas que ejecuta una persona en la institución. NO incluyas pasos de ciencia de datos.",
     fields: [
       {

@@ -411,7 +411,7 @@ function renderTable(
         { moment: "DESPUÉS", questions: ["¿Quién recibe el resultado?", "¿Qué hacen con él?", "¿Cómo queremos cambiar la actividad?"] },
       ];
 
-      const head = ["Momento", "Pregunta", ...td.activityNames.slice(0, actCount)];
+      const head = ["Etapa del Proyecto", "Pregunta", ...td.activityNames.slice(0, actCount)];
       const body: any[][] = [];
       let rowIdx = 0;
 
