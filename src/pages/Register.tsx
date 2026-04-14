@@ -73,7 +73,7 @@ export default function Register() {
     { key: "full_name", label: "Nombre completo *", placeholder: "Juan Pérez", type: "text" },
     { key: "email", label: "Correo electrónico *", placeholder: "juan@ejemplo.cl", type: "email" },
     { key: "cargo", label: "Cargo", placeholder: "Analista de datos", type: "text" },
-    { key: "entidad", label: "Entidad", placeholder: "Ministerio de...", type: "text" },
+    { key: "entidad", label: "Organización", placeholder: "Ministerio de...", type: "text" },
     { key: "password", label: "Contraseña *", placeholder: "Mínimo 6 caracteres", type: "password" },
   ];
 

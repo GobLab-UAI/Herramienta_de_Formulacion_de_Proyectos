@@ -22,15 +22,21 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
         </div>
         <div className="space-y-6">
           <h1 className="text-4xl font-display text-secondary-foreground leading-tight">
-            Diseña proyectos de IA y ciencia de datos para el sector público
+            Diseña proyectos de IA y ciencia de datos viables y responsables
           </h1>
           <p className="text-lg text-secondary-foreground/70 max-w-md">
             Colabora con tu equipo usando la metodología GobLab UAI para formular proyectos de impacto.
           </p>
         </div>
-        <p className="text-sm text-secondary-foreground/50">
-          GobLab UAI · CC BY-SA 3.0 · goblab.uai.cl
-        </p>
+        <div className="space-y-2">
+          <div className="flex items-center gap-4">
+            <GobLabLogo size={28} />
+            <span className="text-sm font-medium text-secondary-foreground/70">Herramientas Algoritmos Éticos</span>
+          </div>
+          <p className="text-sm text-secondary-foreground/50">
+            GobLab Ficha de Proyecto · Proyecto financiado por ANID · CC BY-SA 3.0 · goblab.uai.cl
+          </p>
+        </div>
       </div>
 
       {/* Right panel - form */}

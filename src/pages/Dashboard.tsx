@@ -175,7 +175,7 @@ export default function Dashboard() {
                 ? showDeleted
                   ? "Proyectos que han sido eliminados por los formuladores"
                   : "Revisa y comenta los proyectos formulados"
-                : "Gestiona y formula tus proyectos de IA y ciencia de datos"}
+                : "Formula tus proyectos de IA y ciencia de datos"}
             </p>
           </div>
           <div className="flex gap-2">

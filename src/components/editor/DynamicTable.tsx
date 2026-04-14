@@ -178,7 +178,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-secondary text-secondary-foreground">
-                <th className="px-3 py-2 text-left font-medium text-xs w-24">Momento</th>
+                <th className="px-3 py-2 text-left font-medium text-xs w-24">Etapa del Proyecto</th>
                 <th className="px-3 py-2 text-left font-medium text-xs w-48">Pregunta</th>
                 {Array.from({ length: td.activityCount }, (_, i) => (
                   <th key={i} className="px-1 py-1 min-w-[160px]">
