@@ -1,52 +1,57 @@
 
 
-## Plan: Authentication System with Formulador/Consultor Roles
+## Plan: UI Text and Structure Updates
 
-### Overview
-Replace the current public-access role switcher with real authentication. Formuladores register with full profile data; the Consultor is a single pre-seeded user (admin2026/consultor2026). No email verification for anyone.
+### Changes Overview
 
-### Database Changes
+**1. Topbar brand name** (Topbar.tsx, AuthLayout.tsx)
+- Change "GobLab Ficha" to "Portal de Evaluación de Proyectos de IA" in both the dashboard topbar and the auth layout left panel.
 
-1. **Alter `profiles` table**: Add `username` (unique, not null) and `entidad` (text) columns
-2. **Add enum values**: Add `FORMULADOR` and `CONSULTOR` to `app_role` enum
-3. **Enable auto-confirm**: Disable email verification via configure-auth tool
-4. **Update `handle_new_user` trigger**: Store username and entidad from user metadata, assign FORMULADOR role by default
-5. **Seed consultor user**: Create user `admin2026` with dummy email `admin2026@goblab.local`, password `consultor2026`, and assign CONSULTOR role in user_roles. This will be done via an edge function that uses the service role key to create the user programmatically on first deploy.
+**2. Dashboard footer** (Dashboard.tsx, line 264-266)
+- Replace current long text with:
+  > Desarrollado por el GobLab UAI. Proyecto financiado por el Laboratorio de Gobierno y el Servicio Civil, en colaboración con el Center for Data Science and Public Policy de la Universidad de Chicago.
+  > Licencia CC BY-SA 3.0 · goblab.uai.cl
 
-### New Pages/Components
+**3. "Formular proyecto" buttons** (Dashboard.tsx)
+- Change both "Nuevo proyecto" (line 189) and "Crear proyecto" (line 236) to "Formular proyecto".
 
-1. **`src/pages/Login.tsx`**: Login form accepting username + password. Looks up email from profiles by username, then calls `supabase.auth.signInWithPassword`. Special case: if username is "admin2026", use the known dummy email directly.
+**4. Remove green + icon in empty state** (Dashboard.tsx)
+- Remove the `<Plus>` icon inside the rounded circle (lines 221-224) in the empty state view.
 
-2. **`src/pages/Register.tsx`**: Registration form for Formuladores only. Fields: username, nombre completo, correo, cargo, entidad, contraseña. Calls `supabase.auth.signUp` with metadata.
+**5. Renumber sections 1-10** (formSections.ts)
+- Portada (P) becomes **1** with title "Datos del Proyecto"
+- Section 4 becomes **2** (Definicion del Problema)
+- Section 5 becomes **3** (Analisis de Prefactibilidad)
+- Section 6 becomes **4** (Objetivos)
+- Section 7 becomes **5** (Actividades)
+- Section 8 becomes **6** (Mapeo de Datos)
+- Section 9 becomes **7** (Analisis)
+- Section 10 becomes **8** (Consideraciones Eticas)
+- Section 11 becomes **9** (Piloto y Validacion)
+- Section 12 becomes **10** (Equipo)
+- All field labels (e.g., "4.1" to "2.1", "5.1" to "3.1", etc.) and table labels updated accordingly.
 
-3. **`src/contexts/AuthContext.tsx`**: Replace RoleContext. Provides current user session, profile, role (FORMULADOR/CONSULTOR), loading state, and logout function. Uses `onAuthStateChange` + `getSession`. Queries `user_roles` to determine role.
+**6. Form header text** (ProjectEditor.tsx)
+- Add a subtitle/description at the top of the form document:
+  > Completa tu proyecto por etapas. Cada seccion agrupa la informacion necesaria para avanzar en el proceso de formulacion.
 
-### Modified Files
+**7. Update hints for section 2 (current section 4)** (formSections.ts)
+- 2.1: "Describe brevemente la mision, funciones y contexto operativo del area que presenta el proyecto (max 400-500 caracteres)"
+- 2.2: "Explica que problema existe y por que es relevante. Evita incluir la solucion; esta se aborda al final de la seccion."
+- 2.3: "Identifica las causas principales del problema. Si no tienes toda la informacion, describe las causas que se conocen."
+- 2.4: "Selecciona los grupos afectados y describe brevemente como se relacionan con el problema"
+- 2.5: "Ingresa la cantidad de personas u organizaciones afectadas. Puedes desagregar segun los criterios disponibles (edad, genero, territorio, etc.)."
+- 2.6: "Describe la intensidad o severidad del problema usando un indicador cuantitativo cuando sea posible."
+- 2.7: "Explica que acciones existen hoy para enfrentar el problema y por que no son suficientes."
+- 2.8: Change hint to reference named links "Algoritmos Publicos" and "Data Science for Social Good" instead of raw URLs.
 
-1. **`src/App.tsx`**: Replace RoleProvider with AuthProvider. Add login/register routes. Wrap dashboard/editor routes in a ProtectedRoute component that redirects to `/login` if not authenticated.
+**8. Fix section number display** (ProjectEditor.tsx)
+- Remove the `section.number !== "P"` check (line 446) since there's no longer a "P" section; all sections now have numeric numbers.
 
-2. **`src/components/Topbar.tsx`**: Remove role switcher buttons. Show current user's name and role. Add logout button.
-
-3. **`src/pages/Dashboard.tsx`**:
-   - Formulador: query projects where `created_by = currentUser.id`
-   - Consultor: query all projects, join with profiles to show creator name
-   - Remove ANON_USER_ID usage
-   - ProjectCard for consultor shows creator name
-
-4. **`src/pages/ProjectEditor.tsx`**: Use `auth.uid()` instead of ANON_USER_ID for all mutations (save, comments, history).
-
-5. **`src/components/ProjectCard.tsx`**: Add optional `creatorName` prop displayed when in consultor view.
-
-6. **`src/components/editor/CommentBubble.tsx`** and related: Use real user ID from auth context.
-
-### Auth Flow
-
-- `/login` - both roles login here with username + password
-- `/register` - only formuladores can register
-- After login, redirect to `/dashboard`
-- Role is determined from `user_roles` table, not localStorage
-- The consultor user is pre-created; no registration path for consultors
-
-### Security Note
-The consultor credentials (admin2026/consultor2026) are hardcoded as requested. The dummy email lookup for username-based login is handled client-side for simplicity since this is a low-security internal tool.
+### Files to modify
+- `src/components/Topbar.tsx` - brand name
+- `src/components/AuthLayout.tsx` - brand name in auth panel
+- `src/pages/Dashboard.tsx` - footer, button labels, remove + icon
+- `src/lib/formSections.ts` - section renumbering, title change, hint updates
+- `src/pages/ProjectEditor.tsx` - form header text, remove "P" check
 
