@@ -95,7 +95,7 @@ export const FORM_SECTIONS: FormSection[] = [
     fields: [
       {
         key: "table-6", label: "Objetivos del proyecto", type: "dynamic-rows",
-        headers: ["#", "Objetivo", "Limitaciones"],
+        headers: ["Objetivo N°", "Objetivo", "Limitaciones"],
         initialRows: 3,
       } as TableConfig,
     ],
