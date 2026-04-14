@@ -38,9 +38,9 @@ export const REQUIRED_FIELDS = [
 
 export const FORM_SECTIONS: FormSection[] = [
   {
-    id: "portada",
-    number: "P",
-    title: "Portada",
+    id: "section-1",
+    number: "1",
+    title: "Datos del Proyecto",
     fields: [
       { key: "portada-nombre", label: "Nombre del proyecto", type: "text", required: true },
       { key: "portada-org", label: "Organización", type: "text", required: true },
@@ -49,16 +49,17 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "seccion-4",
-    number: "4",
+    id: "section-2",
+    number: "2",
     title: "Definición del Problema",
     fields: [
-      { key: "ans-4-1", label: "4.1 ¿Cuál es el contexto institucional?", type: "textarea", required: true, hint: "Describe la misión de la institución, su rol en el Estado y cómo se relaciona con el problema. Incluye el marco legal habilitante si aplica." },
-      { key: "ans-4-2", label: "4.2 Describe el problema que enfrentan.", type: "textarea", required: true, hint: "¿Cuál es el problema concreto, observable? No la solución, sino el estado actual que quieres cambiar. Usa datos cuando sea posible." },
-      { key: "ans-4-3", label: "4.3 ¿Cuáles son las causas del problema?", type: "textarea", required: true, hint: "Diferencia causas directas de causas sistémicas." },
-      { key: "ans-4-4", label: "4.4 ¿Quiénes o qué son los afectados por el problema?", type: "textarea", required: true, hint: "Personas, organizaciones, barrios, ecosistemas. Directos e indirectos." },
+      { key: "ans-4-1", label: "2.1 ¿Cuál es el contexto institucional?", type: "textarea", required: true, hint: "Describe brevemente la misión, funciones y contexto operativo del área que presenta el proyecto (máx 400-500 caracteres)." },
+      { key: "ans-4-2", label: "2.2 Describe el problema que enfrentan.", type: "textarea", required: true, hint: "Explica qué problema existe y por qué es relevante. Evita incluir la solución; esta se aborda al final de la sección." },
+      { key: "ans-4-3", label: "2.3 ¿Cuáles son las causas del problema?", type: "textarea", required: true, hint: "Identifica las causas principales del problema. Si no tienes toda la información, describe las causas que se conocen." },
+      { key: "ans-4-4", label: "2.4 ¿Quiénes o qué son los afectados por el problema?", type: "textarea", required: true, hint: "Selecciona los grupos afectados y describe brevemente cómo se relacionan con el problema." },
       {
-        key: "table-4-5", label: "4.5 ¿Cuántos son afectados?", type: "dynamic-rows",
+        key: "table-4-5", label: "2.5 ¿Cuántos son afectados?", type: "dynamic-rows",
+        hint: "Ingresa la cantidad de personas u organizaciones afectadas. Puedes desagregar según los criterios disponibles (edad, género, territorio, etc.).",
         headers: ["Dimensión", "Grupo/Categoría", "N° estimado de afectados", "Fuente/Año"],
         prefillRows: [
           ["Total", "", "", ""],
@@ -68,27 +69,27 @@ export const FORM_SECTIONS: FormSection[] = [
           ["Etnia", "", "", ""],
         ],
       } as TableConfig,
-      { key: "ans-4-6", label: "4.6 ¿Cuánto les afecta?", type: "textarea", required: true, hint: "Usa indicadores concretos: tiempos de espera, tasas, costos económicos." },
-      { key: "ans-4-7", label: "4.7 ¿Cuáles son las medidas actuales para abordar el problema y sus deficiencias?", type: "textarea", required: true },
-      { key: "ans-4-8", label: "4.8 ¿Cómo otros proyectos han utilizado la ciencia de datos o IA para resolver problemas similares?", type: "textarea", hint: "Revisar algoritmospublicos.cl y dssgfellowship.org/projects" },
+      { key: "ans-4-6", label: "2.6 ¿Cuánto les afecta?", type: "textarea", required: true, hint: "Describe la intensidad o severidad del problema usando un indicador cuantitativo cuando sea posible." },
+      { key: "ans-4-7", label: "2.7 ¿Cuáles son las medidas actuales para abordar el problema y sus deficiencias?", type: "textarea", required: true, hint: "Explica qué acciones existen hoy para enfrentar el problema y por qué no son suficientes." },
+      { key: "ans-4-8", label: "2.8 ¿Cómo otros proyectos han utilizado la ciencia de datos o IA para resolver problemas similares?", type: "textarea", hint: "Revisar Algoritmos Públicos y Data Science for Social Good." },
     ],
   },
   {
-    id: "seccion-5",
-    number: "5",
+    id: "section-3",
+    number: "3",
     title: "Análisis de Prefactibilidad",
     fields: [
-      { key: "ans-5-1", label: "5.1 ¿Qué facultades tiene la institución para actuar sobre el problema?", type: "textarea", required: true, hint: "Cita la norma legal que habilita la intervención." },
-      { key: "ans-5-2", label: "5.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas?", type: "textarea" },
-      { key: "ans-5-3", label: "5.3 ¿Dónde se ha manifestado que es prioritario resolver el problema?", type: "textarea", hint: "Programa de gobierno, plan estratégico, discursos, compromisos internacionales." },
-      { key: "ans-5-4", label: "5.4 ¿Existen, y podemos acceder a los datos relevantes?", type: "textarea", required: true, hint: "¿Están desagregados por género, edad, etnia, territorio?" },
-      { key: "ans-5-5", label: "5.5 ¿Tenemos los recursos humanos y financieros para llevar a cabo el proyecto?", type: "textarea" },
-      { key: "ans-5-6", label: "5.6 ¿Cuáles son los riesgos del proyecto?", type: "textarea", required: true, hint: "Considera: éticos (sesgos, privacidad), licencia social, implementación, datos, técnicos y políticos." },
+      { key: "ans-5-1", label: "3.1 ¿Qué facultades tiene la institución para actuar sobre el problema?", type: "textarea", required: true, hint: "Cita la norma legal que habilita la intervención." },
+      { key: "ans-5-2", label: "3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas?", type: "textarea" },
+      { key: "ans-5-3", label: "3.3 ¿Dónde se ha manifestado que es prioritario resolver el problema?", type: "textarea", hint: "Programa de gobierno, plan estratégico, discursos, compromisos internacionales." },
+      { key: "ans-5-4", label: "3.4 ¿Existen, y podemos acceder a los datos relevantes?", type: "textarea", required: true, hint: "¿Están desagregados por género, edad, etnia, territorio?" },
+      { key: "ans-5-5", label: "3.5 ¿Tenemos los recursos humanos y financieros para llevar a cabo el proyecto?", type: "textarea" },
+      { key: "ans-5-6", label: "3.6 ¿Cuáles son los riesgos del proyecto?", type: "textarea", required: true, hint: "Considera: éticos (sesgos, privacidad), licencia social, implementación, datos, técnicos y políticos." },
     ],
   },
   {
-    id: "seccion-6",
-    number: "6",
+    id: "section-4",
+    number: "4",
     title: "Objetivos",
     globalHint: "La solución técnica NO es el objetivo. Debe ser medible. Usa verbos: aumentar, disminuir, mejorar, reducir. Considera trade-offs.",
     fields: [
@@ -100,8 +101,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "seccion-7",
-    number: "7",
+    id: "section-5",
+    number: "5",
     title: "Actividades",
     globalHint: "Las actividades son tareas que ejecuta una persona en la institución. NO incluyas pasos de ciencia de datos.",
     fields: [
@@ -112,26 +113,26 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "seccion-8",
-    number: "8",
+    id: "section-6",
+    number: "6",
     title: "Mapeo de Datos",
     fields: [
       {
-        key: "table-8a", label: "8.A Datos internos", type: "dynamic-cols",
+        key: "table-8a", label: "6.A Datos internos", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "Comentarios adicionales"],
         initialCols: 2,
       } as TableConfig,
       {
-        key: "table-8b", label: "8.B Datos externos", type: "dynamic-cols",
+        key: "table-8b", label: "6.B Datos externos", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "¿Son necesarios acuerdos legales para el acceso?", "Comentarios adicionales"],
         initialCols: 2,
       } as TableConfig,
-      { key: "ans-8-c", label: "8.C En un mundo ideal, ¿qué datos adicionales querrías obtener?", type: "textarea", required: true, hint: "Encuestas, CCTV, registros telefónicos, ADN, diferente frecuencia o granularidad. Sé ambicioso." },
+      { key: "ans-8-c", label: "6.C En un mundo ideal, ¿qué datos adicionales querrías obtener?", type: "textarea", required: true, hint: "Encuestas, CCTV, registros telefónicos, ADN, diferente frecuencia o granularidad. Sé ambicioso." },
     ],
   },
   {
-    id: "seccion-9",
-    number: "9",
+    id: "section-7",
+    number: "7",
     title: "Análisis",
     globalHint: "Tipos comunes: descripción, predicción, detección, optimización, cambio de comportamiento.",
     fields: [
@@ -143,8 +144,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "seccion-10",
-    number: "10",
+    id: "section-8",
+    number: "8",
     title: "Consideraciones Éticas",
     fields: [
       { key: "eth-prop", label: "⚖️ Proporcionalidad — ¿Es la ciencia de datos/IA el medio adecuado? ¿Evaluaste alternativas?", type: "textarea", required: true },
@@ -162,16 +163,16 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "seccion-11",
-    number: "11",
+    id: "section-9",
+    number: "9",
     title: "Piloto y Validación",
     fields: [
-      { key: "ans-11-1", label: "11.1 ¿Qué prueba de campo o ensayo aleatorio controlado puedes diseñar para validar el proyecto?", type: "textarea", required: true, hint: "Los resultados del piloto deben coincidir con los objetivos de la sección 6. Describe alcance, duración y criterios de éxito." },
+      { key: "ans-11-1", label: "9.1 ¿Qué prueba de campo o ensayo aleatorio controlado puedes diseñar para validar el proyecto?", type: "textarea", required: true, hint: "Los resultados del piloto deben coincidir con los objetivos de la sección 4. Describe alcance, duración y criterios de éxito." },
     ],
   },
   {
-    id: "seccion-12",
-    number: "12",
+    id: "section-10",
+    number: "10",
     title: "Equipo",
     fields: [
       {
