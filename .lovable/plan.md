@@ -1,57 +1,52 @@
 
 
-## Plan: UI Text and Structure Updates
+## Plan: Multiple UI Text and Content Updates
 
-### Changes Overview
+### Changes Summary
 
-**1. Topbar brand name** (Topbar.tsx, AuthLayout.tsx)
-- Change "GobLab Ficha" to "Portal de Evaluación de Proyectos de IA" in both the dashboard topbar and the auth layout left panel.
+**1. Section 4 (Objetivos) - Table header** (`formSections.ts` line 98)
+- Change `"#"` to `"N°"` in headers array.
 
-**2. Dashboard footer** (Dashboard.tsx, line 264-266)
-- Replace current long text with:
-  > Desarrollado por el GobLab UAI. Proyecto financiado por el Laboratorio de Gobierno y el Servicio Civil, en colaboración con el Center for Data Science and Public Policy de la Universidad de Chicago.
-  > Licencia CC BY-SA 3.0 · goblab.uai.cl
+**2. Section 5 (Actividades) - Title and table label** (`formSections.ts` lines 106, 181)
+- Change title from `"Actividades"` to `"Actividades del proceso"`.
+- In `DynamicTable.tsx` line 181: change `"Momento"` to `"Etapa del Proyecto"`.
+- In `exportPdf.ts` line 414: change `"Momento"` to `"Etapa del Proyecto"`.
 
-**3. "Formular proyecto" buttons** (Dashboard.tsx)
-- Change both "Nuevo proyecto" (line 189) and "Crear proyecto" (line 236) to "Formular proyecto".
+**3. AuthLayout - HOME text updates** (`AuthLayout.tsx`)
+- Line 25: Replace `"Diseña proyectos de IA y ciencia de datos para el sector público"` with `"Diseña proyectos de IA y ciencia de datos viables y responsables"`.
+- Add mention to ANID project (e.g., below the subtitle or as part of the footer text).
+- Line 32: Replace `"GobLab UAI"` with `"GobLab Ficha de Proyecto"` (or add it alongside).
+- Add GobLab and Herramientas Algoritmos Eticos logos. Since we don't have actual logo files, we'll use the existing SVG logo and add a text reference for "Herramientas Algoritmos Eticos", or place placeholder image tags if URLs are provided.
 
-**4. Remove green + icon in empty state** (Dashboard.tsx)
-- Remove the `<Plus>` icon inside the rounded circle (lines 221-224) in the empty state view.
+**4. Register - "Entidad" to "Organización"** (`Register.tsx` line 76)
+- Change label from `"Entidad"` to `"Organización"`.
+- Update placeholder accordingly.
 
-**5. Renumber sections 1-10** (formSections.ts)
-- Portada (P) becomes **1** with title "Datos del Proyecto"
-- Section 4 becomes **2** (Definicion del Problema)
-- Section 5 becomes **3** (Analisis de Prefactibilidad)
-- Section 6 becomes **4** (Objetivos)
-- Section 7 becomes **5** (Actividades)
-- Section 8 becomes **6** (Mapeo de Datos)
-- Section 9 becomes **7** (Analisis)
-- Section 10 becomes **8** (Consideraciones Eticas)
-- Section 11 becomes **9** (Piloto y Validacion)
-- Section 12 becomes **10** (Equipo)
-- All field labels (e.g., "4.1" to "2.1", "5.1" to "3.1", etc.) and table labels updated accordingly.
+**5. Dashboard - Subtitle text** (`Dashboard.tsx` line 178)
+- Change `"Gestiona y formula tus proyectos..."` to `"Formula tus proyectos de IA y ciencia de datos"`.
 
-**6. Form header text** (ProjectEditor.tsx)
-- Add a subtitle/description at the top of the form document:
-  > Completa tu proyecto por etapas. Cada seccion agrupa la informacion necesaria para avanzar en el proceso de formulacion.
+**6. Section 1 (Datos del Proyecto) - Fecha hint and Equipo placeholder** (`formSections.ts`)
+- Add hint to fecha field: `"Fecha inicio de formulación de proyecto"`.
+- Add hint to equipo field as placeholder text: `"Escribe los nombres y apellidos de los integrantes del equipo que está formulando el proyecto"`.
 
-**7. Update hints for section 2 (current section 4)** (formSections.ts)
-- 2.1: "Describe brevemente la mision, funciones y contexto operativo del area que presenta el proyecto (max 400-500 caracteres)"
-- 2.2: "Explica que problema existe y por que es relevante. Evita incluir la solucion; esta se aborda al final de la seccion."
-- 2.3: "Identifica las causas principales del problema. Si no tienes toda la informacion, describe las causas que se conocen."
-- 2.4: "Selecciona los grupos afectados y describe brevemente como se relacionan con el problema"
-- 2.5: "Ingresa la cantidad de personas u organizaciones afectadas. Puedes desagregar segun los criterios disponibles (edad, genero, territorio, etc.)."
-- 2.6: "Describe la intensidad o severidad del problema usando un indicador cuantitativo cuando sea posible."
-- 2.7: "Explica que acciones existen hoy para enfrentar el problema y por que no son suficientes."
-- 2.8: Change hint to reference named links "Algoritmos Publicos" and "Data Science for Social Good" instead of raw URLs.
+**7. Section 2 (Definición del Problema) - 2.8 hint** (`formSections.ts` line 74)
+- Update hint to include the new link (Algoritmos de IA en America Latina from UniAndes) and change algoritmospublicos.cl to point to `/repositorio`: `"Revisar Algoritmos Públicos, Data Science for Social Good y Algoritmos de IA en América Latina."`.
 
-**8. Fix section number display** (ProjectEditor.tsx)
-- Remove the `section.number !== "P"` check (line 446) since there's no longer a "P" section; all sections now have numeric numbers.
+**8. Section 3 (Prefactibilidad) - 3.2 question text** (`formSections.ts` line 83)
+- Change label to: `"3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas? ¿Cuáles?"`.
+
+**9. Section 3 (Prefactibilidad) - 3.4 hint** (`formSections.ts` line 85)
+- Change hint from `"¿Están desagregados por género, edad, etnia, territorio?"` to `"¿Están desagregados según las dimensiones de la población afectada?"`.
+
+### Clarification needed
+- For the GobLab and Herramientas Algoritmos Eticos logos: do you have image URLs or files to use? I can place the existing SVG GobLabLogo and add a text label for now.
+- For the ANID mention: what specific text should appear? (e.g., "Proyecto financiado por ANID" or a specific grant number?)
 
 ### Files to modify
-- `src/components/Topbar.tsx` - brand name
-- `src/components/AuthLayout.tsx` - brand name in auth panel
-- `src/pages/Dashboard.tsx` - footer, button labels, remove + icon
-- `src/lib/formSections.ts` - section renumbering, title change, hint updates
-- `src/pages/ProjectEditor.tsx` - form header text, remove "P" check
+- `src/lib/formSections.ts` — section titles, table headers, hints, question labels
+- `src/components/editor/DynamicTable.tsx` — "Momento" to "Etapa del Proyecto"
+- `src/lib/exportPdf.ts` — "Momento" to "Etapa del Proyecto"
+- `src/components/AuthLayout.tsx` — HOME text, logos, ANID mention
+- `src/pages/Register.tsx` — "Entidad" to "Organización"
+- `src/pages/Dashboard.tsx` — subtitle text
 
