@@ -7,7 +7,7 @@ import { Topbar } from "@/components/Topbar";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const STATUS_FILTERS = [
