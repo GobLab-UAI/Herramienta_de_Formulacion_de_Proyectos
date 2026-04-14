@@ -186,7 +186,7 @@ export default function Dashboard() {
             )}
             {!isConsultor && (
               <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
-                <Plus className="mr-2 h-4 w-4" /> Nuevo proyecto
+                Formular proyecto
               </Button>
             )}
           </div>
@@ -218,9 +218,6 @@ export default function Dashboard() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="rounded-full bg-accent p-4 mb-4">
-              <Plus className="h-8 w-8 text-primary" />
-            </div>
             <h3 className="font-display text-xl text-foreground mb-2">
               {showDeleted ? "No hay proyectos eliminados" : "No hay proyectos"}
             </h3>
@@ -233,7 +230,7 @@ export default function Dashboard() {
             </p>
             {!isConsultor && !showDeleted && (
               <Button onClick={() => createProject.mutate()}>
-                <Plus className="mr-2 h-4 w-4" /> Crear proyecto
+                Formular proyecto
               </Button>
             )}
           </div>
@@ -262,7 +259,9 @@ export default function Dashboard() {
         )}
 
         <footer className="mt-16 border-t pt-6 pb-8 text-xs text-muted-foreground text-center">
-          Fue creada en 2019 en el marco de un proyecto de innovación del GobLab titulado "Ciencia de Datos para Directivos Públicos" con financiamiento del Laboratorio de Gobierno y Servicio Civil, en colaboración con el Center for Data Science and Public Policy de la Universidad de Chicago. Licencia CC BY-SA 3.0 · goblab.uai.cl
+          Desarrollado por el GobLab UAI. Proyecto financiado por el Laboratorio de Gobierno y el Servicio Civil, en colaboración con el Center for Data Science and Public Policy de la Universidad de Chicago.
+          <br />
+          Licencia CC BY-SA 3.0 · goblab.uai.cl
         </footer>
       </main>
     </div>

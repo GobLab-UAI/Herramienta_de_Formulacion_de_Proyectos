@@ -18,7 +18,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
       <div className="hidden lg:flex lg:w-1/2 bg-secondary flex-col justify-between p-12">
         <div className="flex items-center gap-3">
           <GobLabLogo size={40} />
-          <span className="font-display text-2xl text-secondary-foreground">GobLab Ficha</span>
+          <span className="font-display text-2xl text-secondary-foreground">Portal de Evaluación de Proyectos de IA</span>
         </div>
         <div className="space-y-6">
           <h1 className="text-4xl font-display text-secondary-foreground leading-tight">
@@ -38,7 +38,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
         <div className="w-full max-w-md space-y-8">
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <GobLabLogo size={36} />
-            <span className="font-display text-xl text-foreground">GobLab Ficha</span>
+            <span className="font-display text-xl text-foreground">Portal de Evaluación de Proyectos de IA</span>
           </div>
           <div>
             <h2 className="text-2xl font-display text-foreground">{title}</h2>
