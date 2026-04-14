@@ -17,7 +17,7 @@ export function Topbar() {
     <header className="sticky top-0 z-50 flex h-[60px] items-center justify-between border-b bg-card px-6 shadow-goblab-sm">
       <Link to="/dashboard" className="flex items-center gap-2.5">
         <GobLabLogo size={32} />
-        <span className="font-display text-lg text-foreground hidden sm:inline">GobLab Ficha</span>
+        <span className="font-display text-lg text-foreground hidden sm:inline">Portal de Evaluación de Proyectos de IA</span>
       </Link>
 
       <div className="flex items-center gap-3">

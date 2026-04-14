@@ -435,6 +435,9 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
               className="bg-card rounded-xl shadow-goblab-sm border border-border/50 px-10 py-8"
               style={{ maxWidth: '860px', overflow: 'visible' }}
             >
+              <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+                Completa tu proyecto por etapas. Cada sección agrupa la información necesaria para avanzar en el proceso de formulación.
+              </p>
               {FORM_SECTIONS.map((section, sIdx) => (
                 <section
                   key={section.id}
@@ -443,9 +446,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                 >
                   <div className="mb-6">
                     <h2 className="font-display text-xl text-foreground tracking-tight">
-                      {section.number !== "P" && (
-                        <span className="text-primary mr-2">{section.number}.</span>
-                      )}
+                      <span className="text-primary mr-2">{section.number}.</span>
                       {section.title}
                     </h2>
                     {section.globalHint && (
@@ -455,7 +456,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                     )}
                   </div>
 
-                  <div className={section.id === "seccion-10" ? "grid gap-4 md:grid-cols-2" : "space-y-1"}>
+                  <div className={section.id === "section-8" ? "grid gap-4 md:grid-cols-2" : "space-y-1"}>
                     {section.fields.map((field) => {
                       const isTable = "headers" in field || "rowLabels" in field || ("type" in field && (field as TableConfig).type !== undefined && ["dynamic-rows", "dynamic-cols", "activities"].includes((field as any).type));
 
