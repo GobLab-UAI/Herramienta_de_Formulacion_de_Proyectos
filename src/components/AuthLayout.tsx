@@ -21,11 +21,6 @@ export function BrandLogos({ className = "" }: { className?: string }) {
         alt="GobLab UAI - Universidad Adolfo Ibáñez"
         className="h-10 md:h-12 w-auto object-contain"
       />
-      <img
-        src={logoHerramientas}
-        alt="Herramientas Algoritmos Éticos"
-        className="h-10 md:h-12 w-auto object-contain"
-      />
     </div>
   );
 }
