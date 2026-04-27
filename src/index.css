@@ -6,78 +6,78 @@
 
 @layer base {
   :root {
-    /* GobLab Design System */
-    --teal-h: 174;
-    --teal-s: 100%;
-    --teal-l: 35%;
-    
-    --background: 218 40% 97%;
-    --foreground: 218 48% 20%;
-    
+    /* GobLab Escuela de Gobierno - Paleta institucional
+       Primario: Burdeos/rosado #B67A84 (Pantone 500C) ≈ hsl(349 22% 60%)
+       Secundario: Navy profundo para texto y acentos oscuros */
+
+    --background: 20 20% 97%;
+    --foreground: 349 25% 18%;
+
     --card: 0 0% 100%;
-    --card-foreground: 218 48% 20%;
-    
+    --card-foreground: 349 25% 18%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 218 48% 20%;
-    
-    --primary: 174 100% 35%;
+    --popover-foreground: 349 25% 18%;
+
+    --primary: 349 22% 60%;
     --primary-foreground: 0 0% 100%;
-    
-    --secondary: 218 48% 20%;
+
+    --secondary: 349 30% 28%;
     --secondary-foreground: 0 0% 100%;
-    
-    --muted: 218 30% 95%;
-    --muted-foreground: 216 22% 50%;
-    
-    --accent: 174 70% 95%;
-    --accent-foreground: 174 100% 30%;
-    
-    --destructive: 1 76% 55%;
+
+    --muted: 349 15% 95%;
+    --muted-foreground: 349 12% 42%;
+
+    --accent: 349 40% 94%;
+    --accent-foreground: 349 35% 35%;
+
+    --destructive: 1 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    
-    --border: 218 30% 90%;
-    --border-strong: 216 25% 78%;
-    --input: 218 30% 90%;
-    --ring: 174 100% 35%;
-    
+
+    --border: 349 18% 88%;
+    --border-strong: 349 15% 75%;
+    --input: 349 18% 88%;
+    --ring: 349 22% 60%;
+
     --radius: 0.625rem;
     --radius-lg: 1rem;
-    
-    /* Semantic colors */
-    --teal: 174 100% 35%;
-    --teal-dark: 174 100% 30%;
-    --teal-light: 174 60% 95%;
-    --teal-mid: 174 60% 82%;
-    --navy: 218 48% 20%;
-    --navy-mid: 218 40% 28%;
-    --text-primary: 218 48% 20%;
-    --text-secondary: 216 22% 38%;
-    --text-tertiary: 216 18% 62%;
-    --bg-page: 218 40% 97%;
+
+    /* Semantic colors — keep teal/navy token names for backward compatibility,
+       but remap them to the burdeos GobLab palette. */
+    --teal: 349 22% 60%;
+    --teal-dark: 349 28% 48%;
+    --teal-light: 349 40% 95%;
+    --teal-mid: 349 30% 80%;
+    --navy: 349 30% 25%;
+    --navy-mid: 349 25% 35%;
+    --text-primary: 349 25% 18%;
+    --text-secondary: 349 12% 38%;
+    --text-tertiary: 349 10% 60%;
+    --bg-page: 20 20% 97%;
     --bg-white: 0 0% 100%;
-    --amber: 37 90% 55%;
+    --amber: 37 85% 52%;
     --amber-bg: 37 100% 96%;
-    --red: 1 76% 55%;
+    --red: 1 70% 50%;
     --red-bg: 0 100% 97%;
-    --green: 122 46% 33%;
-    --green-bg: 120 40% 96%;
-    
-    --shadow-sm: 0 1px 3px rgba(26,43,74,.08), 0 1px 2px rgba(26,43,74,.04);
-    --shadow: 0 4px 16px rgba(26,43,74,.10), 0 1px 4px rgba(26,43,74,.06);
-    --shadow-lg: 0 12px 40px rgba(26,43,74,.12), 0 4px 12px rgba(26,43,74,.07);
-    
+    --green: 152 40% 35%;
+    --green-bg: 152 35% 95%;
+
+    --shadow-sm: 0 1px 3px rgba(95,40,50,.08), 0 1px 2px rgba(95,40,50,.04);
+    --shadow: 0 4px 16px rgba(95,40,50,.10), 0 1px 4px rgba(95,40,50,.06);
+    --shadow-lg: 0 12px 40px rgba(95,40,50,.12), 0 4px 12px rgba(95,40,50,.07);
+
     --sidebar-width: 252px;
     --topbar-height: 60px;
     --content-max-width: 920px;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 218 48% 20%;
-    --sidebar-primary: 174 100% 35%;
+    --sidebar-foreground: 349 25% 18%;
+    --sidebar-primary: 349 22% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 174 70% 95%;
-    --sidebar-accent-foreground: 174 100% 30%;
-    --sidebar-border: 218 30% 90%;
-    --sidebar-ring: 174 100% 35%;
+    --sidebar-accent: 349 40% 94%;
+    --sidebar-accent-foreground: 349 35% 35%;
+    --sidebar-border: 349 18% 88%;
+    --sidebar-ring: 349 22% 60%;
   }
 }
 
