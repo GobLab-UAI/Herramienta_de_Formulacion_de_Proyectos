@@ -1,8 +1,9 @@
-import { GobLabLogo } from "@/components/AuthLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
+import logoGoblab from "@/assets/logo-goblab-uai.png";
+import logoHerramientas from "@/assets/logo-herramientas-eticas.png";
 
 export function Topbar() {
   const { profile, role, logout } = useAuth();
@@ -15,9 +16,16 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-50 flex h-[60px] items-center justify-between border-b bg-card px-6 shadow-goblab-sm">
-      <Link to="/dashboard" className="flex items-center gap-2.5">
-        <GobLabLogo size={32} />
-        <span className="font-display text-lg text-foreground hidden sm:inline">Portal de Evaluación de Proyectos de IA</span>
+      <Link to="/dashboard" className="flex items-center gap-4 min-w-0">
+        <img src={logoGoblab} alt="GobLab UAI" className="h-8 w-auto object-contain" />
+        <span className="font-display text-base lg:text-lg text-foreground hidden md:inline truncate">
+          Portal de Evaluación de Proyectos de IA
+        </span>
+        <img
+          src={logoHerramientas}
+          alt="Herramientas Algoritmos Éticos"
+          className="h-8 w-auto object-contain hidden lg:inline-block"
+        />
       </Link>
 
       <div className="flex items-center gap-3">
