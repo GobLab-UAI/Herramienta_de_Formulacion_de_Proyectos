@@ -2,9 +2,12 @@ export interface FormField {
   key: string;
   label: string;
   hint?: string;
-  type: "text" | "textarea" | "date" | "table";
+  type: "text" | "textarea" | "date" | "table" | "yesno";
   required?: boolean;
   defaultValue?: string;
+  // For yesno type: labels for the textarea shown after each choice
+  yesDetailLabel?: string;
+  noDetailLabel?: string;
 }
 
 export interface TableConfig {
@@ -13,6 +16,7 @@ export interface TableConfig {
   hint?: string;
   type: "dynamic-rows" | "dynamic-cols" | "activities";
   headers?: string[];
+  headerHints?: string[];
   rowLabels?: string[];
   initialRows?: number;
   initialCols?: number;
@@ -29,7 +33,7 @@ export interface FormSection {
 
 export const REQUIRED_FIELDS = [
   "portada-nombre", "portada-org",
-  "ans-4-1", "ans-4-2", "ans-4-3", "ans-4-4", "ans-4-6", "ans-4-7",
+  "ans-4-1", "ans-4-2", "ans-4-3", "ans-4-4", "ans-4-6", "table-2-7",
   "ans-5-1", "ans-5-4", "ans-5-6",
   "table-6", "table-7", "table-8a", "ans-8-c", "table-9",
   "eth-prop", "eth-lic1", "eth-dat1", "eth-tra1", "eth-eq1", "eth-res1",
@@ -77,7 +81,18 @@ export const FORM_SECTIONS: FormSection[] = [
         ],
       } as TableConfig,
       { key: "ans-4-6", label: "2.6 ¿Cuánto les afecta?", type: "textarea", required: true, hint: "Describe la intensidad o severidad del problema usando un indicador cuantitativo cuando sea posible." },
-      { key: "ans-4-7", label: "2.7 ¿Cuáles son las medidas actuales para abordar el problema y sus deficiencias?", type: "textarea", required: true, hint: "Explica qué acciones existen hoy para enfrentar el problema y por qué no son suficientes." },
+      {
+        key: "table-2-7",
+        label: "2.7 ¿Cuáles son las medidas actuales para abordar el problema y sus deficiencias?",
+        type: "dynamic-rows",
+        hint: "Lista las medidas actuales y, en cada una, indica sus limitaciones o brechas. Puedes agregar tantas filas como necesites.",
+        headers: ["Medida actual", "Limitaciones o brechas"],
+        headerHints: [
+          "Describe las acciones, programas o procesos que existen hoy para enfrentar el problema",
+          "Explica por qué las medidas actuales no resuelven el problema o qué aspectos quedan pendientes",
+        ],
+        initialRows: 3,
+      } as TableConfig,
       { key: "ans-4-8", label: "2.8 ¿Cómo otros proyectos han utilizado la ciencia de datos o IA para resolver problemas similares?", type: "textarea", hint: "Revisar Algoritmos Públicos (algoritmospublicos.cl/repositorio), Data Science for Social Good (dssgfellowship.org/projects) y Algoritmos de IA en América Latina (algoritmos.uniandes.edu.co)." },
     ],
   },
@@ -87,8 +102,14 @@ export const FORM_SECTIONS: FormSection[] = [
     title: "Análisis de Prefactibilidad",
     fields: [
       { key: "ans-5-1", label: "3.1 ¿Qué facultades tiene la institución para actuar sobre el problema?", type: "textarea", required: true, hint: "Cita la norma legal que habilita la intervención." },
-      { key: "ans-5-2", label: "3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas? ¿Cuáles?", type: "textarea" },
-      { key: "ans-5-3", label: "3.3 ¿Dónde se ha manifestado que es prioritario resolver el problema?", type: "textarea", hint: "Programa de gobierno, plan estratégico, discursos, compromisos internacionales." },
+      {
+        key: "ans-5-2",
+        label: "3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas?",
+        type: "yesno",
+        yesDetailLabel: "Indica el nombre de las entidades y su rol en el proyecto.",
+        noDetailLabel: "Fundamenta la respuesta.",
+      },
+      { key: "ans-5-3", label: "3.3 ¿Dónde se ha manifestado que es prioritario resolver el problema?", type: "textarea", hint: "Indica en qué documentos, planes o compromisos institucionales se establece que este problema es prioritario." },
       { key: "ans-5-4", label: "3.4 ¿Existen, y podemos acceder a los datos relevantes? ¿Están desagregados según las dimensiones de la población afectada?", type: "textarea", required: true },
       { key: "ans-5-5", label: "3.5 ¿Tenemos los recursos humanos y financieros para llevar a cabo el proyecto?", type: "textarea" },
       { key: "ans-5-6", label: "3.6 ¿Cuáles son los riesgos del proyecto?", type: "textarea", required: true, hint: "Considera: éticos (sesgos, privacidad), licencia social, implementación, datos, técnicos y políticos." },
