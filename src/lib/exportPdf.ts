@@ -86,7 +86,6 @@ export function generateProjectPDF(
   const coverFields = [
     { label: "Organización", key: "portada-org" },
     { label: "Fecha", key: "portada-fecha" },
-    { label: "Equipo formulador", key: "portada-equipo" },
   ];
 
   doc.setFontSize(11);
@@ -106,8 +105,15 @@ export function generateProjectPDF(
   doc.addPage();
   y = MARGIN + 5;
 
-  for (let sIdx = 1; sIdx < FORM_SECTIONS.length; sIdx++) {
+  for (let sIdx = 0; sIdx < FORM_SECTIONS.length; sIdx++) {
     const section = FORM_SECTIONS[sIdx];
+
+    // Skip cover fields already shown on the cover, but render the team table
+    const skipKeysForCover = new Set(["portada-nombre", "portada-org", "portada-fecha"]);
+    const fieldsToRender = sIdx === 0
+      ? section.fields.filter((f) => !skipKeysForCover.has((f as any).key))
+      : section.fields;
+    if (fieldsToRender.length === 0) continue;
 
     // Section header bar
     y = checkPageBreak(doc, y, 22);
@@ -152,7 +158,7 @@ export function generateProjectPDF(
         }
       }
     } else {
-      for (const field of section.fields) {
+      for (const field of fieldsToRender) {
         const isTable =
           "headers" in field ||
           "rowLabels" in field ||
