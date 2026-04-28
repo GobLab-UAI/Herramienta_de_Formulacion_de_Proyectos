@@ -7,17 +7,22 @@ const PAGE_WIDTH = 210;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 
 const COLORS = {
-  primary: [0, 82, 136] as [number, number, number],
-  sectionBg: [0, 82, 136] as [number, number, number],
+  // GobLab burdeos palette — match the app design tokens
+  // primary  #B67A84  (hsl 349 22% 60%)
+  // secondary/navy #5C2E38 (hsl 349 30% 28%)
+  // accent bg #F5E9EB (hsl 349 40% 94%)
+  // muted bg  #F1E8EA (hsl 349 15% 95%)
+  primary: [182, 122, 132] as [number, number, number],
+  sectionBg: [92, 46, 56] as [number, number, number],
   sectionText: [255, 255, 255] as [number, number, number],
-  text: [30, 30, 30] as [number, number, number],
-  muted: [120, 120, 120] as [number, number, number],
-  lightBorder: [210, 218, 226] as [number, number, number],
-  headerBg: [0, 82, 136] as [number, number, number],
+  text: [46, 28, 33] as [number, number, number],
+  muted: [140, 110, 116] as [number, number, number],
+  lightBorder: [225, 210, 214] as [number, number, number],
+  headerBg: [182, 122, 132] as [number, number, number],
   headerText: [255, 255, 255] as [number, number, number],
-  altRow: [243, 247, 251] as [number, number, number],
-  rowLabelBg: [235, 240, 245] as [number, number, number],
-  momentBg: [0, 60, 100] as [number, number, number],
+  altRow: [250, 244, 246] as [number, number, number],
+  rowLabelBg: [245, 233, 235] as [number, number, number],
+  momentBg: [92, 46, 56] as [number, number, number],
   momentText: [255, 255, 255] as [number, number, number],
 };
 
