@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, HelpCircle } from "lucide-react";
 import type { TableConfig } from "@/lib/formSections";
 
 interface DynamicTableProps {
@@ -65,7 +65,17 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                         : "px-3 py-2 text-left font-medium text-xs"
                     }
                   >
-                    {h}
+                    <span className="inline-flex items-center gap-1">
+                      {h}
+                      {config.headerHints?.[i] && (
+                        <HelpCircle
+                          className="h-3 w-3 text-muted-foreground/70 cursor-help"
+                          aria-label={config.headerHints[i]}
+                        >
+                          <title>{config.headerHints[i]}</title>
+                        </HelpCircle>
+                      )}
+                    </span>
                   </th>
                 ))}
                 {!readOnly && <th className="w-10" />}
