@@ -332,7 +332,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       {/* Topbar */}
       <header className="sticky top-0 z-50 flex h-[60px] items-center gap-3 border-b bg-card px-4 shadow-goblab-sm">
         <Link to="/dashboard" className="flex items-center gap-2 shrink-0">
-          <GobLabLogo size={28} />
+          <img src={logoHerramientas} alt="Herramientas Algoritmos Éticos" className="h-7 w-auto object-contain" />
         </Link>
 
         <Input
