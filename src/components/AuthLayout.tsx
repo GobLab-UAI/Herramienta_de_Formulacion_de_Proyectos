@@ -49,7 +49,10 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
         </div>
         <div className="space-y-2">
           <p className="text-sm text-secondary-foreground/50">
-            GobLab Ficha de Proyecto · Proyecto financiado por ANID · CC BY-SA 3.0 · goblab.uai.cl
+            Desarrollado por el GobLab UAI. Proyecto financiado por el Laboratorio de Gobierno y el Servicio Civil, en colaboración con el Center for Data Science and Public Policy de la Universidad de Chicago.
+          </p>
+          <p className="text-sm text-secondary-foreground/50">
+            Licencia CC BY-SA 3.0 · goblab.uai.cl
           </p>
         </div>
       </div>
