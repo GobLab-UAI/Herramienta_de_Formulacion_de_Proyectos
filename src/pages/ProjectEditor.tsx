@@ -503,7 +503,11 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                         <div key={field.key} id={`field-${field.key}`} className="relative">
                           <QuestionBlock
                             field={formField}
-                            value={(responses[field.key] as string) || formField.defaultValue || ""}
+                            value={
+                              responses[field.key] !== undefined && responses[field.key] !== null
+                                ? (responses[field.key] as any)
+                                : formField.defaultValue || ""
+                            }
                             onChange={(val) => updateField(field.key, val)}
                             readOnly={isReadOnly}
                             showCommentButton={isConsultor}
