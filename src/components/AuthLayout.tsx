@@ -42,7 +42,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             Diseña proyectos de IA y ciencia de datos viables y responsables
           </h1>
           <p className="font-display text-xl text-secondary-foreground/90">
-            Portal de Evaluación de Proyectos de IA
+            Herramienta de Evaluación de Proyectos de IA
           </p>
           <p className="text-lg text-secondary-foreground/70 max-w-md">
             Colabora con tu equipo usando la metodología GobLab UAI para formular proyectos de impacto.
@@ -71,7 +71,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             <BrandLogos />
           </div>
           <div className="lg:hidden">
-            <span className="font-display text-lg text-foreground">Portal de Evaluación de Proyectos de IA</span>
+            <span className="font-display text-lg text-foreground">Herramienta de Evaluación de Proyectos de IA</span>
           </div>
           <div>
             <h2 className="text-2xl font-display text-foreground">{title}</h2>
