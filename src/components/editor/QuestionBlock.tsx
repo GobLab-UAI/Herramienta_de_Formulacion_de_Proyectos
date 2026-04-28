@@ -3,12 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { FormField } from "@/lib/formSections";
 
 interface QuestionBlockProps {
   field: FormField;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | { choice?: "si" | "no"; details?: string };
+  onChange: (value: any) => void;
   readOnly: boolean;
   showCommentButton: boolean;
   pendingComments?: number;
@@ -19,6 +20,17 @@ interface QuestionBlockProps {
 export function QuestionBlock({
   field, value, onChange, readOnly, showCommentButton, pendingComments = 0, onComment, isCommentActive = false,
 }: QuestionBlockProps) {
+  const isYesNo = field.type === "yesno";
+  const yesNoVal: { choice?: "si" | "no"; details?: string } =
+    isYesNo && typeof value === "object" && value !== null ? (value as any) : {};
+  const stringVal = typeof value === "string" ? value : "";
+  const detailLabel =
+    yesNoVal.choice === "si"
+      ? field.yesDetailLabel || "Indica el nombre de las entidades y su rol en el proyecto."
+      : yesNoVal.choice === "no"
+        ? field.noDetailLabel || "Fundamenta la respuesta."
+        : null;
+
   return (
     <div
       className={`group relative rounded-lg transition-all duration-200 px-1 py-3 ${
@@ -71,9 +83,46 @@ export function QuestionBlock({
           )}
         </p>
       )}
-      {field.type === "textarea" ? (
+      {isYesNo ? (
+        <div className="space-y-3">
+          <RadioGroup
+            value={yesNoVal.choice || ""}
+            onValueChange={(v) => {
+              if (readOnly) return;
+              onChange({ choice: v as "si" | "no", details: yesNoVal.details || "" });
+            }}
+            disabled={readOnly}
+            className="flex gap-6"
+          >
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="si" id={`${field.key}-si`} />
+              <Label htmlFor={`${field.key}-si`} className="text-sm cursor-pointer">Sí</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="no" id={`${field.key}-no`} />
+              <Label htmlFor={`${field.key}-no`} className="text-sm cursor-pointer">No</Label>
+            </div>
+          </RadioGroup>
+          {detailLabel && (
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">{detailLabel}</Label>
+              <Textarea
+                value={yesNoVal.details || ""}
+                onChange={(e) =>
+                  onChange({ choice: yesNoVal.choice, details: e.target.value })
+                }
+                readOnly={readOnly}
+                placeholder={readOnly ? "Sin respuesta" : "Escribe tu respuesta aquí..."}
+                className={`min-h-[80px] resize-y border-0 border-b border-border rounded-none bg-transparent focus-visible:ring-0 focus-visible:border-primary px-0.5 text-sm ${
+                  readOnly ? "text-muted-foreground cursor-not-allowed" : ""
+                }`}
+              />
+            </div>
+          )}
+        </div>
+      ) : field.type === "textarea" ? (
         <Textarea
-          value={value}
+          value={stringVal}
           onChange={(e) => onChange(e.target.value)}
           readOnly={readOnly}
           placeholder={readOnly ? "Sin respuesta" : "Escribe tu respuesta aquí..."}
@@ -84,7 +133,7 @@ export function QuestionBlock({
       ) : field.type === "date" ? (
         <Input
           type="date"
-          value={value}
+          value={stringVal}
           onChange={(e) => onChange(e.target.value)}
           readOnly={readOnly}
           className={`border-0 border-b border-border rounded-none bg-transparent focus-visible:ring-0 focus-visible:border-primary px-0.5 ${
@@ -93,7 +142,7 @@ export function QuestionBlock({
         />
       ) : (
         <Input
-          value={value}
+          value={stringVal}
           onChange={(e) => onChange(e.target.value)}
           readOnly={readOnly}
           placeholder={readOnly ? "Sin respuesta" : "Escribe aquí..."}
