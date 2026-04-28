@@ -45,7 +45,14 @@ export const FORM_SECTIONS: FormSection[] = [
       { key: "portada-nombre", label: "Nombre del proyecto", type: "text", required: true },
       { key: "portada-org", label: "Organización", type: "text", required: true },
       { key: "portada-fecha", label: "Fecha", type: "date", defaultValue: new Date().toISOString().split("T")[0], hint: "Fecha inicio de formulación de proyecto" },
-      { key: "portada-equipo", label: "Equipo formulador", type: "textarea", hint: "Escribe los nombres y apellidos de los integrantes del equipo que está formulando el proyecto" },
+      {
+        key: "portada-equipo",
+        label: "Equipo formulador",
+        type: "dynamic-rows",
+        hint: "Ingresa los integrantes del equipo que está formulando el proyecto.",
+        headers: ["#", "Nombre completo", "Rol", "Organización/Departamento"],
+        initialRows: 3,
+      } as TableConfig,
     ],
   },
   {
