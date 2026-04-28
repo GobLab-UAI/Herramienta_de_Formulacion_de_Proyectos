@@ -19,7 +19,7 @@ export function Topbar() {
       <Link to="/dashboard" className="flex items-center gap-4 min-w-0">
         <img src={logoHerramientas} alt="Herramientas Algoritmos Éticos" className="h-8 w-auto object-contain" />
         <span className="font-display text-base lg:text-lg text-foreground hidden md:inline truncate">
-          Portal de Evaluación de Proyectos de IA
+          Herramienta de Evaluación de Proyectos de IA
         </span>
       </Link>
 
