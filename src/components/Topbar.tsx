@@ -17,15 +17,10 @@ export function Topbar() {
   return (
     <header className="sticky top-0 z-50 flex h-[60px] items-center justify-between border-b bg-card px-6 shadow-goblab-sm">
       <Link to="/dashboard" className="flex items-center gap-4 min-w-0">
-        <img src={logoGoblab} alt="GobLab UAI" className="h-8 w-auto object-contain" />
+        <img src={logoHerramientas} alt="Herramientas Algoritmos Éticos" className="h-8 w-auto object-contain" />
         <span className="font-display text-base lg:text-lg text-foreground hidden md:inline truncate">
           Portal de Evaluación de Proyectos de IA
         </span>
-        <img
-          src={logoHerramientas}
-          alt="Herramientas Algoritmos Éticos"
-          className="h-8 w-auto object-contain hidden lg:inline-block"
-        />
       </Link>
 
       <div className="flex items-center gap-3">
