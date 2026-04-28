@@ -338,6 +338,74 @@ function renderTextField(
   return y;
 }
 
+function renderYesNoField(
+  doc: jsPDF,
+  field: FormField,
+  value: any,
+  y: number
+): number {
+  y = checkPageBreak(doc, y, 22);
+
+  // Label
+  doc.setFontSize(9.5);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.text);
+  const labelLines = doc.splitTextToSize(field.label, CONTENT_WIDTH - 4);
+  doc.text(labelLines, MARGIN + 1, y);
+  y += labelLines.length * 4.5 + 2;
+
+  const choice = value && typeof value === "object" ? (value.choice as "si" | "no" | undefined) : undefined;
+  const details = value && typeof value === "object" ? (value.details as string | undefined) : undefined;
+
+  // Choice line
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...COLORS.primary);
+  doc.text("Respuesta:", MARGIN + 1, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.text);
+  const choiceLabel = choice === "si" ? "Sí" : choice === "no" ? "No" : "—";
+  doc.text(choiceLabel, MARGIN + 22, y);
+  y += 5;
+
+  // Detail label + value
+  if (choice) {
+    const detailHeader =
+      choice === "si"
+        ? field.yesDetailLabel || "Indica el nombre de las entidades y su rol en el proyecto."
+        : field.noDetailLabel || "Fundamenta la respuesta.";
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(8.5);
+    doc.setTextColor(...COLORS.muted);
+    const dhLines = doc.splitTextToSize(detailHeader, CONTENT_WIDTH - 4);
+    for (const ln of dhLines) {
+      y = checkPageBreak(doc, y, 5);
+      doc.text(ln, MARGIN + 1, y);
+      y += 4;
+    }
+
+    const txt = (details && details.trim()) || "—";
+    const isEmpty = txt === "—";
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(isEmpty ? 170 : 30, isEmpty ? 170 : 30, isEmpty ? 170 : 30);
+    const valLines = doc.splitTextToSize(txt, CONTENT_WIDTH - 4);
+    for (const ln of valLines) {
+      y = checkPageBreak(doc, y, 5);
+      doc.text(ln, MARGIN + 1, y);
+      y += 4.5;
+    }
+  }
+
+  y += 3;
+  doc.setDrawColor(...COLORS.lightBorder);
+  doc.setLineWidth(0.15);
+  doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
+  y += 4;
+
+  return y;
+}
+
 function renderTable(
   doc: jsPDF,
   config: TableConfig,
