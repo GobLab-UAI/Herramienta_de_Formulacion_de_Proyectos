@@ -33,7 +33,7 @@ export const REQUIRED_FIELDS = [
   "ans-5-1", "ans-5-4", "ans-5-6",
   "table-6", "table-7", "table-8a", "ans-8-c", "table-9",
   "eth-prop", "eth-lic1", "eth-dat1", "eth-tra1", "eth-eq1", "eth-res1",
-  "ans-11-1", "table-12",
+  "table-12",
 ];
 
 export const FORM_SECTIONS: FormSection[] = [
@@ -145,7 +145,7 @@ export const FORM_SECTIONS: FormSection[] = [
     fields: [
       {
         key: "table-9", label: "Análisis planificados", type: "dynamic-cols",
-        rowLabels: ["Tipo de análisis", "Propósito del análisis", "¿Qué actividades utilizarán este análisis?", "¿Cómo se validará?"],
+        rowLabels: ["Tipo de análisis", "Propósito del análisis", "¿Qué actividades utilizarán este análisis?", "¿Cómo se validará? (incluye la prueba de campo o ensayo aleatorio controlado que se diseñará para validar el proyecto: alcance, duración y criterios de éxito alineados con los objetivos de la sección 4)"],
         initialCols: 3,
       } as TableConfig,
     ],
@@ -172,14 +172,6 @@ export const FORM_SECTIONS: FormSection[] = [
   {
     id: "section-9",
     number: "9",
-    title: "Piloto y Validación",
-    fields: [
-      { key: "ans-11-1", label: "9.1 ¿Qué prueba de campo o ensayo aleatorio controlado puedes diseñar para validar el proyecto?", type: "textarea", required: true, hint: "Los resultados del piloto deben coincidir con los objetivos de la sección 4. Describe alcance, duración y criterios de éxito." },
-    ],
-  },
-  {
-    id: "section-10",
-    number: "10",
     title: "Equipo",
     fields: [
       {
