@@ -15,10 +15,15 @@ export function GobLabLogo({ size = 32 }: { size?: number }) {
 
 export function BrandLogos({ className = "" }: { className?: string }) {
   return (
-    <div className={`flex items-center justify-center w-full ${className}`}>
+    <div className={`flex items-center justify-center gap-6 w-full ${className}`}>
       <img
         src={logoGoblab}
         alt="GobLab UAI - Universidad Adolfo Ibáñez"
+        className="h-8 md:h-10 w-auto object-contain"
+      />
+      <img
+        src={logoHerramientas}
+        alt="Herramientas Algoritmos Éticos"
         className="h-8 md:h-10 w-auto object-contain"
       />
     </div>
