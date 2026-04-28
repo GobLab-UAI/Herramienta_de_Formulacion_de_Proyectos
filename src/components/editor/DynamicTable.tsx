@@ -68,12 +68,9 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                     <span className="inline-flex items-center gap-1">
                       {h}
                       {config.headerHints?.[i] && (
-                        <HelpCircle
-                          className="h-3 w-3 text-muted-foreground/70 cursor-help"
-                          aria-label={config.headerHints[i]}
-                        >
-                          <title>{config.headerHints[i]}</title>
-                        </HelpCircle>
+                        <span title={config.headerHints[i]} className="cursor-help inline-flex">
+                          <HelpCircle className="h-3 w-3 text-muted-foreground/70" />
+                        </span>
                       )}
                     </span>
                   </th>
