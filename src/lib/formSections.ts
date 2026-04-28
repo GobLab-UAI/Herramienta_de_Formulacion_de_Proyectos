@@ -63,7 +63,7 @@ export const FORM_SECTIONS: FormSection[] = [
       { key: "ans-4-1", label: "2.1 ¿Cuál es el contexto institucional?", type: "textarea", required: true, hint: "Describe brevemente la misión, funciones y contexto operativo del área que presenta el proyecto (máx 400-500 caracteres)." },
       { key: "ans-4-2", label: "2.2 Describe el problema que enfrentan.", type: "textarea", required: true, hint: "Explica qué problema existe y por qué es relevante. Evita incluir la solución; esta se aborda al final de la sección." },
       { key: "ans-4-3", label: "2.3 ¿Cuáles son las causas del problema?", type: "textarea", required: true, hint: "Identifica las causas principales del problema. Si no tienes toda la información, describe las causas que se conocen." },
-      { key: "ans-4-4", label: "2.4 ¿Quiénes o qué son los afectados por el problema?", type: "textarea", required: true, hint: "Selecciona los grupos afectados y describe brevemente cómo se relacionan con el problema." },
+      { key: "ans-4-4", label: "2.4 ¿Quiénes o qué son los afectados por el problema?", type: "textarea", required: true, hint: "Menciona los grupos afectados y describe brevemente cómo se relacionan con el problema." },
       {
         key: "table-4-5", label: "2.5 ¿Cuántos son afectados?", type: "dynamic-rows",
         hint: "Ingresa la cantidad de personas u organizaciones afectadas. Puedes desagregar según los criterios disponibles (edad, género, territorio, etc.).",
