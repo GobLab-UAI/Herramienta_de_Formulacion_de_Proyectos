@@ -15,11 +15,11 @@ export function GobLabLogo({ size = 32 }: { size?: number }) {
 
 export function BrandLogos({ className = "" }: { className?: string }) {
   return (
-    <div className={`flex items-center justify-between gap-6 w-full ${className}`}>
+    <div className={`flex items-center justify-center w-full ${className}`}>
       <img
         src={logoGoblab}
         alt="GobLab UAI - Universidad Adolfo Ibáñez"
-        className="h-10 md:h-12 w-auto object-contain"
+        className="h-8 md:h-10 w-auto object-contain"
       />
     </div>
   );
@@ -30,8 +30,8 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
     <div className="flex min-h-screen">
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-secondary flex-col justify-between p-12">
-        <div className="bg-white rounded-lg p-4 shadow-goblab-sm">
-          <BrandLogos />
+        <div className="bg-white rounded-lg p-3 shadow-goblab-sm inline-flex justify-center self-start">
+          <BrandLogos className="max-w-[180px]" />
         </div>
         <div className="space-y-6">
           <h1 className="text-4xl font-display text-secondary-foreground leading-tight">
