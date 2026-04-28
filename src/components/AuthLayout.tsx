@@ -30,7 +30,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
     <div className="flex min-h-screen">
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-secondary flex-col justify-between p-12">
-        <div className="bg-white rounded-lg p-3 shadow-goblab-sm inline-flex justify-center self-start">
+        <div className="flex justify-center w-full">
           <BrandLogos className="max-w-[180px]" />
         </div>
         <div className="space-y-6">
