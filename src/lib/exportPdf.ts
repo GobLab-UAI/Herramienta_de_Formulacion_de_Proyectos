@@ -166,6 +166,8 @@ export function generateProjectPDF(
 
         if (isTable) {
           y = renderTable(doc, field as TableConfig, responses[field.key], y);
+        } else if ((field as FormField).type === "yesno") {
+          y = renderYesNoField(doc, field as FormField, responses[field.key], y);
         } else {
           y = renderTextField(doc, field as FormField, responses[field.key], y);
         }
