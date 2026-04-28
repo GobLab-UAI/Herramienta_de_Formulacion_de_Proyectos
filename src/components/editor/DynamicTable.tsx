@@ -57,7 +57,16 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
             <thead>
               <tr className="bg-secondary text-secondary-foreground">
                 {td.headers.map((h, i) => (
-                  <th key={i} className="px-3 py-2 text-left font-medium text-xs">{h}</th>
+                  <th
+                    key={i}
+                    className={
+                      h === "#"
+                        ? "px-2 py-2 text-center font-medium text-xs w-10"
+                        : "px-3 py-2 text-left font-medium text-xs"
+                    }
+                  >
+                    {h}
+                  </th>
                 ))}
                 {!readOnly && <th className="w-10" />}
               </tr>
@@ -66,7 +75,10 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
               {td.rows.map((row, ri) => (
                 <tr key={ri} className="border-t">
                   {row.map((cell, ci) => (
-                    <td key={ci} className="px-1 py-1">
+                    <td
+                      key={ci}
+                      className={td.headers[ci] === "#" ? "px-1 py-1 w-10" : "px-1 py-1"}
+                    >
                       <Input
                         value={cell}
                         onChange={(e) => {
@@ -76,7 +88,11 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                           updateAndNotify({ ...td, rows: newRows });
                         }}
                         readOnly={readOnly || (td.headers[ci] === "#")}
-                        className="border-0 bg-transparent h-8 text-xs"
+                        className={
+                          td.headers[ci] === "#"
+                            ? "border-0 bg-transparent h-8 text-xs text-center px-1 w-10 text-muted-foreground"
+                            : "border-0 bg-transparent h-8 text-xs"
+                        }
                         placeholder={readOnly ? "" : "..."}
                       />
                     </td>
