@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import logoGoblab from "@/assets/logo-goblab-uai.png";
 import logoHerramientas from "@/assets/logo-herramientas-eticas.png";
+import logoAnid from "@/assets/logo-anid.png";
 
 export function GobLabLogo({ size = 32 }: { size?: number }) {
   return (
@@ -54,6 +55,18 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           <p className="text-sm text-secondary-foreground/50">
             Licencia CC BY-SA 3.0 · goblab.uai.cl
           </p>
+          <div className="pt-4 space-y-2">
+            <p className="text-sm text-secondary-foreground/70 font-medium">
+              Agradecimientos a:
+            </p>
+            <div className="bg-white rounded-md p-3 inline-block">
+              <img
+                src={logoAnid}
+                alt="Agencia Nacional de Investigación y Desarrollo (ANID)"
+                className="h-16 w-auto object-contain"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
