@@ -48,14 +48,8 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             Colabora con tu equipo usando la metodología GobLab UAI para formular proyectos de impacto.
           </p>
         </div>
-        <div className="space-y-2">
-          <p className="text-sm text-secondary-foreground/50">
-            Desarrollado por el GobLab UAI. Proyecto financiado por el Laboratorio de Gobierno y el Servicio Civil, en colaboración con el Center for Data Science and Public Policy de la Universidad de Chicago.
-          </p>
-          <p className="text-sm text-secondary-foreground/50">
-            Licencia CC BY-SA 3.0 · goblab.uai.cl
-          </p>
-          <div className="pt-4 space-y-2">
+        <div className="space-y-6">
+          <div className="pt-4 space-y-3">
             <p className="text-sm text-secondary-foreground/70 font-medium">
               Agradecimientos a:
             </p>
