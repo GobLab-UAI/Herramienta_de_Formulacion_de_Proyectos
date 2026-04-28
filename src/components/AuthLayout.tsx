@@ -35,9 +35,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
     <div className="flex min-h-screen">
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-secondary flex-col justify-between p-12">
-        <div className="flex justify-center w-full">
-          <BrandLogos className="max-w-[180px]" />
-        </div>
+        <div />
         <div className="space-y-6">
           <h1 className="text-4xl font-display text-secondary-foreground leading-tight">
             Diseña proyectos de IA y ciencia de datos viables y responsables
