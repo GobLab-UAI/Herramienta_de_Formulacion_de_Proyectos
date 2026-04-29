@@ -6,6 +6,22 @@ const MARGIN = 18;
 const PAGE_WIDTH = 210;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 
+// jsPDF's built-in Helvetica doesn't support emoji or many extended unicode
+// glyphs — they render as garbled characters (e.g. "&–þ"). Strip them from
+// any text we write to the PDF.
+function sanitize(text: string): string {
+  if (!text) return text;
+  return text
+    // Remove emoji ranges (pictographs, symbols, dingbats, flags, etc.)
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu, "")
+    .replace(/[\u{2600}-\u{27BF}]/gu, "")
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, "")
+    // Variation selectors and zero-width joiners often paired with emoji
+    .replace(/[\u200D\uFE0F]/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 const COLORS = {
   // GobLab burdeos palette — match the app design tokens
   // primary  #B67A84  (hsl 349 22% 60%)
