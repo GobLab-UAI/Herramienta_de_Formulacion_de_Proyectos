@@ -160,11 +160,11 @@ export function generateProjectPDF(
       for (const group of ethicsGroups) {
         // Subsection header
         y = checkPageBreak(doc, y, 16);
-        doc.setFillColor(235, 240, 245);
+        doc.setFillColor(245, 233, 235); // accent burdeos light
         doc.roundedRect(MARGIN, y - 4, CONTENT_WIDTH, 9, 1, 1, "F");
         doc.setFontSize(9.5);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(...COLORS.primary);
+        doc.setTextColor(...COLORS.sectionBg);
         doc.text(group.title, MARGIN + 4, y + 1.5);
         y += 10;
 
