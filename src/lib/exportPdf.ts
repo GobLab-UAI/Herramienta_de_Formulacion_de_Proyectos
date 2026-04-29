@@ -6,6 +6,22 @@ const MARGIN = 18;
 const PAGE_WIDTH = 210;
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 
+// jsPDF's built-in Helvetica doesn't support emoji or many extended unicode
+// glyphs — they render as garbled characters (e.g. "&–þ"). Strip them from
+// any text we write to the PDF.
+function sanitize(text: string): string {
+  if (!text) return text;
+  return text
+    // Remove emoji ranges (pictographs, symbols, dingbats, flags, etc.)
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu, "")
+    .replace(/[\u{2600}-\u{27BF}]/gu, "")
+    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, "")
+    // Variation selectors and zero-width joiners often paired with emoji
+    .replace(/[\u200D\uFE0F]/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 const COLORS = {
   // GobLab burdeos palette — match the app design tokens
   // primary  #B67A84  (hsl 349 22% 60%)
@@ -130,7 +146,7 @@ export function generateProjectPDF(
     doc.text(`${section.number}. ${section.title}`, MARGIN + 5, y + 2);
     y += 12;
 
-    if (section.id === "seccion-10") {
+    if (section.id === "section-8") {
       // Group ethics fields by subsection
       const ethicsGroups: { title: string; prefixes: string[] }[] = [
         { title: "Proporcionalidad", prefixes: ["eth-prop", "eth-imp"] },
@@ -144,11 +160,11 @@ export function generateProjectPDF(
       for (const group of ethicsGroups) {
         // Subsection header
         y = checkPageBreak(doc, y, 16);
-        doc.setFillColor(235, 240, 245);
+        doc.setFillColor(245, 233, 235); // accent burdeos light
         doc.roundedRect(MARGIN, y - 4, CONTENT_WIDTH, 9, 1, 1, "F");
         doc.setFontSize(9.5);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(...COLORS.primary);
+        doc.setTextColor(...COLORS.sectionBg);
         doc.text(group.title, MARGIN + 4, y + 1.5);
         y += 10;
 
@@ -159,7 +175,7 @@ export function generateProjectPDF(
           const rawLabel = (field as FormField).label;
           const dashIdx = rawLabel.indexOf("—");
           const cleanLabel = dashIdx !== -1 ? rawLabel.substring(dashIdx + 1).trim() : rawLabel;
-          y = renderTextField(doc, field as FormField, responses[field.key], y, cleanLabel);
+          y = renderTextField(doc, field as FormField, responses[field.key], y, sanitize(cleanLabel));
         }
       }
     } else {
@@ -316,7 +332,7 @@ function renderTextField(
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
   const labelText = labelOverride || field.label;
-  const labelLines = doc.splitTextToSize(labelText, CONTENT_WIDTH - 4);
+  const labelLines = doc.splitTextToSize(sanitize(labelText), CONTENT_WIDTH - 4);
   doc.text(labelLines, MARGIN + 1, y);
   y += labelLines.length * 4.5 + 2;
 
@@ -355,7 +371,7 @@ function renderYesNoField(
   doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
-  const labelLines = doc.splitTextToSize(field.label, CONTENT_WIDTH - 4);
+  const labelLines = doc.splitTextToSize(sanitize(field.label), CONTENT_WIDTH - 4);
   doc.text(labelLines, MARGIN + 1, y);
   y += labelLines.length * 4.5 + 2;
 
@@ -423,7 +439,7 @@ function renderTable(
   doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
-  doc.text(config.label, MARGIN + 1, y);
+  doc.text(sanitize(config.label), MARGIN + 1, y);
   y += 6;
 
   if (!data) {
