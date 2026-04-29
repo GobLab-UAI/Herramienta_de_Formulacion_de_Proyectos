@@ -130,7 +130,7 @@ export function generateProjectPDF(
     doc.text(`${section.number}. ${section.title}`, MARGIN + 5, y + 2);
     y += 12;
 
-    if (section.id === "seccion-10") {
+    if (section.id === "section-8") {
       // Group ethics fields by subsection
       const ethicsGroups: { title: string; prefixes: string[] }[] = [
         { title: "Proporcionalidad", prefixes: ["eth-prop", "eth-imp"] },
