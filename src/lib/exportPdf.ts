@@ -175,7 +175,7 @@ export function generateProjectPDF(
           const rawLabel = (field as FormField).label;
           const dashIdx = rawLabel.indexOf("—");
           const cleanLabel = dashIdx !== -1 ? rawLabel.substring(dashIdx + 1).trim() : rawLabel;
-          y = renderTextField(doc, field as FormField, responses[field.key], y, cleanLabel);
+          y = renderTextField(doc, field as FormField, responses[field.key], y, sanitize(cleanLabel));
         }
       }
     } else {
@@ -332,7 +332,7 @@ function renderTextField(
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
   const labelText = labelOverride || field.label;
-  const labelLines = doc.splitTextToSize(labelText, CONTENT_WIDTH - 4);
+  const labelLines = doc.splitTextToSize(sanitize(labelText), CONTENT_WIDTH - 4);
   doc.text(labelLines, MARGIN + 1, y);
   y += labelLines.length * 4.5 + 2;
 
@@ -371,7 +371,7 @@ function renderYesNoField(
   doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
-  const labelLines = doc.splitTextToSize(field.label, CONTENT_WIDTH - 4);
+  const labelLines = doc.splitTextToSize(sanitize(field.label), CONTENT_WIDTH - 4);
   doc.text(labelLines, MARGIN + 1, y);
   y += labelLines.length * 4.5 + 2;
 
@@ -439,7 +439,7 @@ function renderTable(
   doc.setFontSize(9.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...COLORS.text);
-  doc.text(config.label, MARGIN + 1, y);
+  doc.text(sanitize(config.label), MARGIN + 1, y);
   y += 6;
 
   if (!data) {
