@@ -439,6 +439,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           Historial
         </Button>
 
+        {project?.join_code && (
+          <TeamPanel projectId={projectId!} joinCode={(project as any).join_code} ownerId={project.created_by} />
+        )}
+
         <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
           <Link to="/dashboard">
             <ArrowLeft className="h-4 w-4" />
