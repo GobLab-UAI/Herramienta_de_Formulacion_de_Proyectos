@@ -108,7 +108,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   // Fetch active comments (not deleted)
   const { data: comments = [] } = useQuery({
-    queryKey: ["comments", projectId],
+    queryKey: ["comments", projectId, Object.keys(memberMap).length],
     queryFn: async () => {
       const { data } = await supabase
         .from("comments")
@@ -130,7 +130,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   // Fetch ALL comments for history (including deleted and resolved)
   const { data: allComments = [] } = useQuery({
-    queryKey: ["allComments", projectId],
+    queryKey: ["allComments", projectId, Object.keys(memberMap).length],
     queryFn: async () => {
       const { data } = await supabase
         .from("comments")
