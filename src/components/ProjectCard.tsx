@@ -7,7 +7,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Calendar, MessageSquare, User, Trash2, Send, CheckCircle2, RotateCcw } from "lucide-react";
+import { Calendar, MessageSquare, User, Trash2, Send, CheckCircle2, RotateCcw, KeyRound } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -29,6 +29,9 @@ interface ProjectCardProps {
   role?: string;
   creatorName?: string;
   isDeleted?: boolean;
+  joinCode?: string;
+  myCustomRole?: string;
+  isOwnerOfProject?: boolean;
   onDelete?: (id: string) => void;
   onRestore?: (id: string) => void;
   onSendToReview?: (id: string) => void;
@@ -37,7 +40,7 @@ interface ProjectCardProps {
 
 export function ProjectCard({
   id, title, organizationName, status, completionPct, updatedAt,
-  commentCount = 0, role, creatorName, isDeleted,
+  commentCount = 0, role, creatorName, isDeleted, joinCode, myCustomRole, isOwnerOfProject,
   onDelete, onRestore, onSendToReview, onApprove,
 }: ProjectCardProps) {
   const statusInfo = statusConfig[status] || statusConfig.DRAFT;
@@ -63,6 +66,16 @@ export function ProjectCard({
           {creatorName && (
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <User className="h-3 w-3" />{creatorName}
+            </p>
+          )}
+          {myCustomRole && !isOwnerOfProject && (
+            <p className="text-xs text-primary flex items-center gap-1 mt-1 font-medium">
+              Miembro · {myCustomRole}
+            </p>
+          )}
+          {joinCode && isOwnerOfProject && (
+            <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-1 font-mono">
+              <KeyRound className="h-3 w-3" />{joinCode}
             </p>
           )}
         </CardHeader>
