@@ -256,6 +256,7 @@ export type Database = {
       }
       project_members: {
         Row: {
+          custom_role: string | null
           invited_at: string | null
           is_owner: boolean | null
           joined_at: string | null
@@ -264,6 +265,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          custom_role?: string | null
           invited_at?: string | null
           is_owner?: boolean | null
           joined_at?: string | null
@@ -272,6 +274,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          custom_role?: string | null
           invited_at?: string | null
           is_owner?: boolean | null
           joined_at?: string | null
@@ -297,6 +300,7 @@ export type Database = {
           created_by: string
           deleted_at: string | null
           id: string
+          join_code: string
           organization_id: string | null
           status: Database["public"]["Enums"]["project_status"] | null
           tags: string[] | null
@@ -310,6 +314,7 @@ export type Database = {
           created_by: string
           deleted_at?: string | null
           id?: string
+          join_code: string
           organization_id?: string | null
           status?: Database["public"]["Enums"]["project_status"] | null
           tags?: string[] | null
@@ -323,6 +328,7 @@ export type Database = {
           created_by?: string
           deleted_at?: string | null
           id?: string
+          join_code?: string
           organization_id?: string | null
           status?: Database["public"]["Enums"]["project_status"] | null
           tags?: string[] | null
@@ -413,6 +419,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      gen_join_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -442,6 +449,7 @@ export type Database = {
         | "STATUS_CHANGED"
         | "MEMBER_INVITED"
         | "PROJECT_APPROVED"
+        | "MEMBER_JOINED"
       project_role: "FORMULADOR" | "CONSULTOR"
       project_status:
         | "DRAFT"
@@ -597,6 +605,7 @@ export const Constants = {
         "STATUS_CHANGED",
         "MEMBER_INVITED",
         "PROJECT_APPROVED",
+        "MEMBER_JOINED",
       ],
       project_role: ["FORMULADOR", "CONSULTOR"],
       project_status: [
