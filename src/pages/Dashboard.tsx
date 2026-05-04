@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { JoinProjectDialog } from "@/components/team/JoinProjectDialog";
 
 const STATUS_FILTERS = [
   { value: "ALL", label: "Todos" },
@@ -32,7 +33,7 @@ export default function Dashboard() {
     queryFn: async () => {
       let query = supabase
         .from("projects")
-        .select("*, organizations(name)")
+        .select("*, organizations(name), project_members!inner(user_id, custom_role, is_owner)")
         .order("updated_at", { ascending: false });
 
       if (showDeleted && isConsultor) {
@@ -42,10 +43,19 @@ export default function Dashboard() {
       }
 
       if (!isConsultor && user) {
-        query = query.eq("created_by", user.id);
+        query = query.eq("project_members.user_id", user.id);
       }
 
-      const { data: allProjects } = await query;
+      let allProjects: any[] | null = null;
+      if (isConsultor) {
+        let q2 = supabase.from("projects").select("*, organizations(name)").order("updated_at", { ascending: false });
+        q2 = showDeleted ? q2.not("deleted_at", "is", null) : q2.is("deleted_at", null);
+        const { data } = await q2;
+        allProjects = (data || []).map((p: any) => ({ ...p, project_members: [] }));
+      } else {
+        const { data } = await query;
+        allProjects = data;
+      }
       const projectIds = (allProjects || []).map((p) => p.id);
       if (projectIds.length === 0) return [];
 
@@ -81,6 +91,7 @@ export default function Dashboard() {
         commentCount: commentCountMap[p.id] || 0,
         creatorName: creatorMap[p.created_by] || undefined,
         isDeleted: !!p.deleted_at,
+        myMembership: (p as any).project_members?.find((m: any) => m.user_id === user?.id),
       }));
     },
     enabled: !!user,
@@ -98,7 +109,7 @@ export default function Dashboard() {
 
       const { data: project, error } = await supabase
         .from("projects")
-        .insert({ title: "Nuevo Proyecto", organization_id: org.id, created_by: user!.id })
+        .insert([{ title: "Nuevo Proyecto", organization_id: org.id, created_by: user!.id } as any])
         .select()
         .single();
       if (error || !project) throw error ?? new Error("No se pudo crear el proyecto");
@@ -185,9 +196,12 @@ export default function Dashboard() {
               </Button>
             )}
             {!isConsultor && (
-              <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
-                Formular proyecto
-              </Button>
+              <>
+                <JoinProjectDialog />
+                <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
+                  Formular proyecto
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -249,6 +263,9 @@ export default function Dashboard() {
                 role={isConsultor ? "CONSULTOR" : "FORMULADOR"}
                 creatorName={p.creatorName}
                 isDeleted={p.isDeleted}
+                joinCode={p.join_code}
+                myCustomRole={p.myMembership?.custom_role}
+                isOwnerOfProject={p.created_by === user?.id}
                 onDelete={(id) => softDelete.mutate(id)}
                 onRestore={(id) => restoreProject.mutate(id)}
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}

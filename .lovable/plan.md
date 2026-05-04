@@ -1,52 +1,95 @@
+# Colaboración multi-usuario en proyectos
 
+Permitir que varios formuladores se unan a un mismo proyecto usando un **código único** (3 letras + 3 números, ej. `ABC123`), con un **rol personalizado** que se identifique en el historial y comentarios.
 
-## Plan: Multiple UI Text and Content Updates
+## Modelo de datos (migración)
 
-### Changes Summary
+1. `**projects.join_code**` — `text unique not null`, generado al crear el proyecto.
+  - Formato: 3 letras mayúsculas + 3 dígitos (`ABC123`). Trigger `before insert` lo genera y reintenta si colisiona.
+2. **Reusar `project_members**` (ya existe) y agregarle:
+  - `custom_role text` — rol libre que el usuario escribe al unirse (ej. "Líder de TI", "Científico de Datos"). Sugeriremos opciones predefinidas pero el campo es abierto.
+  - El owner original queda con `is_owner = true` y `custom_role = 'Creador del proyecto'` (vía trigger en creación).
+3. `**field_history**` ya guarda `changed_by`. Bastará con hacer `join` a `project_members` para mostrar el `custom_role` del autor en el historial.
+4. `**comments**`: misma idea — el `author_id` se cruza con `project_members` para mostrar el rol del comentarista.
 
-**1. Section 4 (Objetivos) - Table header** (`formSections.ts` line 98)
-- Change `"#"` to `"N°"` in headers array.
+## Reglas RLS (clave)
 
-**2. Section 5 (Actividades) - Title and table label** (`formSections.ts` lines 106, 181)
-- Change title from `"Actividades"` to `"Actividades del proceso"`.
-- In `DynamicTable.tsx` line 181: change `"Momento"` to `"Etapa del Proyecto"`.
-- In `exportPdf.ts` line 414: change `"Momento"` to `"Etapa del Proyecto"`.
+Se reescriben para que los miembros del proyecto tengan acceso, no sólo el creador:
 
-**3. AuthLayout - HOME text updates** (`AuthLayout.tsx`)
-- Line 25: Replace `"Diseña proyectos de IA y ciencia de datos para el sector público"` with `"Diseña proyectos de IA y ciencia de datos viables y responsables"`.
-- Add mention to ANID project (e.g., below the subtitle or as part of the footer text).
-- Line 32: Replace `"GobLab UAI"` with `"GobLab Ficha de Proyecto"` (or add it alongside).
-- Add GobLab and Herramientas Algoritmos Eticos logos. Since we don't have actual logo files, we'll use the existing SVG logo and add a text reference for "Herramientas Algoritmos Eticos", or place placeholder image tags if URLs are provided.
+- `projects` SELECT/UPDATE: permitir si `auth.uid() = created_by` **o** existe fila en `project_members` con ese `user_id` y `project_id` **o** es CONSULTOR.
+- `form_responses`, `comments`, `field_history`, `notifications`: SELECT/INSERT/UPDATE permitidos a miembros del proyecto.
+- Función security-definer `is_project_member(user_id, project_id)` ya existe — la usamos en todas las políticas para evitar recursión.
 
-**4. Register - "Entidad" to "Organización"** (`Register.tsx` line 76)
-- Change label from `"Entidad"` to `"Organización"`.
-- Update placeholder accordingly.
+## Flujo de UI
 
-**5. Dashboard - Subtitle text** (`Dashboard.tsx` line 178)
-- Change `"Gestiona y formula tus proyectos..."` to `"Formula tus proyectos de IA y ciencia de datos"`.
+### a) Al crear proyecto
 
-**6. Section 1 (Datos del Proyecto) - Fecha hint and Equipo placeholder** (`formSections.ts`)
-- Add hint to fecha field: `"Fecha inicio de formulación de proyecto"`.
-- Add hint to equipo field as placeholder text: `"Escribe los nombres y apellidos de los integrantes del equipo que está formulando el proyecto"`.
+- Mostrar modal con el código generado y botón "Copiar". Texto: "Comparte este código con tu equipo para que se unan."
 
-**7. Section 2 (Definición del Problema) - 2.8 hint** (`formSections.ts` line 74)
-- Update hint to include the new link (Algoritmos de IA en America Latina from UniAndes) and change algoritmospublicos.cl to point to `/repositorio`: `"Revisar Algoritmos Públicos, Data Science for Social Good y Algoritmos de IA en América Latina."`.
+### b) Card del proyecto en Dashboard
 
-**8. Section 3 (Prefactibilidad) - 3.2 question text** (`formSections.ts` line 83)
-- Change label to: `"3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas? ¿Cuáles?"`.
+- Mostrar el código en chip junto al título (visible para owner/miembros).
+- Menú de acciones gana opción "Gestionar equipo".
 
-**9. Section 3 (Prefactibilidad) - 3.4 hint** (`formSections.ts` line 85)
-- Change hint from `"¿Están desagregados por género, edad, etnia, territorio?"` to `"¿Están desagregados según las dimensiones de la población afectada?"`.
+### c) Botón global "Unirse a un proyecto" en Dashboard
 
-### Clarification needed
-- For the GobLab and Herramientas Algoritmos Eticos logos: do you have image URLs or files to use? I can place the existing SVG GobLabLogo and add a text label for now.
-- For the ANID mention: what specific text should appear? (e.g., "Proyecto financiado por ANID" or a specific grant number?)
+- Abre diálogo con dos campos:
+  - Código (input con máscara `AAA000`).
+  - Mi rol en el proyecto (input libre + sugerencias: Líder de proyecto, Administrador de recursos, Líder de TI, Coordinador de ciencia de datos, Científico de datos).
+- Al confirmar: busca el proyecto por `join_code`, inserta en `project_members` con el `custom_role` y redirige al editor.
 
-### Files to modify
-- `src/lib/formSections.ts` — section titles, table headers, hints, question labels
-- `src/components/editor/DynamicTable.tsx` — "Momento" to "Etapa del Proyecto"
-- `src/lib/exportPdf.ts` — "Momento" to "Etapa del Proyecto"
-- `src/components/AuthLayout.tsx` — HOME text, logos, ANID mention
-- `src/pages/Register.tsx` — "Entidad" to "Organización"
-- `src/pages/Dashboard.tsx` — subtitle text
+### d) Dashboard: query
 
+- Reemplazar el filtro `created_by = user.id` por: proyectos donde `created_by = user.id` **OR** existe membresía. Mostrar badge "Miembro · {custom_role}" cuando el usuario no sea el creador.
+
+### e) Página/Drawer "Equipo del proyecto" (dentro del editor)
+
+- Lista de miembros con avatar, nombre, `custom_role`, fecha de ingreso.
+- El owner puede: cambiar rol de un miembro, expulsar.
+- Cualquier miembro puede editar su propio `custom_role`.
+
+### f) Comentarios e historial
+
+- En `CommentBubble` y `CommentHistorySidebar`: junto al nombre mostrar `· {custom_role}` (ej. "María · Científica de Datos").
+- En el sidebar de historial de cambios de un campo, cada entrada muestra `quién (rol) · cuándo · valor anterior → valor nuevo`.
+
+### g) Historial de cambios por campo (mejora)
+
+- Hoy `field_history` se inserta pero no hay UI dedicada. Añadir un botón "Ver historial" en cada campo (icono reloj) que abra un popover con las últimas N versiones, mostrando autor + rol.
+
+## Detalles técnicos
+
+- **Generación de código** (SQL):
+  ```sql
+  create or replace function gen_join_code() returns text language plpgsql as $$
+  declare letters text := 'ABCDEFGHJKLMNPQRSTUVWXYZ'; digits text := '0123456789'; code text;
+  begin
+    loop
+      code := substr(letters,1+floor(random()*24)::int,1)||substr(letters,1+floor(random()*24)::int,1)||substr(letters,1+floor(random()*24)::int,1)
+            ||substr(digits,1+floor(random()*10)::int,1)||substr(digits,1+floor(random()*10)::int,1)||substr(digits,1+floor(random()*10)::int,1);
+      exit when not exists (select 1 from projects where join_code = code);
+    end loop;
+    return code;
+  end$$;
+  ```
+  Trigger `before insert on projects` que setea `join_code` si es null y crea el row de `project_members` para el creador.
+- **Cliente**: nueva carpeta `src/components/team/` con `JoinProjectDialog.tsx`, `TeamPanel.tsx`, `JoinCodeBadge.tsx`. Hooks `useProjectMembers(projectId)`, `useJoinProject()`.
+- **Seguridad**: validar formato del código en cliente con regex `/^[A-Z]{3}\d{3}$/`. Insert en `project_members` se hace desde el cliente porque la RLS exige `auth.uid() = user_id` y existencia del proyecto con ese código (policy con `exists (select 1 from projects where id = project_id)`).
+
+## Archivos a crear / editar
+
+- **Migración** nueva (columnas + trigger + RLS rewrites).
+- `src/pages/Dashboard.tsx` — botón "Unirse a un proyecto", query incluye membresías, modal con código al crear.
+- `src/pages/ProjectEditor.tsx` — botón "Equipo", mostrar `custom_role` junto al autor, historial de campo enriquecido.
+- `src/components/ProjectCard.tsx` — chip con código, badge de rol propio.
+- `src/components/team/JoinProjectDialog.tsx` (nuevo).
+- `src/components/team/TeamPanel.tsx` (nuevo).
+- `src/components/editor/CommentBubble.tsx` y `CommentHistorySidebar.tsx` — anexar rol al nombre del autor.
+- `src/contexts/AuthContext.tsx` — sin cambios (los roles de proyecto se leen por proyecto, no global).
+
+## Decisiones a confirmar antes de implementar
+
+1. Formato del código: confirmamos **3 letras + 3 números** (ej. `ABC123`). ¿OK o prefieres 6 dígitos? -R: quiero las 3 letras + 3 numeros
+2. ¿Los CONSULTORES también pueden unirse con código, o sólo formuladores? solo los formuladores los consultores es un único rol. 
+3. Al expulsar a un miembro, ¿qué pasa con sus comentarios e historial? Propuesta: se mantienen (auditoría). -> se deben mantener en una auditoria.
+4. ¿Quieres también notificación in-app cuando alguien se une al proyecto? -> siii, que cuando alguien se una entonces le notifique al owner quien se ha unido y a qué proyecto.
