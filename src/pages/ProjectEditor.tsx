@@ -349,8 +349,8 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           onReply={(parentId, text) => replyToComment(parentId, fieldKey, text)}
           onResolve={resolveComment}
           onDelete={deleteComment}
-          canCreate={isConsultor}
-          canReply={!isConsultor}
+          canCreate={true}
+          canReply={true}
           isActive={isActive}
           onActivate={() => handleFieldComment(fieldKey)}
         />
