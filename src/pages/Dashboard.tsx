@@ -46,26 +46,15 @@ export default function Dashboard() {
         query = query.eq("project_members.user_id", user.id);
       }
 
-      let { data: allProjects } = await query;
-      // For consultor: also fetch projects without inner join (above limits to projects with members)
+      let allProjects: any[] | null = null;
       if (isConsultor) {
-        const { data: all } = await supabase
-          .from("projects")
-          .select("*, organizations(name)")
-          .order("updated_at", { ascending: false })
-          .is("deleted_at", showDeleted ? null : null);
-        // Use the membership-less query when consultor (members table not needed for visibility)
-        const { data: allConsultor } = await supabase
-          .from("projects")
-          .select("*, organizations(name)")
-          .order("updated_at", { ascending: false })
-          [showDeleted ? "not" : "is"]("deleted_at", showDeleted ? "is" : null, showDeleted ? null : undefined as any);
-        // Simpler: re-query without inner join filter
-        const q = supabase.from("projects").select("*, organizations(name)").order("updated_at", { ascending: false });
-        const { data: allP } = showDeleted
-          ? await q.not("deleted_at", "is", null)
-          : await q.is("deleted_at", null);
-        allProjects = (allP || []).map((p: any) => ({ ...p, project_members: [] }));
+        let q2 = supabase.from("projects").select("*, organizations(name)").order("updated_at", { ascending: false });
+        q2 = showDeleted ? q2.not("deleted_at", "is", null) : q2.is("deleted_at", null);
+        const { data } = await q2;
+        allProjects = (data || []).map((p: any) => ({ ...p, project_members: [] }));
+      } else {
+        const { data } = await query;
+        allProjects = data;
       }
       const projectIds = (allProjects || []).map((p) => p.id);
       if (projectIds.length === 0) return [];
