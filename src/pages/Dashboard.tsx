@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { JoinProjectDialog } from "@/components/team/JoinProjectDialog";
 
 const STATUS_FILTERS = [
   { value: "ALL", label: "Todos" },
@@ -32,7 +33,7 @@ export default function Dashboard() {
     queryFn: async () => {
       let query = supabase
         .from("projects")
-        .select("*, organizations(name)")
+        .select("*, organizations(name), project_members!inner(user_id, custom_role, is_owner)")
         .order("updated_at", { ascending: false });
 
       if (showDeleted && isConsultor) {
@@ -42,10 +43,30 @@ export default function Dashboard() {
       }
 
       if (!isConsultor && user) {
-        query = query.eq("created_by", user.id);
+        query = query.eq("project_members.user_id", user.id);
       }
 
-      const { data: allProjects } = await query;
+      let { data: allProjects } = await query;
+      // For consultor: also fetch projects without inner join (above limits to projects with members)
+      if (isConsultor) {
+        const { data: all } = await supabase
+          .from("projects")
+          .select("*, organizations(name)")
+          .order("updated_at", { ascending: false })
+          .is("deleted_at", showDeleted ? null : null);
+        // Use the membership-less query when consultor (members table not needed for visibility)
+        const { data: allConsultor } = await supabase
+          .from("projects")
+          .select("*, organizations(name)")
+          .order("updated_at", { ascending: false })
+          [showDeleted ? "not" : "is"]("deleted_at", showDeleted ? "is" : null, showDeleted ? null : undefined as any);
+        // Simpler: re-query without inner join filter
+        const q = supabase.from("projects").select("*, organizations(name)").order("updated_at", { ascending: false });
+        const { data: allP } = showDeleted
+          ? await q.not("deleted_at", "is", null)
+          : await q.is("deleted_at", null);
+        allProjects = (allP || []).map((p: any) => ({ ...p, project_members: [] }));
+      }
       const projectIds = (allProjects || []).map((p) => p.id);
       if (projectIds.length === 0) return [];
 
@@ -81,6 +102,7 @@ export default function Dashboard() {
         commentCount: commentCountMap[p.id] || 0,
         creatorName: creatorMap[p.created_by] || undefined,
         isDeleted: !!p.deleted_at,
+        myMembership: (p as any).project_members?.find((m: any) => m.user_id === user?.id),
       }));
     },
     enabled: !!user,
@@ -98,7 +120,7 @@ export default function Dashboard() {
 
       const { data: project, error } = await supabase
         .from("projects")
-        .insert({ title: "Nuevo Proyecto", organization_id: org.id, created_by: user!.id })
+        .insert([{ title: "Nuevo Proyecto", organization_id: org.id, created_by: user!.id } as any])
         .select()
         .single();
       if (error || !project) throw error ?? new Error("No se pudo crear el proyecto");
@@ -185,9 +207,12 @@ export default function Dashboard() {
               </Button>
             )}
             {!isConsultor && (
-              <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
-                Formular proyecto
-              </Button>
+              <>
+                <JoinProjectDialog />
+                <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
+                  Formular proyecto
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -249,6 +274,9 @@ export default function Dashboard() {
                 role={isConsultor ? "CONSULTOR" : "FORMULADOR"}
                 creatorName={p.creatorName}
                 isDeleted={p.isDeleted}
+                joinCode={p.join_code}
+                myCustomRole={p.myMembership?.custom_role}
+                isOwnerOfProject={p.created_by === user?.id}
                 onDelete={(id) => softDelete.mutate(id)}
                 onRestore={(id) => restoreProject.mutate(id)}
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}
