@@ -314,7 +314,7 @@ export type Database = {
           created_by: string
           deleted_at?: string | null
           id?: string
-          join_code: string
+          join_code?: string
           organization_id?: string | null
           status?: Database["public"]["Enums"]["project_status"] | null
           tags?: string[] | null
