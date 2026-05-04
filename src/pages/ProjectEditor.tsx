@@ -17,6 +17,7 @@ import { Save, ArrowLeft, MessageSquare, PanelRightOpen, FileDown, Send, CheckCi
 import { Badge } from "@/components/ui/badge";
 import { generateProjectPDF } from "@/lib/exportPdf";
 import { Link } from "react-router-dom";
+import { TeamPanel } from "@/components/team/TeamPanel";
 
 type SaveStatus = "saved" | "saving" | "error" | "unsaved";
 
@@ -79,6 +80,32 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     enabled: !!projectId,
   });
 
+  // Fetch project members (for role enrichment in comments/history)
+  const { data: memberMap = {} } = useQuery<Record<string, { name: string; role: string }>>({
+    queryKey: ["member-map", projectId],
+    queryFn: async () => {
+      const { data: rows } = await supabase
+        .from("project_members")
+        .select("user_id, custom_role")
+        .eq("project_id", projectId!);
+      const ids = (rows || []).map((r) => r.user_id);
+      if (ids.length === 0) return {};
+      const { data: profiles } = await supabase
+        .from("profiles").select("id, full_name, username").in("id", ids);
+      const pmap = Object.fromEntries((profiles || []).map((p) => [p.id, p]));
+      const out: Record<string, { name: string; role: string }> = {};
+      (rows || []).forEach((r) => {
+        const p = pmap[r.user_id];
+        out[r.user_id] = {
+          name: p?.full_name || p?.username || "Usuario",
+          role: r.custom_role || "Miembro",
+        };
+      });
+      return out;
+    },
+    enabled: !!projectId,
+  });
+
   // Fetch active comments (not deleted)
   const { data: comments = [] } = useQuery({
     queryKey: ["comments", projectId],
@@ -92,8 +119,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
       return (data || []).map((c) => ({
         ...c,
-        author_name: isConsultor ? "Consultor" : "Formulador",
-        resolved_by_name: c.resolved_by ? "Usuario" : undefined,
+        author_name: memberMap[c.author_id]
+          ? `${memberMap[c.author_id].name} · ${memberMap[c.author_id].role}`
+          : (isConsultor ? "Consultor" : "Formulador"),
+        resolved_by_name: c.resolved_by ? (memberMap[c.resolved_by]?.name || "Usuario") : undefined,
       }));
     },
     enabled: !!projectId,
@@ -111,8 +140,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
       return (data || []).map((c) => ({
         ...c,
-        author_name: "Usuario",
-        resolved_by_name: c.resolved_by ? "Usuario" : undefined,
+        author_name: memberMap[c.author_id]
+          ? `${memberMap[c.author_id].name} · ${memberMap[c.author_id].role}`
+          : "Usuario",
+        resolved_by_name: c.resolved_by ? (memberMap[c.resolved_by]?.name || "Usuario") : undefined,
       }));
     },
     enabled: !!projectId,
