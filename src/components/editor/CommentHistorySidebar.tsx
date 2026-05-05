@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, Trash2, Send, X, MessageSquare, ChevronDown, ChevronUp, Reply } from "lucide-react";
+import { Check, Trash2, Send, X, MessageSquare, Reply, History } from "lucide-react";
 
 interface Comment {
   id: string;
@@ -20,6 +20,7 @@ interface Comment {
 interface CommentHistorySidebarProps {
   comments: Comment[];
   allComments: Comment[]; // includes resolved and deleted
+  fieldHistory?: FieldHistoryEntry[];
   fieldLabels: Record<string, string>;
   onReply: (parentId: string, fieldKey: string, text: string) => void;
   onResolve: (commentId: string) => void;
@@ -29,9 +30,20 @@ interface CommentHistorySidebarProps {
   canReply: boolean;
 }
 
+interface FieldHistoryEntry {
+  id: string;
+  field_key: string;
+  old_value: string | null;
+  new_value: string | null;
+  changed_by: string;
+  changed_at: string;
+  author_name: string;
+}
+
 export function CommentHistorySidebar({
   comments,
   allComments,
+  fieldHistory = [],
   fieldLabels,
   onReply,
   onResolve,
@@ -42,7 +54,7 @@ export function CommentHistorySidebar({
 }: CommentHistorySidebarProps) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [showSection, setShowSection] = useState<"pending" | "resolved" | "deleted">("pending");
+  const [showSection, setShowSection] = useState<"pending" | "resolved" | "deleted" | "changes">("pending");
 
   // Build replies map from ALL comments (including deleted/resolved threads)
   const repliesMap: Record<string, Comment[]> = {};
@@ -117,15 +129,15 @@ export function CommentHistorySidebar({
       <div className="flex border-b">
         <button
           onClick={() => setShowSection("pending")}
-          className={`flex-1 text-xs py-2.5 font-medium transition-colors border-b-2 ${
+          className={`flex-1 text-[11px] py-2.5 font-medium transition-colors border-b-2 ${
             showSection === "pending" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Pendientes ({pending.length})
+          Pend. ({pending.length})
         </button>
         <button
           onClick={() => setShowSection("resolved")}
-          className={`flex-1 text-xs py-2.5 font-medium transition-colors border-b-2 ${
+          className={`flex-1 text-[11px] py-2.5 font-medium transition-colors border-b-2 ${
             showSection === "resolved" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -133,16 +145,28 @@ export function CommentHistorySidebar({
         </button>
         <button
           onClick={() => setShowSection("deleted")}
-          className={`flex-1 text-xs py-2.5 font-medium transition-colors border-b-2 ${
+          className={`flex-1 text-[11px] py-2.5 font-medium transition-colors border-b-2 ${
             showSection === "deleted" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Eliminados ({deleted.length})
+          Elim. ({deleted.length})
+        </button>
+        <button
+          onClick={() => setShowSection("changes")}
+          className={`flex-1 text-[11px] py-2.5 font-medium transition-colors border-b-2 inline-flex items-center justify-center gap-1 ${
+            showSection === "changes" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <History className="h-3 w-3" /> Cambios ({fieldHistory.length})
         </button>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
+        {showSection === "changes" ? (
+          <ChangesView entries={fieldHistory} fieldLabels={fieldLabels} onFieldClick={onFieldClick} />
+        ) : (
+        <>
         {Object.keys(grouped).length === 0 && (
           <div className="flex flex-col items-center justify-center h-40 text-center px-6">
             <MessageSquare className="h-8 w-8 text-muted-foreground/30 mb-2" />
@@ -268,7 +292,73 @@ export function CommentHistorySidebar({
             </div>
           );
         })}
+        </>
+        )}
       </div>
     </aside>
+  );
+}
+
+function truncate(str: string | null, n = 80) {
+  if (!str) return "—";
+  return str.length > n ? str.slice(0, n) + "…" : str;
+}
+
+function ChangesView({
+  entries,
+  fieldLabels,
+  onFieldClick,
+}: {
+  entries: FieldHistoryEntry[];
+  fieldLabels: Record<string, string>;
+  onFieldClick: (fieldKey: string) => void;
+}) {
+  if (entries.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-40 text-center px-6">
+        <History className="h-8 w-8 text-muted-foreground/30 mb-2" />
+        <p className="text-xs text-muted-foreground">Aún no hay cambios registrados.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="divide-y">
+      {entries.map((e) => {
+        const label = fieldLabels[e.field_key] || e.field_key;
+        return (
+          <div key={e.id} className="px-4 py-3 hover:bg-muted/30 transition-colors">
+            <button
+              onClick={() => onFieldClick(e.field_key)}
+              className="text-[11px] font-semibold text-primary hover:underline truncate block w-full text-left mb-1"
+            >
+              {label}
+            </button>
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[9px] font-bold shrink-0">
+                  {e.author_name.charAt(0).toUpperCase()}
+                </span>
+                <span className="text-[11px] font-medium text-foreground truncate">{e.author_name}</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground shrink-0">
+                {new Date(e.changed_at).toLocaleDateString("es-CL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </div>
+            <div className="space-y-1 text-[11px]">
+              {e.old_value && (
+                <div className="rounded border border-destructive/20 bg-destructive/5 px-2 py-1">
+                  <span className="text-[9px] uppercase tracking-wide text-destructive/70 font-semibold">Antes</span>
+                  <p className="text-foreground/80 break-words">{truncate(e.old_value, 140)}</p>
+                </div>
+              )}
+              <div className="rounded border border-primary/20 bg-primary/5 px-2 py-1">
+                <span className="text-[9px] uppercase tracking-wide text-primary/70 font-semibold">Ahora</span>
+                <p className="text-foreground break-words">{truncate(e.new_value, 140)}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
