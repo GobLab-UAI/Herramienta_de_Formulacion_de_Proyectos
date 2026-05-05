@@ -419,6 +419,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      find_project_by_join_code: {
+        Args: { _code: string }
+        Returns: {
+          id: string
+          title: string
+        }[]
+      }
       gen_join_code: { Args: never; Returns: string }
       has_role: {
         Args: {
