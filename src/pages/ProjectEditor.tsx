@@ -632,6 +632,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           <CommentHistorySidebar
             comments={comments}
             allComments={allComments}
+            fieldHistory={fieldHistory}
             fieldLabels={fieldLabels}
             onReply={(parentId, fieldKey, text) => replyToComment(parentId, fieldKey, text)}
             onResolve={resolveComment}
