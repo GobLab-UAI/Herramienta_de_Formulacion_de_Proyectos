@@ -196,9 +196,22 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       const keys = Array.from(pendingChanges.current);
       if (keys.length === 0) return;
       setSaveStatus("saving");
+      const historyRows: any[] = [];
       const upserts = keys.map((key) => {
         const value = responses[key];
         const isTable = typeof value === "object" && value !== null;
+        const prev = lastSavedRef.current[key];
+        const oldStr = prev == null ? "" : (typeof prev === "object" ? JSON.stringify(prev) : String(prev));
+        const newStr = value == null ? "" : (isTable ? JSON.stringify(value) : String(value));
+        if (oldStr !== newStr) {
+          historyRows.push({
+            project_id: projectId!,
+            field_key: key,
+            old_value: oldStr || null,
+            new_value: newStr || null,
+            changed_by: currentUserId,
+          });
+        }
         return {
           project_id: projectId!,
           field_key: key,
@@ -213,6 +226,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           .upsert(upsert, { onConflict: "project_id,field_key" });
         if (error) throw error;
       }
+      if (historyRows.length > 0) {
+        await supabase.from("field_history").insert(historyRows);
+      }
+      keys.forEach((k) => { lastSavedRef.current[k] = responses[k]; });
       const filledCount = REQUIRED_FIELDS.filter((key) => {
         const val = responses[key];
         if (typeof val === "string") return val.length > 10;
@@ -223,7 +240,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       await supabase.from("projects").update({ completion_pct: pct }).eq("id", projectId!);
       pendingChanges.current.clear();
     },
-    onSuccess: () => setSaveStatus("saved"),
+    onSuccess: () => {
+      setSaveStatus("saved");
+      queryClient.invalidateQueries({ queryKey: ["fieldHistory", projectId] });
+    },
     onError: () => {
       setSaveStatus("error");
       toast({ title: "Error al guardar", description: "No se pudieron guardar los cambios.", variant: "destructive" });
