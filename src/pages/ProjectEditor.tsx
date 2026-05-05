@@ -150,6 +150,26 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     enabled: !!projectId,
   });
 
+  // Fetch field change history
+  const { data: fieldHistory = [] } = useQuery({
+    queryKey: ["fieldHistory", projectId, Object.keys(memberMap).length],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("field_history")
+        .select("id, field_key, old_value, new_value, changed_by, changed_at")
+        .eq("project_id", projectId!)
+        .order("changed_at", { ascending: false })
+        .limit(500);
+      return (data || []).map((h) => ({
+        ...h,
+        author_name: memberMap[h.changed_by]
+          ? `${memberMap[h.changed_by].name} · ${memberMap[h.changed_by].role}`
+          : "Usuario",
+      }));
+    },
+    enabled: !!projectId,
+  });
+
   // Initialize state
   useEffect(() => {
     if (project) {
