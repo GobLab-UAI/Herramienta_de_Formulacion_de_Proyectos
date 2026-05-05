@@ -40,6 +40,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const [showHistorySidebar, setShowHistorySidebar] = useState(false);
   const pendingChanges = useRef<Set<string>>(new Set());
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedRef = useRef<Record<string, any>>({});
 
   // Build field labels map
   const fieldLabels = useMemo(() => {
@@ -169,6 +170,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         resp[r.field_key] = r.table_data || r.field_value || "";
       });
       setResponses(resp);
+      lastSavedRef.current = { ...resp };
     }
   }, [formResponses]);
 
