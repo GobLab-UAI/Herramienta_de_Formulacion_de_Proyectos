@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2, HelpCircle } from "lucide-react";
@@ -13,7 +13,6 @@ interface DynamicTableProps {
 
 export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableProps) {
   const getInitialData = () => {
-    if (data) return data;
     if (config.type === "dynamic-rows") {
       const headers = config.headers || [];
       const rows = config.prefillRows || Array.from({ length: config.initialRows || 3 }, (_, ri) =>
@@ -41,10 +40,15 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
     return {};
   };
 
-  const [tableData, setTableData] = useState(getInitialData);
+  // Controlled: always derive from `data` prop so updates from other users
+  // (or after the form_responses query resolves) are reflected immediately.
+  const tableData = useMemo(() => {
+    if (data && typeof data === "object") return data;
+    return getInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, config.type]);
 
   const updateAndNotify = (newData: any) => {
-    setTableData(newData);
     onChange(newData);
   };
 
