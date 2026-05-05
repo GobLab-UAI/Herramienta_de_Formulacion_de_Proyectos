@@ -304,6 +304,100 @@ function truncate(str: string | null, n = 80) {
   return str.length > n ? str.slice(0, n) + "…" : str;
 }
 
+type TableLike = { headers?: string[]; rows?: any[][] } | null;
+
+function parseTable(str: string | null): TableLike {
+  if (!str) return null;
+  const trimmed = str.trim();
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return null;
+  try {
+    const obj = JSON.parse(trimmed);
+    if (obj && Array.isArray(obj.rows)) return obj as TableLike;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function rowKey(row: any[]) {
+  return JSON.stringify(row);
+}
+
+function diffTables(oldT: TableLike, newT: TableLike) {
+  const headers = newT?.headers || oldT?.headers || [];
+  const oldRows = oldT?.rows || [];
+  const newRows = newT?.rows || [];
+  const oldSet = new Set(oldRows.map(rowKey));
+  const newSet = new Set(newRows.map(rowKey));
+  const added = newRows.filter((r) => !oldSet.has(rowKey(r)));
+  const removed = oldRows.filter((r) => !newSet.has(rowKey(r)));
+  return { headers, added, removed, oldCount: oldRows.length, newCount: newRows.length };
+}
+
+function MiniRow({ headers, row, tone }: { headers: string[]; row: any[]; tone: "add" | "remove" }) {
+  const colors =
+    tone === "add"
+      ? "border-primary/30 bg-primary/5"
+      : "border-destructive/30 bg-destructive/5";
+  return (
+    <div className={`rounded border ${colors} px-2 py-1.5 text-[10.5px] space-y-0.5`}>
+      {headers.map((h, i) => {
+        const v = row[i];
+        if (v == null || v === "") return null;
+        return (
+          <div key={i} className="flex gap-1.5">
+            <span className="text-muted-foreground font-medium shrink-0 min-w-[60px]">{h || `Col ${i + 1}`}:</span>
+            <span className="text-foreground break-words">{String(v)}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TableDiff({ oldVal, newVal }: { oldVal: string | null; newVal: string | null }) {
+  const oldT = parseTable(oldVal);
+  const newT = parseTable(newVal);
+  const { headers, added, removed, oldCount, newCount } = diffTables(oldT, newT);
+
+  return (
+    <div className="space-y-1.5 text-[11px]">
+      <div className="text-[10px] text-muted-foreground">
+        Tabla actualizada · {oldCount} → {newCount} fila{newCount !== 1 ? "s" : ""}
+      </div>
+      {removed.length > 0 && (
+        <div className="space-y-1">
+          <span className="text-[9px] uppercase tracking-wide text-destructive/70 font-semibold">
+            Eliminadas ({removed.length})
+          </span>
+          {removed.slice(0, 5).map((r, i) => (
+            <MiniRow key={i} headers={headers} row={r} tone="remove" />
+          ))}
+          {removed.length > 5 && (
+            <p className="text-[10px] text-muted-foreground">+{removed.length - 5} más…</p>
+          )}
+        </div>
+      )}
+      {added.length > 0 && (
+        <div className="space-y-1">
+          <span className="text-[9px] uppercase tracking-wide text-primary/70 font-semibold">
+            Agregadas/editadas ({added.length})
+          </span>
+          {added.slice(0, 5).map((r, i) => (
+            <MiniRow key={i} headers={headers} row={r} tone="add" />
+          ))}
+          {added.length > 5 && (
+            <p className="text-[10px] text-muted-foreground">+{added.length - 5} más…</p>
+          )}
+        </div>
+      )}
+      {added.length === 0 && removed.length === 0 && (
+        <p className="text-[10px] text-muted-foreground italic">Cambios menores en la tabla.</p>
+      )}
+    </div>
+  );
+}
+
 function ChangesView({
   entries,
   fieldLabels,
@@ -344,18 +438,22 @@ function ChangesView({
                 {new Date(e.changed_at).toLocaleDateString("es-CL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
               </span>
             </div>
-            <div className="space-y-1 text-[11px]">
-              {e.old_value && (
-                <div className="rounded border border-destructive/20 bg-destructive/5 px-2 py-1">
-                  <span className="text-[9px] uppercase tracking-wide text-destructive/70 font-semibold">Antes</span>
-                  <p className="text-foreground/80 break-words">{truncate(e.old_value, 140)}</p>
+            {parseTable(e.old_value) || parseTable(e.new_value) ? (
+              <TableDiff oldVal={e.old_value} newVal={e.new_value} />
+            ) : (
+              <div className="space-y-1 text-[11px]">
+                {e.old_value && (
+                  <div className="rounded border border-destructive/20 bg-destructive/5 px-2 py-1">
+                    <span className="text-[9px] uppercase tracking-wide text-destructive/70 font-semibold">Antes</span>
+                    <p className="text-foreground/80 break-words">{truncate(e.old_value, 140)}</p>
+                  </div>
+                )}
+                <div className="rounded border border-primary/20 bg-primary/5 px-2 py-1">
+                  <span className="text-[9px] uppercase tracking-wide text-primary/70 font-semibold">Ahora</span>
+                  <p className="text-foreground break-words">{truncate(e.new_value, 140)}</p>
                 </div>
-              )}
-              <div className="rounded border border-primary/20 bg-primary/5 px-2 py-1">
-                <span className="text-[9px] uppercase tracking-wide text-primary/70 font-semibold">Ahora</span>
-                <p className="text-foreground break-words">{truncate(e.new_value, 140)}</p>
               </div>
-            </div>
+            )}
           </div>
         );
       })}
