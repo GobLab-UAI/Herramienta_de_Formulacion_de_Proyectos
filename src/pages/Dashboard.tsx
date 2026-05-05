@@ -71,6 +71,30 @@ export default function Dashboard() {
         commentCountMap[c.project_id] = (commentCountMap[c.project_id] || 0) + 1;
       });
 
+      // Members per project
+      const { data: allMembers } = await supabase
+        .from("project_members")
+        .select("project_id, user_id, custom_role, is_owner")
+        .in("project_id", projectIds);
+      const memberUserIds = [...new Set((allMembers || []).map((m) => m.user_id))];
+      let profileMap: Record<string, { full_name: string; username: string }> = {};
+      if (memberUserIds.length > 0) {
+        const { data: mp } = await supabase
+          .from("profiles").select("id, full_name, username").in("id", memberUserIds);
+        (mp || []).forEach((p) => { profileMap[p.id] = { full_name: p.full_name, username: p.username }; });
+      }
+      const membersByProject: Record<string, any[]> = {};
+      (allMembers || []).forEach((m) => {
+        if (!membersByProject[m.project_id]) membersByProject[m.project_id] = [];
+        const p = profileMap[m.user_id];
+        membersByProject[m.project_id].push({
+          user_id: m.user_id,
+          custom_role: m.custom_role,
+          is_owner: m.is_owner,
+          name: p?.full_name || p?.username || "Usuario",
+        });
+      });
+
       let creatorMap: Record<string, string> = {};
       if (isConsultor) {
         const creatorIds = [...new Set((allProjects || []).map((p) => p.created_by))];
@@ -92,6 +116,7 @@ export default function Dashboard() {
         creatorName: creatorMap[p.created_by] || undefined,
         isDeleted: !!p.deleted_at,
         myMembership: (p as any).project_members?.find((m: any) => m.user_id === user?.id),
+        members: membersByProject[p.id] || [],
       }));
     },
     enabled: !!user,
@@ -266,6 +291,7 @@ export default function Dashboard() {
                 joinCode={p.join_code}
                 myCustomRole={p.myMembership?.custom_role}
                 isOwnerOfProject={p.created_by === user?.id}
+                members={p.members}
                 onDelete={(id) => softDelete.mutate(id)}
                 onRestore={(id) => restoreProject.mutate(id)}
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}

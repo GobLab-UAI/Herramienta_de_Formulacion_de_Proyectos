@@ -40,6 +40,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const [showHistorySidebar, setShowHistorySidebar] = useState(false);
   const pendingChanges = useRef<Set<string>>(new Set());
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSavedRef = useRef<Record<string, any>>({});
 
   // Build field labels map
   const fieldLabels = useMemo(() => {
@@ -149,6 +150,26 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     enabled: !!projectId,
   });
 
+  // Fetch field change history
+  const { data: fieldHistory = [] } = useQuery({
+    queryKey: ["fieldHistory", projectId, Object.keys(memberMap).length],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("field_history")
+        .select("id, field_key, old_value, new_value, changed_by, changed_at")
+        .eq("project_id", projectId!)
+        .order("changed_at", { ascending: false })
+        .limit(500);
+      return (data || []).map((h) => ({
+        ...h,
+        author_name: memberMap[h.changed_by]
+          ? `${memberMap[h.changed_by].name} · ${memberMap[h.changed_by].role}`
+          : "Usuario",
+      }));
+    },
+    enabled: !!projectId,
+  });
+
   // Initialize state
   useEffect(() => {
     if (project) {
@@ -169,6 +190,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         resp[r.field_key] = r.table_data || r.field_value || "";
       });
       setResponses(resp);
+      lastSavedRef.current = { ...resp };
     }
   }, [formResponses]);
 
@@ -194,9 +216,22 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       const keys = Array.from(pendingChanges.current);
       if (keys.length === 0) return;
       setSaveStatus("saving");
+      const historyRows: any[] = [];
       const upserts = keys.map((key) => {
         const value = responses[key];
         const isTable = typeof value === "object" && value !== null;
+        const prev = lastSavedRef.current[key];
+        const oldStr = prev == null ? "" : (typeof prev === "object" ? JSON.stringify(prev) : String(prev));
+        const newStr = value == null ? "" : (isTable ? JSON.stringify(value) : String(value));
+        if (oldStr !== newStr) {
+          historyRows.push({
+            project_id: projectId!,
+            field_key: key,
+            old_value: oldStr || null,
+            new_value: newStr || null,
+            changed_by: currentUserId,
+          });
+        }
         return {
           project_id: projectId!,
           field_key: key,
@@ -211,6 +246,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           .upsert(upsert, { onConflict: "project_id,field_key" });
         if (error) throw error;
       }
+      if (historyRows.length > 0) {
+        await supabase.from("field_history").insert(historyRows);
+      }
+      keys.forEach((k) => { lastSavedRef.current[k] = responses[k]; });
       const filledCount = REQUIRED_FIELDS.filter((key) => {
         const val = responses[key];
         if (typeof val === "string") return val.length > 10;
@@ -221,7 +260,10 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       await supabase.from("projects").update({ completion_pct: pct }).eq("id", projectId!);
       pendingChanges.current.clear();
     },
-    onSuccess: () => setSaveStatus("saved"),
+    onSuccess: () => {
+      setSaveStatus("saved");
+      queryClient.invalidateQueries({ queryKey: ["fieldHistory", projectId] });
+    },
     onError: () => {
       setSaveStatus("error");
       toast({ title: "Error al guardar", description: "No se pudieron guardar los cambios.", variant: "destructive" });
@@ -590,6 +632,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           <CommentHistorySidebar
             comments={comments}
             allComments={allComments}
+            fieldHistory={fieldHistory}
             fieldLabels={fieldLabels}
             onReply={(parentId, fieldKey, text) => replyToComment(parentId, fieldKey, text)}
             onResolve={resolveComment}

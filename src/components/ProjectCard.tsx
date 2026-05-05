@@ -7,8 +7,10 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Calendar, MessageSquare, User, Trash2, Send, CheckCircle2, RotateCcw, KeyRound } from "lucide-react";
+import { Calendar, MessageSquare, User, Trash2, Send, CheckCircle2, RotateCcw, KeyRound, Copy, Users, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useToast } from "@/hooks/use-toast";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   DRAFT: { label: "Borrador", className: "bg-muted text-muted-foreground" },
@@ -32,6 +34,7 @@ interface ProjectCardProps {
   joinCode?: string;
   myCustomRole?: string;
   isOwnerOfProject?: boolean;
+  members?: { user_id: string; name: string; custom_role: string | null; is_owner: boolean | null }[];
   onDelete?: (id: string) => void;
   onRestore?: (id: string) => void;
   onSendToReview?: (id: string) => void;
@@ -40,15 +43,24 @@ interface ProjectCardProps {
 
 export function ProjectCard({
   id, title, organizationName, status, completionPct, updatedAt,
-  commentCount = 0, role, creatorName, isDeleted, joinCode, myCustomRole, isOwnerOfProject,
+  commentCount = 0, role, creatorName, isDeleted, joinCode, myCustomRole, isOwnerOfProject, members = [],
   onDelete, onRestore, onSendToReview, onApprove,
 }: ProjectCardProps) {
   const statusInfo = statusConfig[status] || statusConfig.DRAFT;
   const editUrl = role === "CONSULTOR" ? `/projects/${id}/review` : `/projects/${id}/edit`;
+  const { toast } = useToast();
 
   const isFormulador = role !== "CONSULTOR";
   const canSendToReview = isFormulador && (status === "DRAFT" || status === "WITH_OBSERVATIONS");
   const canApprove = !isFormulador && status === "IN_REVIEW";
+
+  const handleCopyCode = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!joinCode) return;
+    navigator.clipboard.writeText(joinCode);
+    toast({ title: "Código copiado", description: joinCode });
+  };
 
   return (
     <Card className={`group transition-all hover:shadow-goblab hover:-translate-y-0.5 animate-fade-in ${isDeleted ? "opacity-60" : ""}`}>
@@ -73,10 +85,50 @@ export function ProjectCard({
               Miembro · {myCustomRole}
             </p>
           )}
-          {joinCode && isOwnerOfProject && (
-            <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-1 font-mono">
-              <KeyRound className="h-3 w-3" />{joinCode}
-            </p>
+          {joinCode && (
+            <div className="flex items-center gap-2 mt-1.5">
+              <button
+                onClick={handleCopyCode}
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-primary transition-colors group/code"
+                title="Copiar código"
+              >
+                <KeyRound className="h-3 w-3" />
+                <span>{joinCode}</span>
+                <Copy className="h-3 w-3 opacity-0 group-hover/code:opacity-100 transition-opacity" />
+              </button>
+              {members.length > 0 && (
+                <HoverCard openDelay={150}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Users className="h-3 w-3" />
+                      <span>{members.length}</span>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent align="start" className="w-64 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Colaboradores</p>
+                    <ul className="space-y-1.5">
+                      {members.map((m) => (
+                        <li key={m.user_id} className="flex items-start gap-2 text-xs">
+                          <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-[9px] font-bold">
+                            {m.name.charAt(0).toUpperCase()}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-foreground truncate flex items-center gap-1">
+                              {m.name}
+                              {m.is_owner && <Crown className="h-3 w-3 text-amber" />}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground truncate">{m.custom_role || "—"}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </HoverCardContent>
+                </HoverCard>
+              )}
+            </div>
           )}
         </CardHeader>
         <CardContent className="space-y-3">
