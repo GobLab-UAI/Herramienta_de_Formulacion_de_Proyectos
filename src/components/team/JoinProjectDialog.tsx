@@ -38,13 +38,10 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
       if (!CODE_REGEX.test(upper)) throw new Error("El código debe tener 3 letras y 3 números (ej. ABC123).");
       if (!customRole.trim()) throw new Error("Indica tu rol en el proyecto.");
 
-      const { data: project, error } = await supabase
-        .from("projects")
-        .select("id, title")
-        .eq("join_code", upper)
-        .is("deleted_at", null)
-        .maybeSingle();
+      const { data: matches, error } = await supabase
+        .rpc("find_project_by_join_code", { _code: upper });
       if (error) throw error;
+      const project = matches?.[0];
       if (!project) throw new Error("No encontramos un proyecto con ese código.");
 
       // Check if already a member
