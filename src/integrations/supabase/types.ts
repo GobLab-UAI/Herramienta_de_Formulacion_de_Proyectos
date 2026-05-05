@@ -419,6 +419,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_join_project: { Args: { _project_id: string }; Returns: boolean }
       find_project_by_join_code: {
         Args: { _code: string }
         Returns: {
