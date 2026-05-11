@@ -329,6 +329,13 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   const updateTitle = async (newTitle: string) => {
     setTitle(newTitle);
+    // Sync to the form field "portada-nombre" so both stay in sync
+    setResponses((prev) => {
+      if (prev["portada-nombre"] === newTitle) return prev;
+      return { ...prev, "portada-nombre": newTitle };
+    });
+    pendingChanges.current.add("portada-nombre");
+    setSaveStatus("unsaved");
     await supabase.from("projects").update({ title: newTitle }).eq("id", projectId!);
   };
 
