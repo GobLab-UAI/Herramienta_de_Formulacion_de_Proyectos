@@ -62,6 +62,18 @@ export const FORM_SECTIONS: FormSection[] = [
   {
     id: "section-2",
     number: "2",
+    title: "Equipo",
+    fields: [
+      {
+        key: "table-12", label: "Equipo del proyecto", type: "dynamic-rows",
+        headers: ["#", "Organización/Departamento", "Descripción de la participación deseada", "Nombre/Rol de la contraparte"],
+        initialRows: 4,
+      } as TableConfig,
+    ],
+  },
+  {
+    id: "section-3",
+    number: "3",
     title: "Definición del Problema",
     fields: [
       { key: "ans-4-1", label: "2.1 ¿Cuál es el contexto institucional?", type: "textarea", required: true, hint: "Describe brevemente la misión, funciones y contexto operativo del área que presenta el proyecto (máx 400-500 caracteres)." },
@@ -97,8 +109,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "section-3",
-    number: "3",
+    id: "section-4",
+    number: "4",
     title: "Análisis de Prefactibilidad",
     fields: [
       { key: "ans-5-1", label: "3.1 ¿Qué facultades tiene la institución para actuar sobre el problema?", type: "textarea", required: true, hint: "Cita la norma legal que habilita la intervención." },
@@ -116,8 +128,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "section-4",
-    number: "4",
+    id: "section-5",
+    number: "5",
     title: "Objetivos",
     globalHint: "La solución técnica NO es el objetivo. Debe ser medible. Usa verbos: aumentar, disminuir, mejorar, reducir. Considera trade-offs.",
     fields: [
@@ -129,8 +141,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "section-5",
-    number: "5",
+    id: "section-6",
+    number: "6",
     title: "Actividades del proceso",
     globalHint: "Las actividades son tareas que ejecuta una persona en la institución. NO incluyas pasos de ciencia de datos.",
     fields: [
@@ -141,8 +153,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "section-6",
-    number: "6",
+    id: "section-7",
+    number: "7",
     title: "Mapeo de Datos",
     fields: [
       {
@@ -159,8 +171,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "section-7",
-    number: "7",
+    id: "section-8",
+    number: "8",
     title: "Análisis",
     globalHint: "Tipos comunes: descripción, predicción, detección, optimización, cambio de comportamiento.",
     fields: [
@@ -172,8 +184,8 @@ export const FORM_SECTIONS: FormSection[] = [
     ],
   },
   {
-    id: "section-8",
-    number: "8",
+    id: "section-9",
+    number: "9",
     title: "Consideraciones Éticas",
     fields: [
       { key: "eth-prop", label: "⚖️ Proporcionalidad — ¿Es la ciencia de datos/IA el medio adecuado? ¿Evaluaste alternativas?", type: "textarea", required: true },
@@ -188,18 +200,6 @@ export const FORM_SECTIONS: FormSection[] = [
       { key: "eth-eq2", label: "⚖️ Discriminación / Equidad — ¿Existen grupos para los que deseas garantizar equidad? ¿Qué sesgos pueden tener los datos?", type: "textarea" },
       { key: "eth-res1", label: "🧭 Responsabilidad — ¿Quién elabora la respuesta ante requerimientos? ¿Quién responde si el sistema se equivoca?", type: "textarea", required: true },
       { key: "eth-res2", label: "🧭 Responsabilidad — ¿Hay mecanismos de monitoreo, control y formación del equipo?", type: "textarea" },
-    ],
-  },
-  {
-    id: "section-9",
-    number: "9",
-    title: "Equipo",
-    fields: [
-      {
-        key: "table-12", label: "Equipo del proyecto", type: "dynamic-rows",
-        headers: ["#", "Organización/Departamento", "Descripción de la participación deseada", "Nombre/Rol de la contraparte"],
-        initialRows: 4,
-      } as TableConfig,
     ],
   },
 ];
