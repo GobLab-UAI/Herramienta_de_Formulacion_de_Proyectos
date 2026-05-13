@@ -150,7 +150,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                 <th className="px-3 py-2 text-left font-medium text-xs w-48">Campo</th>
                 {Array.from({ length: td.colCount }, (_, i) => (
                   <th key={i} className="px-3 py-2 text-left font-medium text-xs">
-                    Fuente {i + 1}
+                    {(config.colLabel || "Fuente")} {i + 1}
                   </th>
                 ))}
               </tr>
