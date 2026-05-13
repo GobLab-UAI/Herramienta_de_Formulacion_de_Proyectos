@@ -21,6 +21,7 @@ export interface TableConfig {
   initialRows?: number;
   initialCols?: number;
   prefillRows?: string[][];
+  colLabel?: string;
 }
 
 export interface FormSection {
@@ -180,6 +181,7 @@ export const FORM_SECTIONS: FormSection[] = [
         key: "table-9", label: "Análisis planificados", type: "dynamic-cols",
         rowLabels: ["Tipo de análisis", "Propósito del análisis", "¿Qué actividades utilizarán este análisis?", "¿Cómo se validará? (incluye la prueba de campo o ensayo aleatorio controlado que se diseñará para validar el proyecto: alcance, duración y criterios de éxito alineados con los objetivos de la sección 4)"],
         initialCols: 3,
+        colLabel: "Análisis",
       } as TableConfig,
     ],
   },
