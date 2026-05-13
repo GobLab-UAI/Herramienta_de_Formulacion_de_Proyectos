@@ -458,7 +458,7 @@ export type Database = {
         | "MEMBER_INVITED"
         | "PROJECT_APPROVED"
         | "MEMBER_JOINED"
-      project_role: "FORMULADOR" | "CONSULTOR"
+      project_role: "FORMULADOR" | "CONSULTOR" | "COMENTARISTA"
       project_status:
         | "DRAFT"
         | "IN_REVIEW"
@@ -615,7 +615,7 @@ export const Constants = {
         "PROJECT_APPROVED",
         "MEMBER_JOINED",
       ],
-      project_role: ["FORMULADOR", "CONSULTOR"],
+      project_role: ["FORMULADOR", "CONSULTOR", "COMENTARISTA"],
       project_status: [
         "DRAFT",
         "IN_REVIEW",

@@ -11,7 +11,8 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Pencil, MessageSquare } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const ROLE_SUGGESTIONS = [
   "Líder de proyecto",
@@ -31,6 +32,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const [customRole, setCustomRole] = useState("");
+  const [joinAs, setJoinAs] = useState<"FORMULADOR" | "COMENTARISTA">("FORMULADOR");
 
   const join = useMutation({
     mutationFn: async () => {
@@ -60,7 +62,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
         .insert({
           project_id: project.id,
           user_id: user!.id,
-          role: "FORMULADOR",
+          role: joinAs,
           custom_role: customRole.trim(),
           joined_at: new Date().toISOString(),
         });
@@ -71,7 +73,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast({ title: "Te uniste al proyecto", description: project.title });
       setOpen(false);
-      setCode(""); setCustomRole("");
+      setCode(""); setCustomRole(""); setJoinAs("FORMULADOR");
       navigate(`/projects/${project.id}/edit`);
     },
     onError: (e: any) => {
@@ -105,6 +107,45 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
               className="font-mono tracking-[0.3em] uppercase text-center text-lg"
               maxLength={6}
             />
+          </div>
+          <div className="space-y-1.5">
+            <Label>¿Cómo quieres unirte?</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setJoinAs("FORMULADOR")}
+                className={cn(
+                  "rounded-md border p-3 text-left transition-colors",
+                  joinAs === "FORMULADOR"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/40"
+                )}
+              >
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Pencil className="h-4 w-4" /> Formulador
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Edita el formulario y deja comentarios.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setJoinAs("COMENTARISTA")}
+                className={cn(
+                  "rounded-md border p-3 text-left transition-colors",
+                  joinAs === "COMENTARISTA"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/40"
+                )}
+              >
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <MessageSquare className="h-4 w-4" /> Comentarista
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Solo puede leer y dejar comentarios. No edita el texto.
+                </p>
+              </button>
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label>Mi rol en el proyecto</Label>
