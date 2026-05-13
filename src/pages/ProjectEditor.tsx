@@ -30,7 +30,25 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const queryClient = useQueryClient();
 
   const isConsultor = reviewMode || roleIsConsultor;
-  const isReadOnly = isConsultor;
+
+  // Membership of the current user in this project (for COMENTARISTA role)
+  const { data: myMembership } = useQuery({
+    queryKey: ["my-membership", projectId, currentUserId],
+    queryFn: async () => {
+      if (!currentUserId || !projectId) return null;
+      const { data } = await supabase
+        .from("project_members")
+        .select("role")
+        .eq("project_id", projectId)
+        .eq("user_id", currentUserId)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!projectId && !!currentUserId,
+  });
+  const isCommenter = myMembership?.role === "COMENTARISTA";
+  const isReadOnly = isConsultor || isCommenter;
+  const canComment = isConsultor || isCommenter;
 
   const [activeSection, setActiveSection] = useState(FORM_SECTIONS[0].id);
   const [title, setTitle] = useState("");
@@ -358,7 +376,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   const projectStatus = project?.status || "DRAFT";
   const statusInfo = statusConfig[projectStatus] || statusConfig.DRAFT;
-  const canSendToReview = !isConsultor && (projectStatus === "DRAFT" || projectStatus === "WITH_OBSERVATIONS");
+  const canSendToReview = !isConsultor && !isCommenter && (projectStatus === "DRAFT" || projectStatus === "WITH_OBSERVATIONS");
   const canApprove = isConsultor && projectStatus === "IN_REVIEW";
 
   const changeStatusMutation = useMutation({
@@ -427,9 +445,11 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
           isConsultor
             ? "bg-amber-bg text-amber border border-amber/30"
-            : "bg-accent text-accent-foreground"
+            : isCommenter
+              ? "bg-muted text-muted-foreground border border-border"
+              : "bg-accent text-accent-foreground"
         }`}>
-          {isConsultor ? "Consultor" : "Formulador"}
+          {isConsultor ? "Consultor" : isCommenter ? "Comentarista" : "Formulador"}
         </span>
 
         {/* Project status + action */}
@@ -550,7 +570,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                           <div key={field.key} id={`field-${field.key}`} className="relative group space-y-2 py-3">
                             <div className="flex items-center justify-between">
                               <h3 className="font-medium text-sm text-foreground">{tableConfig.label}</h3>
-                              {isConsultor && (
+                              {canComment && (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -594,7 +614,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                             }
                             onChange={(val) => updateField(field.key, val)}
                             readOnly={isReadOnly}
-                            showCommentButton={isConsultor}
+                            showCommentButton={canComment}
                             pendingComments={commentCounts[field.key] || 0}
                             onComment={() => handleFieldComment(field.key)}
                             isCommentActive={activeCommentField === field.key}
