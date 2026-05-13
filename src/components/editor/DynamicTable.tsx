@@ -144,12 +144,12 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
     return (
       <div className="space-y-2">
         <div className="overflow-x-auto rounded-md border">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
             <thead>
               <tr className="bg-secondary text-secondary-foreground">
                 <th className="px-3 py-2 text-left font-medium text-xs w-48">Campo</th>
                 {Array.from({ length: td.colCount }, (_, i) => (
-                  <th key={i} className="px-3 py-2 text-left font-medium text-xs">
+                  <th key={i} className="px-3 py-2 text-left font-medium text-xs" style={{ width: `${(100 - 25) / td.colCount}%` }}>
                     {(config.colLabel || "Fuente")} {i + 1}
                   </th>
                 ))}
