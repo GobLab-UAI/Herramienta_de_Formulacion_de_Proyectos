@@ -149,7 +149,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
               <tr className="bg-secondary text-secondary-foreground">
                 <th className="px-3 py-2 text-left font-medium text-xs w-48">Campo</th>
                 {Array.from({ length: td.colCount }, (_, i) => (
-                  <th key={i} className="px-3 py-2 text-left font-medium text-xs" style={{ width: `${(100 - 25) / td.colCount}%` }}>
+                  <th key={i} className="px-3 py-2 text-left font-medium text-xs">
                     {(config.colLabel || "Fuente")} {i + 1}
                   </th>
                 ))}
