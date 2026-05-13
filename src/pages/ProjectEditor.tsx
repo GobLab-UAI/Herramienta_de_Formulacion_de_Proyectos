@@ -560,7 +560,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                     )}
                   </div>
 
-                  <div className={section.id === "section-8" ? "grid gap-4 md:grid-cols-2" : "space-y-1"}>
+                  <div className={section.id === "section-9" ? "grid gap-4 md:grid-cols-2" : "space-y-1"}>
                     {section.fields.map((field) => {
                       const isTable = "headers" in field || "rowLabels" in field || ("type" in field && (field as TableConfig).type !== undefined && ["dynamic-rows", "dynamic-cols", "activities"].includes((field as any).type));
 
