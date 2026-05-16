@@ -146,7 +146,7 @@ export function generateProjectPDF(
     doc.text(`${section.number}. ${section.title}`, MARGIN + 5, y + 2);
     y += 12;
 
-    if (section.id === "section-8") {
+    if (section.id === "section-9") {
       // Group ethics fields by subsection
       const ethicsGroups: { title: string; prefixes: string[] }[] = [
         { title: "Proporcionalidad", prefixes: ["eth-prop", "eth-imp"] },
@@ -476,7 +476,8 @@ function renderTable(
     } else if (config.type === "dynamic-cols") {
       const td = data as { rowLabels: string[]; colCount: number; cells: Record<string, string> };
       const colCount = td.colCount || config.initialCols || 2;
-      const head = ["Campo", ...Array.from({ length: colCount }, (_, i) => `Fuente ${i + 1}`)];
+      const colLabel = config.colLabel || "Fuente";
+      const head = ["Campo", ...Array.from({ length: colCount }, (_, i) => `${colLabel} ${i + 1}`)];
       const labels = td.rowLabels || config.rowLabels || [];
       const body = labels.map((label, ri) => {
         const cells = [label];
