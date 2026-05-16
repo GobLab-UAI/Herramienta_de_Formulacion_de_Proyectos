@@ -476,7 +476,8 @@ function renderTable(
     } else if (config.type === "dynamic-cols") {
       const td = data as { rowLabels: string[]; colCount: number; cells: Record<string, string> };
       const colCount = td.colCount || config.initialCols || 2;
-      const head = ["Campo", ...Array.from({ length: colCount }, (_, i) => `Fuente ${i + 1}`)];
+      const colLabel = config.colLabel || "Fuente";
+      const head = ["Campo", ...Array.from({ length: colCount }, (_, i) => `${colLabel} ${i + 1}`)];
       const labels = td.rowLabels || config.rowLabels || [];
       const body = labels.map((label, ri) => {
         const cells = [label];
