@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { Github, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import logoGoblab from "@/assets/logo-goblab-uai.png";
 import logoHerramientas from "@/assets/logo-herramientas-eticas.png";
 import logoAnid from "@/assets/logo-anid.png";
@@ -78,6 +80,34 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             <p className="mt-2 text-muted-foreground">{subtitle}</p>
           </div>
           {children}
+          <div className="mt-8 pt-6 border-t border-border">
+            <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <Download className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                <div className="text-sm text-foreground">
+                  <p className="font-medium">Puedes usar esta herramienta de forma local</p>
+                  <p className="text-muted-foreground mt-1">
+                    Descárgala desde nuestro repositorio en GitHub y ejecútala en tu propio entorno.
+                  </p>
+                </div>
+              </div>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                <a
+                  href="https://github.com/johanpina/herramienta-forproyectos"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Github className="h-4 w-4" />
+                  Ver repositorio en GitHub
+                </a>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
