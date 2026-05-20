@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import { Github, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Github } from "lucide-react";
 import logoGoblab from "@/assets/logo-goblab-uai.png";
 import logoHerramientas from "@/assets/logo-herramientas-eticas.png";
 import logoAnid from "@/assets/logo-anid.png";
