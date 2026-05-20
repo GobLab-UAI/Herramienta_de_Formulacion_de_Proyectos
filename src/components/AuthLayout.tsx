@@ -83,15 +83,15 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           </div>
         </div>
         <div className="w-full max-w-md mx-auto pt-6 border-t border-border">
-          <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-            <span>Nuestra herramienta es de código abierto</span>
+          <div className="flex items-center justify-between gap-3 text-sm text-foreground">
+            <span className="font-medium">Nuestra herramienta es de código abierto</span>
             <a
               href="https://github.com/johanpina/herramienta-forproyectos"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded border border-border bg-background px-2 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm font-semibold text-foreground hover:bg-accent transition-colors"
             >
-              <Github className="h-3.5 w-3.5" />
+              <Github className="h-4 w-4" />
               GitHub
             </a>
           </div>
