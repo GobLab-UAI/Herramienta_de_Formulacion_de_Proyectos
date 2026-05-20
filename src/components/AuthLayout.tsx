@@ -67,46 +67,34 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
       </div>
 
       {/* Right panel - form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-card">
-        <div className="w-full max-w-md space-y-8">
-          <div className="mb-4">
-            <BrandLogos />
-          </div>
-          <div className="lg:hidden text-center">
-            <span className="font-display text-lg text-foreground">Herramienta de Formulación de Proyectos de IA</span>
-          </div>
-          <div>
-            <h2 className="text-2xl font-display text-foreground">{title}</h2>
-            <p className="mt-2 text-muted-foreground">{subtitle}</p>
-          </div>
-          {children}
-          <div className="mt-8 pt-6 border-t border-border">
-            <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-3">
-              <div className="flex items-start gap-3">
-                <Github className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                <div className="text-sm text-foreground">
-                  <p className="font-medium">Nuestra herramienta es de código abierto</p>
-                  <p className="text-muted-foreground mt-1">
-                    Puedes usar esta herramienta de forma local descargándola desde nuestro repositorio.
-                  </p>
-                </div>
-              </div>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="w-full"
-              >
-                <a
-                  href="https://github.com/johanpina/herramienta-forproyectos"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Github className="h-4 w-4" />
-                  Ver repositorio en GitHub
-                </a>
-              </Button>
+      <div className="flex w-full lg:w-1/2 flex-col p-8 bg-card">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-md space-y-8">
+            <div className="mb-4">
+              <BrandLogos />
             </div>
+            <div className="lg:hidden text-center">
+              <span className="font-display text-lg text-foreground">Herramienta de Formulación de Proyectos de IA</span>
+            </div>
+            <div>
+              <h2 className="text-2xl font-display text-foreground">{title}</h2>
+              <p className="mt-2 text-muted-foreground">{subtitle}</p>
+            </div>
+            {children}
+          </div>
+        </div>
+        <div className="w-full max-w-md mx-auto pt-6 border-t border-border">
+          <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span>Nuestra herramienta es de código abierto</span>
+            <a
+              href="https://github.com/johanpina/herramienta-forproyectos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded border border-border bg-background px-2 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors"
+            >
+              <Github className="h-3.5 w-3.5" />
+              GitHub
+            </a>
           </div>
         </div>
       </div>
