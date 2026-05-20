@@ -83,11 +83,11 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           <div className="mt-8 pt-6 border-t border-border">
             <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-3">
               <div className="flex items-start gap-3">
-                <Download className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                <Github className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                 <div className="text-sm text-foreground">
-                  <p className="font-medium">Puedes usar esta herramienta de forma local</p>
+                  <p className="font-medium">Nuestra herramienta es de código abierto</p>
                   <p className="text-muted-foreground mt-1">
-                    Descárgala desde nuestro repositorio en GitHub y ejecútala en tu propio entorno.
+                    Puedes usar esta herramienta de forma local descargándola desde nuestro repositorio.
                   </p>
                 </div>
               </div>
