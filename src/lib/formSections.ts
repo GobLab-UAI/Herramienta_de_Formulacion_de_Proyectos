@@ -208,7 +208,7 @@ export const FORM_SECTIONS: FormSection[] = [
       { key: "eth-tra2", group: "Transparencia", label: "¿Has considerado algún mecanismo para que las partes interesadas se comuniquen con la institución por el proyecto? ¿Cuál?", type: "textarea" },
       { key: "eth-tra3", group: "Transparencia", label: "¿Será necesario explicar los mecanismos de toma de decisión o análisis a implementar? ¿Por qué?", type: "textarea" },
       { key: "eth-eq1", group: "Discriminación / Equidad", label: "¿Qué inequidades de base hay en el proceso/entorno donde se inserta el proyecto?", type: "textarea", required: true },
-      { key: "eth-eq2", group: "Discriminación / Equidad", label: "¿Existen grupos específicos (vulnerables) para los que deseas garantizar la equidad de los resultados o la protección de sus derechos?", type: "textarea", hint: "P. ej., grupos dado su género, edad, localización, clase social, nivel educativo, urbano-rural, etnia." },
+      { key: "eth-eq2", group: "Discriminación / Equidad", label: "¿Existen grupos específicos (vulnerables) para los que deseas garantizar la equidad de los resultados o la protección de sus derechos?", type: "textarea", hint: "P. ej. Grupos dado su género, edad, localización, clase social, nivel educativo, urbano-rural, etnia." },
       { key: "eth-eq3", group: "Discriminación / Equidad", label: "¿Qué sesgos crees que podrían tener los datos?", type: "textarea" },
       { key: "eth-res1", group: "Responsabilidad", label: "En caso de ocurrir un requerimiento de información respecto del proyecto, ¿quién es el encargado/a de elaborar la respuesta?", type: "textarea", required: true },
       { key: "eth-res2", group: "Responsabilidad", label: "¿Quién es responsable si el sistema se equivoca?", type: "textarea" },
