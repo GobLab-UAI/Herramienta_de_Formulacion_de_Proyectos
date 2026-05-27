@@ -29,6 +29,7 @@ export interface FormSection {
   number: string;
   title: string;
   globalHint?: string;
+  description?: string;
   fields: (FormField | TableConfig)[];
 }
 
