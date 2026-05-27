@@ -45,6 +45,9 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           <p className="font-display text-xl text-secondary-foreground/90">
             Herramienta de Formulación de Proyectos de IA
           </p>
+          <p className="text-sm text-secondary-foreground/60 font-mono">
+            v1.2.0
+          </p>
           <p className="text-lg text-secondary-foreground/70 max-w-md">
             Colabora con tu equipo usando la metodología GobLab UAI para formular proyectos de impacto.
           </p>
