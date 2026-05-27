@@ -157,6 +157,7 @@ export const FORM_SECTIONS: FormSection[] = [
     id: "section-7",
     number: "7",
     title: "Mapeo de Datos",
+    globalHint: "Los datos tienen que conectarse con las actividades que respaldan, de modo que la organización pueda alcanzar su objetivo.\n\nLos proyectos típicos de ciencia de datos usan datos administrativos como la fuente primaria de datos y la mejoran con fuentes de datos disponibles públicamente (censo, otros datos abiertos). La asociación con el sector privado u organizaciones sin fines de lucro podría ser una forma de obtener datos que podrían faltar a nivel interno.",
     fields: [
       {
         key: "table-8a", label: "7.A Datos internos", type: "dynamic-cols",
