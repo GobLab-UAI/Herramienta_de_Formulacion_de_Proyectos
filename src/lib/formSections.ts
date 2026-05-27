@@ -171,7 +171,7 @@ export const FORM_SECTIONS: FormSection[] = [
         initialCols: 2,
         colLabel: "Base de datos",
       } as TableConfig,
-      { key: "ans-8-c", label: "7.C En un mundo ideal, ¿qué datos adicionales querrías obtener?", type: "textarea", required: true, hint: "Encuestas, CCTV, registros telefónicos, ADN, diferente frecuencia o granularidad. Sé ambicioso." },
+      { key: "ans-8-c", label: "7.C En un mundo ideal, ¿existen datos adicionales que te gustaría obtener/reunir que serían relevantes para este problema?", type: "textarea", required: true, hint: "(Encuestas, circuito cerrado de televisión, registros telefónicos, ADN, diferente frecuencia o granularidad para datos disponibles actualmente, etc.)" },
     ],
   },
   {
