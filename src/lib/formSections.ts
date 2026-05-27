@@ -65,7 +65,8 @@ export const FORM_SECTIONS: FormSection[] = [
   {
     id: "section-2",
     number: "2",
-    title: "Equipo",
+    title: "Conformación de equipo",
+    description: "Generalmente, los proyectos de ciencia de datos requieren la participación de diversos profesionales del mismo organismo público, e incluso a veces de otras organizaciones relacionadas. Participan los responsables de los datos, los responsables de infraestructura de TI, los responsables del problema/proceso, profesionales de analítica, el área legal y de comunicaciones. Agrega las líneas que requieras en la siguiente tabla.",
     fields: [
       {
         key: "table-12", label: "Equipo del proyecto", type: "dynamic-rows",
