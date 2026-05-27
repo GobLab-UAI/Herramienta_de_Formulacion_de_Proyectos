@@ -84,7 +84,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
         </div>
         <div className="w-full max-w-md mx-auto pt-6 border-t border-border">
           <div className="flex items-center justify-between gap-3 text-sm text-foreground">
-            <span className="font-medium">Nuestra herramienta es de código abierto</span>
+            <span className="font-medium">Nuestra herramienta es de código abierto, puedes instalarla localmente accediendo a:</span>
             <a
               href="https://github.com/johanpina/herramienta-forproyectos"
               target="_blank"
