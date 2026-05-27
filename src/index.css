@@ -119,3 +119,20 @@
     box-shadow: var(--shadow-lg);
   }
 }
+
+/* Global font-size bump: +2px on every Tailwind text utility */
+@layer utilities {
+  .text-xs   { font-size: 0.875rem;  line-height: 1.25rem; }  /* 14px */
+  .text-sm   { font-size: 1rem;      line-height: 1.5rem;  }  /* 16px */
+  .text-base { font-size: 1.125rem;  line-height: 1.75rem; }  /* 18px */
+  .text-lg   { font-size: 1.25rem;   line-height: 1.875rem;}  /* 20px */
+  .text-xl   { font-size: 1.375rem;  line-height: 2rem;    }  /* 22px */
+  .text-2xl  { font-size: 1.625rem;  line-height: 2.125rem;}  /* 26px */
+  .text-3xl  { font-size: 2rem;      line-height: 2.375rem;}  /* 32px */
+  .text-4xl  { font-size: 2.375rem;  line-height: 1.1;     }  /* 38px */
+  .text-5xl  { font-size: 3.125rem;  line-height: 1;       }  /* 50px */
+  .text-6xl  { font-size: 3.875rem;  line-height: 1;       }  /* 62px */
+}
+
+/* Bump inline/base font-size too (covers elements without a text-* class) */
+html { font-size: 18px; }
