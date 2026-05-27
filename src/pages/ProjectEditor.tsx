@@ -553,6 +553,11 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                       <span className="text-primary mr-2">{section.number}.</span>
                       {section.title}
                     </h2>
+                    {section.description && (
+                      <p className="mt-3 text-sm text-foreground/80 leading-relaxed whitespace-pre-line">
+                        {section.description}
+                      </p>
+                    )}
                     {section.globalHint && (
                       <p className="mt-2 text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
                         💡 {section.globalHint}
