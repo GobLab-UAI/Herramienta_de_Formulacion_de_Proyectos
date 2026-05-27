@@ -178,7 +178,7 @@ export const FORM_SECTIONS: FormSection[] = [
     id: "section-8",
     number: "8",
     title: "Análisis",
-    globalHint: "Tipos comunes: descripción, predicción, detección, optimización, cambio de comportamiento.",
+    globalHint: "• Los proyectos típicos de ciencia de datos incluyen una combinación de análisis.\n\n• El análisis no es el objetivo del proyecto.\n\n• Elige el análisis adecuado para el problema correcto.\n\n• Los análisis o herramientas elegidas deben mejorar las actividades o respuesta actual al problema.\n\n• Debes probar el análisis, y el proceso de validación debe coincidir con tu objetivo.",
     fields: [
       {
         key: "table-9", label: "Análisis planificados", type: "dynamic-cols",
