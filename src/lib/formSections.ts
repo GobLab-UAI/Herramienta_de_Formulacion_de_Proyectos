@@ -160,13 +160,13 @@ export const FORM_SECTIONS: FormSection[] = [
     globalHint: "Los datos tienen que conectarse con las actividades que respaldan, de modo que la organización pueda alcanzar su objetivo.\n\nLos proyectos típicos de ciencia de datos usan datos administrativos como la fuente primaria de datos y la mejoran con fuentes de datos disponibles públicamente (censo, otros datos abiertos). La asociación con el sector privado u organizaciones sin fines de lucro podría ser una forma de obtener datos que podrían faltar a nivel interno.",
     fields: [
       {
-        key: "table-8a", label: "7.A Datos internos", type: "dynamic-cols",
+        key: "table-8a", label: "7.A ¿Qué datos tienes internamente?", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "Comentarios adicionales"],
         initialCols: 2,
         colLabel: "Base de datos",
       } as TableConfig,
       {
-        key: "table-8b", label: "7.B Datos externos", type: "dynamic-cols",
+        key: "table-8b", label: "7.B ¿Qué datos puedes obtener de fuentes externas, privadas o públicas?", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "¿Son necesarios acuerdos legales para el acceso?", "Comentarios adicionales"],
         initialCols: 2,
         colLabel: "Base de datos",
