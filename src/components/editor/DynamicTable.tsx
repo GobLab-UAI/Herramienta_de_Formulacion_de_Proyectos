@@ -196,7 +196,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
     const momentRows = [
       { moment: "ANTES", questions: ["¿Qué insumo se necesita?", "¿Quién entrega el insumo?"], span: 2 },
       { moment: "DURANTE", questions: ["¿En qué consiste la actividad?", "¿Quién realiza?", "¿Con qué frecuencia?", "¿Dónde se realiza?", "¿Cuál es el resultado?"], span: 5 },
-      { moment: "DESPUÉS", questions: ["¿Quién recibe el resultado?", "¿Qué hacen con él?", "¿Cómo queremos cambiar la actividad?"], span: 3 },
+      { moment: "DESPUÉS", questions: ["¿Quién recibe el resultado?", "¿Qué hacen con el resultado?", "¿Cómo queremos cambiar la actividad?"], span: 3 },
     ];
 
     let rowIndex = 0;
