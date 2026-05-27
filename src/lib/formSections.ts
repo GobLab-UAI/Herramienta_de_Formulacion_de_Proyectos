@@ -77,12 +77,12 @@ export const FORM_SECTIONS: FormSection[] = [
     number: "3",
     title: "Definición del Problema",
     fields: [
-      { key: "ans-4-1", label: "2.1 ¿Cuál es el contexto institucional?", type: "textarea", required: true, hint: "Describe brevemente la misión, funciones y contexto operativo del área que presenta el proyecto (máx 400-500 caracteres)." },
-      { key: "ans-4-2", label: "2.2 Describe el problema que enfrentan.", type: "textarea", required: true, hint: "Explica qué problema existe y por qué es relevante. Evita incluir la solución; esta se aborda al final de la sección." },
-      { key: "ans-4-3", label: "2.3 ¿Cuáles son las causas del problema?", type: "textarea", required: true, hint: "Identifica las causas principales del problema. Si no tienes toda la información, describe las causas que se conocen." },
-      { key: "ans-4-4", label: "2.4 ¿Quiénes o qué son los afectados por el problema?", type: "textarea", required: true, hint: "Menciona los grupos afectados y describe brevemente cómo se relacionan con el problema." },
+      { key: "ans-4-1", label: "3.1 ¿Cuál es el contexto institucional?", type: "textarea", required: true, hint: "Describe brevemente la misión, funciones y contexto operativo del área que presenta el proyecto (máx 400-500 caracteres)." },
+      { key: "ans-4-2", label: "3.2 Describe el problema que enfrentan.", type: "textarea", required: true, hint: "Explica qué problema existe y por qué es relevante. Evita incluir la solución; esta se aborda al final de la sección." },
+      { key: "ans-4-3", label: "3.3 ¿Cuáles son las causas del problema?", type: "textarea", required: true, hint: "Identifica las causas principales del problema. Si no tienes toda la información, describe las causas que se conocen." },
+      { key: "ans-4-4", label: "3.4 ¿Quiénes o qué son los afectados por el problema?", type: "textarea", required: true, hint: "Menciona los grupos afectados y describe brevemente cómo se relacionan con el problema." },
       {
-        key: "table-4-5", label: "2.5 ¿Cuántos son afectados?", type: "dynamic-rows",
+        key: "table-4-5", label: "3.5 ¿Cuántos son afectados?", type: "dynamic-rows",
         hint: "Ingresa la cantidad de personas u organizaciones afectadas. Puedes desagregar según los criterios disponibles (edad, género, territorio, etc.).",
         headers: ["Dimensión", "Grupo/Categoría", "N° estimado de afectados", "Fuente/Año"],
         prefillRows: [
@@ -93,10 +93,10 @@ export const FORM_SECTIONS: FormSection[] = [
           ["Etnia", "", "", ""],
         ],
       } as TableConfig,
-      { key: "ans-4-6", label: "2.6 ¿Cuánto les afecta?", type: "textarea", required: true, hint: "Describe la intensidad o severidad del problema usando un indicador cuantitativo cuando sea posible." },
+      { key: "ans-4-6", label: "3.6 ¿Cuánto les afecta?", type: "textarea", required: true, hint: "Describe la intensidad o severidad del problema usando un indicador cuantitativo cuando sea posible." },
       {
         key: "table-2-7",
-        label: "2.7 ¿Cuáles son las medidas actuales para abordar el problema y sus deficiencias?",
+        label: "3.7 ¿Cuáles son las medidas actuales para abordar el problema y sus deficiencias?",
         type: "dynamic-rows",
         hint: "Lista las medidas actuales y, en cada una, indica sus limitaciones o brechas. Puedes agregar tantas filas como necesites.",
         headers: ["Medida actual", "Limitaciones o brechas"],
@@ -106,7 +106,7 @@ export const FORM_SECTIONS: FormSection[] = [
         ],
         initialRows: 3,
       } as TableConfig,
-      { key: "ans-4-8", label: "2.8 ¿Cómo otros proyectos han utilizado la ciencia de datos o IA para resolver problemas similares?", type: "textarea", hint: "Revisar Algoritmos Públicos (algoritmospublicos.cl/repositorio), Data Science for Social Good (dssgfellowship.org/projects) y Algoritmos de IA en América Latina (algoritmos.uniandes.edu.co)." },
+      { key: "ans-4-8", label: "3.8 ¿Cómo otros proyectos han utilizado la ciencia de datos o IA para resolver problemas similares?", type: "textarea", hint: "Revisar Algoritmos Públicos (algoritmospublicos.cl/repositorio), Data Science for Social Good (dssgfellowship.org/projects) y Algoritmos de IA en América Latina (algoritmos.uniandes.edu.co)." },
     ],
   },
   {
@@ -114,18 +114,18 @@ export const FORM_SECTIONS: FormSection[] = [
     number: "4",
     title: "Análisis de Prefactibilidad",
     fields: [
-      { key: "ans-5-1", label: "3.1 ¿Qué facultades tiene la institución para actuar sobre el problema?", type: "textarea", required: true, hint: "Cita la norma legal que habilita la intervención." },
+      { key: "ans-5-1", label: "4.1 ¿Qué facultades tiene la institución para actuar sobre el problema?", type: "textarea", required: true, hint: "Cita la norma legal que habilita la intervención." },
       {
         key: "ans-5-2",
-        label: "3.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas?",
+        label: "4.2 ¿Tendrá que asociarse con otras organizaciones públicas o privadas?",
         type: "yesno",
         yesDetailLabel: "Indica el nombre de las entidades y su rol en el proyecto.",
         noDetailLabel: "Fundamenta la respuesta.",
       },
-      { key: "ans-5-3", label: "3.3 ¿Dónde se ha manifestado que es prioritario resolver el problema?", type: "textarea", hint: "Indica en qué documentos, planes o compromisos institucionales se establece que este problema es prioritario." },
-      { key: "ans-5-4", label: "3.4 ¿Existen, y podemos acceder a los datos relevantes? ¿Están desagregados según las dimensiones de la población afectada?", type: "textarea", required: true },
-      { key: "ans-5-5", label: "3.5 ¿Tenemos los recursos humanos y financieros para llevar a cabo el proyecto?", type: "textarea" },
-      { key: "ans-5-6", label: "3.6 ¿Cuáles son los riesgos del proyecto?", type: "textarea", required: true, hint: "Considera: éticos (sesgos, privacidad), licencia social, implementación, datos, técnicos y políticos." },
+      { key: "ans-5-3", label: "4.3 ¿Dónde se ha manifestado que es prioritario resolver el problema?", type: "textarea", hint: "Indica en qué documentos, planes o compromisos institucionales se establece que este problema es prioritario." },
+      { key: "ans-5-4", label: "4.4 ¿Existen, y podemos acceder a los datos relevantes? ¿Están desagregados según las dimensiones de la población afectada?", type: "textarea", required: true },
+      { key: "ans-5-5", label: "4.5 ¿Tenemos los recursos humanos y financieros para llevar a cabo el proyecto?", type: "textarea" },
+      { key: "ans-5-6", label: "4.6 ¿Cuáles son los riesgos del proyecto?", type: "textarea", required: true, hint: "Considera: éticos (sesgos, privacidad), licencia social, implementación, datos, técnicos y políticos." },
     ],
   },
   {
@@ -159,16 +159,16 @@ export const FORM_SECTIONS: FormSection[] = [
     title: "Mapeo de Datos",
     fields: [
       {
-        key: "table-8a", label: "6.A Datos internos", type: "dynamic-cols",
+        key: "table-8a", label: "7.A Datos internos", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "Comentarios adicionales"],
         initialCols: 2,
       } as TableConfig,
       {
-        key: "table-8b", label: "6.B Datos externos", type: "dynamic-cols",
+        key: "table-8b", label: "7.B Datos externos", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "¿Son necesarios acuerdos legales para el acceso?", "Comentarios adicionales"],
         initialCols: 2,
       } as TableConfig,
-      { key: "ans-8-c", label: "6.C En un mundo ideal, ¿qué datos adicionales querrías obtener?", type: "textarea", required: true, hint: "Encuestas, CCTV, registros telefónicos, ADN, diferente frecuencia o granularidad. Sé ambicioso." },
+      { key: "ans-8-c", label: "7.C En un mundo ideal, ¿qué datos adicionales querrías obtener?", type: "textarea", required: true, hint: "Encuestas, CCTV, registros telefónicos, ADN, diferente frecuencia o granularidad. Sé ambicioso." },
     ],
   },
   {
