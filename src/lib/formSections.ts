@@ -5,6 +5,7 @@ export interface FormField {
   type: "text" | "textarea" | "date" | "table" | "yesno";
   required?: boolean;
   defaultValue?: string;
+  group?: string;
   // For yesno type: labels for the textarea shown after each choice
   yesDetailLabel?: string;
   noDetailLabel?: string;
@@ -195,18 +196,18 @@ export const FORM_SECTIONS: FormSection[] = [
     number: "9",
     title: "Consideraciones Éticas",
     fields: [
-      { key: "eth-prop", label: "⚖️ Proporcionalidad — ¿Es la ciencia de datos/IA el medio adecuado? ¿Evaluaste alternativas?", type: "textarea", required: true },
-      { key: "eth-imp", label: "⚖️ Proporcionalidad — ¿Qué impactos negativos podría tener el proyecto?", type: "textarea" },
-      { key: "eth-lic1", label: "🤝 Licencia Social — ¿Los usuarios/afectados encontrarán aceptable el uso de datos? ¿Por qué?", type: "textarea", required: true },
-      { key: "eth-lic2", label: "🤝 Licencia Social — Si la población completa del país se entera, ¿lo aprobará? ¿Por qué?", type: "textarea" },
-      { key: "eth-dat1", label: "🔒 Protección de Datos — ¿Estás trabajando con datos personales y/o sensibles identificables? ¿Cuáles?", type: "textarea", required: true },
-      { key: "eth-dat2", label: "🔒 Protección de Datos — ¿Identificaste la base legal? ¿Necesitas mecanismos para garantizar derechos?", type: "textarea" },
-      { key: "eth-tra1", label: "👁 Transparencia — ¿Qué partes interesadas deben estar al tanto?", type: "textarea", required: true },
-      { key: "eth-tra2", label: "👁 Transparencia — ¿Hay mecanismo de comunicación y reclamos para las partes interesadas?", type: "textarea" },
-      { key: "eth-eq1", label: "⚖️ Discriminación / Equidad — ¿Qué inequidades de base existen en el entorno del proyecto?", type: "textarea", required: true },
-      { key: "eth-eq2", label: "⚖️ Discriminación / Equidad — ¿Existen grupos para los que deseas garantizar equidad? ¿Qué sesgos pueden tener los datos?", type: "textarea" },
-      { key: "eth-res1", label: "🧭 Responsabilidad — ¿Quién elabora la respuesta ante requerimientos? ¿Quién responde si el sistema se equivoca?", type: "textarea", required: true },
-      { key: "eth-res2", label: "🧭 Responsabilidad — ¿Hay mecanismos de monitoreo, control y formación del equipo?", type: "textarea" },
+      { key: "eth-prop", group: "Proporcionalidad", label: "¿Es la ciencia de datos/IA el medio adecuado? ¿Evaluaste alternativas?", type: "textarea", required: true },
+      { key: "eth-imp", group: "Proporcionalidad", label: "¿Qué impactos negativos podría tener el proyecto?", type: "textarea" },
+      { key: "eth-lic1", group: "Licencia Social", label: "¿Los usuarios/afectados encontrarán aceptable el uso de datos? ¿Por qué?", type: "textarea", required: true },
+      { key: "eth-lic2", group: "Licencia Social", label: "Si la población completa del país se entera, ¿lo aprobará? ¿Por qué?", type: "textarea" },
+      { key: "eth-dat1", group: "Protección de Datos", label: "¿Estás trabajando con datos personales y/o sensibles identificables? ¿Cuáles?", type: "textarea", required: true },
+      { key: "eth-dat2", group: "Protección de Datos", label: "¿Identificaste la base legal? ¿Necesitas mecanismos para garantizar derechos?", type: "textarea" },
+      { key: "eth-tra1", group: "Transparencia", label: "¿Qué partes interesadas deben estar al tanto?", type: "textarea", required: true },
+      { key: "eth-tra2", group: "Transparencia", label: "¿Hay mecanismo de comunicación y reclamos para las partes interesadas?", type: "textarea" },
+      { key: "eth-eq1", group: "Discriminación / Equidad", label: "¿Qué inequidades de base existen en el entorno del proyecto?", type: "textarea", required: true },
+      { key: "eth-eq2", group: "Discriminación / Equidad", label: "¿Existen grupos para los que deseas garantizar equidad? ¿Qué sesgos pueden tener los datos?", type: "textarea" },
+      { key: "eth-res1", group: "Responsabilidad", label: "¿Quién elabora la respuesta ante requerimientos? ¿Quién responde si el sistema se equivoca?", type: "textarea", required: true },
+      { key: "eth-res2", group: "Responsabilidad", label: "¿Hay mecanismos de monitoreo, control y formación del equipo?", type: "textarea" },
     ],
   },
 ];

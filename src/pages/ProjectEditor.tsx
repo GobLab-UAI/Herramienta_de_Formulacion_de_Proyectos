@@ -565,14 +565,20 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                     )}
                   </div>
 
-                  <div className={section.id === "section-9" ? "grid gap-4 md:grid-cols-2" : "space-y-1"}>
-                    {section.fields.map((field) => {
+                  <div className="space-y-1">
+                    {section.fields.map((field, fIdx) => {
+                      const prevGroup = fIdx > 0 ? (section.fields[fIdx - 1] as any).group : undefined;
+                      const currGroup = (field as any).group;
+                      const showGroupHeader = currGroup && currGroup !== prevGroup;
                       const isTable = "headers" in field || "rowLabels" in field || ("type" in field && (field as TableConfig).type !== undefined && ["dynamic-rows", "dynamic-cols", "activities"].includes((field as any).type));
 
                       if (isTable) {
                         const tableConfig = field as TableConfig;
                         return (
                           <div key={field.key} id={`field-${field.key}`} className="relative group space-y-2 py-3">
+                            {showGroupHeader && (
+                              <div className="mt-6 mb-2 rounded-md bg-accent/40 px-3 py-2 text-sm font-semibold text-foreground">{currGroup}</div>
+                            )}
                             <div className="flex items-center justify-between">
                               <h3 className="font-medium text-sm text-foreground">{tableConfig.label}</h3>
                               {canComment && (
@@ -610,6 +616,9 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                       const formField = field as FormField;
                       return (
                         <div key={field.key} id={`field-${field.key}`} className="relative">
+                          {showGroupHeader && (
+                            <div className="mt-6 mb-2 rounded-md bg-accent/40 px-3 py-2 text-sm font-semibold text-foreground">{currGroup}</div>
+                          )}
                           <QuestionBlock
                             field={formField}
                             value={
