@@ -209,16 +209,55 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                 <th className="px-3 py-2 text-left font-medium text-xs w-24">Etapa del Proyecto</th>
                 <th className="px-3 py-2 text-left font-medium text-xs w-48">Pregunta</th>
                 {Array.from({ length: td.activityCount }, (_, i) => (
+                  <th key={i} className="px-2 py-2 min-w-[160px] text-center text-xs font-semibold">
+                    <div className="flex items-center justify-center gap-1">
+                      <span>Actividad {i + 1}</span>
+                      {!readOnly && td.activityCount > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 hover:bg-destructive/20"
+                          onClick={() => {
+                            const names = td.activityNames.filter((_, idx) => idx !== i);
+                            const newCells: Record<string, string> = {};
+                            Object.entries(td.cells).forEach(([key, value]) => {
+                              const [r, c] = key.split("-").map(Number);
+                              if (c === i) return;
+                              const newC = c > i ? c - 1 : c;
+                              newCells[`${r}-${newC}`] = value as string;
+                            });
+                            updateAndNotify({
+                              ...td,
+                              activityCount: td.activityCount - 1,
+                              activityNames: names,
+                              cells: newCells,
+                            });
+                          }}
+                          title="Eliminar actividad"
+                        >
+                          <Trash2 className="h-3 w-3 text-muted-foreground" />
+                        </Button>
+                      )}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+              <tr className="bg-secondary/60 text-secondary-foreground">
+                <th className="px-3 py-1 text-left font-medium text-[11px] text-muted-foreground" colSpan={2}>
+                  Nombre de la actividad ↓
+                </th>
+                {Array.from({ length: td.activityCount }, (_, i) => (
                   <th key={i} className="px-1 py-1 min-w-[160px]">
                     <Input
-                      value={td.activityNames[i] || `Actividad ${i + 1}`}
+                      value={td.activityNames[i] ?? ""}
                       onChange={(e) => {
                         const names = [...td.activityNames];
                         names[i] = e.target.value;
                         updateAndNotify({ ...td, activityNames: names });
                       }}
                       readOnly={readOnly}
-                      className="border-0 bg-transparent h-7 text-xs font-medium text-center"
+                      placeholder={readOnly ? "" : `Nombre de la actividad ${i + 1}`}
+                      className="border border-input bg-background h-7 text-xs font-normal text-center"
                     />
                   </th>
                 ))}
