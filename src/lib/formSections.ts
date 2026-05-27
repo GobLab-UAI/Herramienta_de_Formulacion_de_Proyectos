@@ -52,7 +52,7 @@ export const FORM_SECTIONS: FormSection[] = [
       { key: "portada-fecha", label: "Fecha", type: "date", defaultValue: new Date().toISOString().split("T")[0], hint: "Fecha inicio de formulación de proyecto" },
       {
         key: "portada-equipo",
-        label: "Equipo formulador",
+        label: "Integrantes del Equipo de Diseño del Proyecto",
         type: "dynamic-rows",
         hint: "Ingresa los integrantes del equipo que está formulando el proyecto.",
         headers: ["#", "Nombre completo", "Rol", "Organización/Departamento"],
