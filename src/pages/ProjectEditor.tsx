@@ -554,7 +554,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
                       {section.title}
                     </h2>
                     {section.globalHint && (
-                      <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                      <p className="mt-2 text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
                         💡 {section.globalHint}
                       </p>
                     )}
