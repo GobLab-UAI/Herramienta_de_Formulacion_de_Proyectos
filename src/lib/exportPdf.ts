@@ -509,7 +509,15 @@ function renderTable(
         { moment: "DESPUÉS", questions: ["¿Quién recibe el resultado?", "¿Qué hacen con él?", "¿Cómo queremos cambiar la actividad?"] },
       ];
 
-      const head = ["Etapa del Proyecto", "Pregunta", ...td.activityNames.slice(0, actCount)];
+      const headRow1: any[] = [
+        { content: "Etapa del Proyecto", rowSpan: 2, styles: { valign: "middle" } },
+        { content: "Pregunta", rowSpan: 2, styles: { valign: "middle" } },
+        ...Array.from({ length: actCount }, (_, i) => `Actividad ${i + 1}`),
+      ];
+      const headRow2: any[] = Array.from({ length: actCount }, (_, i) => ({
+        content: td.activityNames?.[i] || `Actividad ${i + 1}`,
+        styles: { fontStyle: "normal", fillColor: COLORS.rowLabelBg, textColor: COLORS.text, halign: "center" },
+      }));
       const body: any[][] = [];
       let rowIdx = 0;
 
@@ -530,7 +538,7 @@ function renderTable(
 
       autoTable(doc, {
         startY: y,
-        head: [head],
+        head: [headRow1, headRow2],
         body,
         margin: { left: MARGIN, right: MARGIN },
         styles: { fontSize: 7, cellPadding: 2, textColor: COLORS.text, lineColor: COLORS.lightBorder, lineWidth: 0.15 },
