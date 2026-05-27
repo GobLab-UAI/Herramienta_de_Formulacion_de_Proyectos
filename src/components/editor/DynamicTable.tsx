@@ -54,6 +54,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
 
   if (config.type === "dynamic-rows") {
     const td = tableData as { headers: string[]; rows: string[][] };
+    const isNumCol = (h: string) => h === "#" || /n°|n º|nro\.?|num(ero)?/i.test(h);
     return (
       <div className="space-y-2">
         <div className="overflow-x-auto rounded-md border">
@@ -64,7 +65,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                   <th
                     key={i}
                     className={
-                      h === "#"
+                      isNumCol(h)
                         ? "px-2 py-2 text-center font-medium text-xs w-px whitespace-nowrap"
                         : "px-3 py-2 text-left font-medium text-xs"
                     }
@@ -88,7 +89,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                   {row.map((cell, ci) => (
                     <td
                       key={ci}
-                      className={td.headers[ci] === "#" ? "px-1 py-1 w-px whitespace-nowrap" : "px-1 py-1"}
+                      className={isNumCol(td.headers[ci]) ? "px-1 py-1 w-px whitespace-nowrap" : "px-1 py-1"}
                     >
                       <Input
                         value={cell}
@@ -98,9 +99,9 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                           newRows[ri][ci] = e.target.value;
                           updateAndNotify({ ...td, rows: newRows });
                         }}
-                        readOnly={readOnly || (td.headers[ci] === "#")}
+                        readOnly={readOnly || isNumCol(td.headers[ci])}
                         className={
-                          td.headers[ci] === "#"
+                          isNumCol(td.headers[ci])
                             ? "border-0 bg-transparent h-8 text-xs text-center px-1 w-8 text-muted-foreground"
                             : "border-0 bg-transparent h-8 text-xs"
                         }
