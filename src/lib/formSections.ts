@@ -163,11 +163,13 @@ export const FORM_SECTIONS: FormSection[] = [
         key: "table-8a", label: "7.A Datos internos", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "Comentarios adicionales"],
         initialCols: 2,
+        colLabel: "Base de datos",
       } as TableConfig,
       {
         key: "table-8b", label: "7.B Datos externos", type: "dynamic-cols",
         rowLabels: ["Nombre", "¿Qué contiene?", "Nivel de granularidad", "Frecuencia de actualización", "Identificadores únicos", "Responsable", "¿Cómo se almacena?", "¿Son necesarios acuerdos legales para el acceso?", "Comentarios adicionales"],
         initialCols: 2,
+        colLabel: "Base de datos",
       } as TableConfig,
       { key: "ans-8-c", label: "7.C En un mundo ideal, ¿qué datos adicionales querrías obtener?", type: "textarea", required: true, hint: "Encuestas, CCTV, registros telefónicos, ADN, diferente frecuencia o granularidad. Sé ambicioso." },
     ],
