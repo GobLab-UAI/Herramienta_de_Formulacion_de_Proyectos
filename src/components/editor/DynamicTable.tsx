@@ -4,6 +4,40 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2, HelpCircle } from "lucide-react";
 import type { TableConfig } from "@/lib/formSections";
 
+interface AutoCellProps {
+  value: string;
+  onChange?: (v: string) => void;
+  readOnly?: boolean;
+  className?: string;
+  placeholder?: string;
+}
+
+function AutoCell({ value, onChange, readOnly, className, placeholder }: AutoCellProps) {
+  return (
+    <textarea
+      value={value}
+      onChange={(e) => {
+        onChange?.(e.target.value);
+        e.target.style.height = "auto";
+        e.target.style.height = e.target.scrollHeight + "px";
+      }}
+      ref={(el) => {
+        if (el) {
+          el.style.height = "auto";
+          el.style.height = el.scrollHeight + "px";
+        }
+      }}
+      readOnly={readOnly}
+      placeholder={placeholder}
+      rows={1}
+      className={
+        "w-full resize-none border-0 bg-transparent text-xs leading-snug px-2 py-1.5 outline-none focus:ring-1 focus:ring-ring rounded whitespace-pre-wrap break-words overflow-hidden " +
+        (className || "")
+      }
+    />
+  );
+}
+
 interface DynamicTableProps {
   config: TableConfig;
   data: any;
@@ -89,24 +123,27 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                   {row.map((cell, ci) => (
                     <td
                       key={ci}
-                      className={isNumCol(td.headers[ci]) ? "px-1 py-1 w-px whitespace-nowrap" : "px-1 py-1"}
+                      className={isNumCol(td.headers[ci]) ? "px-1 py-1 w-px whitespace-nowrap align-top" : "px-1 py-1 align-top"}
                     >
-                      <Input
-                        value={cell}
-                        onChange={(e) => {
-                          const newRows = [...td.rows];
-                          newRows[ri] = [...newRows[ri]];
-                          newRows[ri][ci] = e.target.value;
-                          updateAndNotify({ ...td, rows: newRows });
-                        }}
-                        readOnly={readOnly || isNumCol(td.headers[ci])}
-                        className={
-                          isNumCol(td.headers[ci])
-                            ? "border-0 bg-transparent h-8 text-xs text-center px-1 w-8 text-muted-foreground"
-                            : "border-0 bg-transparent h-8 text-xs"
-                        }
-                        placeholder={readOnly ? "" : "..."}
-                      />
+                      {isNumCol(td.headers[ci]) ? (
+                        <Input
+                          value={cell}
+                          readOnly
+                          className="border-0 bg-transparent h-8 text-xs text-center px-1 w-8 text-muted-foreground"
+                        />
+                      ) : (
+                        <AutoCell
+                          value={cell}
+                          onChange={(v) => {
+                            const newRows = [...td.rows];
+                            newRows[ri] = [...newRows[ri]];
+                            newRows[ri][ci] = v;
+                            updateAndNotify({ ...td, rows: newRows });
+                          }}
+                          readOnly={readOnly}
+                          placeholder={readOnly ? "" : "..."}
+                        />
+                      )}
                     </td>
                   ))}
                   {!readOnly && (
@@ -159,17 +196,16 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
             <tbody>
               {td.rowLabels.map((label, ri) => (
                 <tr key={ri} className="border-t">
-                  <td className="px-3 py-2 text-xs font-medium text-foreground bg-muted/30">{label}</td>
+                  <td className="px-3 py-2 text-xs font-medium text-foreground bg-muted/30 align-top">{label}</td>
                   {Array.from({ length: td.colCount }, (_, ci) => (
-                    <td key={ci} className="px-1 py-1">
-                      <Input
+                    <td key={ci} className="px-1 py-1 align-top">
+                      <AutoCell
                         value={td.cells[`${ri}-${ci}`] || ""}
-                        onChange={(e) => {
-                          const newCells = { ...td.cells, [`${ri}-${ci}`]: e.target.value };
+                        onChange={(v) => {
+                          const newCells = { ...td.cells, [`${ri}-${ci}`]: v };
                           updateAndNotify({ ...td, cells: newCells });
                         }}
                         readOnly={readOnly}
-                        className="border-0 bg-transparent h-8 text-xs"
                         placeholder={readOnly ? "" : "..."}
                       />
                     </td>
@@ -276,17 +312,16 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                           </span>
                         </td>
                       )}
-                      <td className="px-3 py-2 text-xs font-medium text-foreground bg-muted/30 whitespace-nowrap">{q}</td>
+                      <td className="px-3 py-2 text-xs font-medium text-foreground bg-muted/30 whitespace-nowrap align-top">{q}</td>
                       {Array.from({ length: td.activityCount }, (_, ci) => (
-                        <td key={ci} className="px-1 py-1">
-                          <Input
+                        <td key={ci} className="px-1 py-1 align-top">
+                          <AutoCell
                             value={td.cells[`${currentRow}-${ci}`] || ""}
-                            onChange={(e) => {
-                              const newCells = { ...td.cells, [`${currentRow}-${ci}`]: e.target.value };
+                            onChange={(v) => {
+                              const newCells = { ...td.cells, [`${currentRow}-${ci}`]: v };
                               updateAndNotify({ ...td, cells: newCells });
                             }}
                             readOnly={readOnly}
-                            className="border-0 bg-transparent h-8 text-xs"
                             placeholder={readOnly ? "" : "..."}
                           />
                         </td>
