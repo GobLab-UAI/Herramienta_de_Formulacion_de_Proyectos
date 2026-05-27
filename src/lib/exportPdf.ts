@@ -506,7 +506,7 @@ function renderTable(
       const momentRows = [
         { moment: "ANTES", questions: ["¿Qué insumo se necesita?", "¿Quién entrega el insumo?"] },
         { moment: "DURANTE", questions: ["¿En qué consiste la actividad?", "¿Quién realiza?", "¿Con qué frecuencia?", "¿Dónde se realiza?", "¿Cuál es el resultado?"] },
-        { moment: "DESPUÉS", questions: ["¿Quién recibe el resultado?", "¿Qué hacen con él?", "¿Cómo queremos cambiar la actividad?"] },
+        { moment: "DESPUÉS", questions: ["¿Quién recibe el resultado?", "¿Qué hacen con el resultado?", "¿Cómo queremos cambiar la actividad?"] },
       ];
 
       const headRow1: any[] = [
