@@ -4,6 +4,40 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2, HelpCircle } from "lucide-react";
 import type { TableConfig } from "@/lib/formSections";
 
+interface AutoCellProps {
+  value: string;
+  onChange?: (v: string) => void;
+  readOnly?: boolean;
+  className?: string;
+  placeholder?: string;
+}
+
+function AutoCell({ value, onChange, readOnly, className, placeholder }: AutoCellProps) {
+  return (
+    <textarea
+      value={value}
+      onChange={(e) => {
+        onChange?.(e.target.value);
+        e.target.style.height = "auto";
+        e.target.style.height = e.target.scrollHeight + "px";
+      }}
+      ref={(el) => {
+        if (el) {
+          el.style.height = "auto";
+          el.style.height = el.scrollHeight + "px";
+        }
+      }}
+      readOnly={readOnly}
+      placeholder={placeholder}
+      rows={1}
+      className={
+        "w-full resize-none border-0 bg-transparent text-xs leading-snug px-2 py-1.5 outline-none focus:ring-1 focus:ring-ring rounded whitespace-pre-wrap break-words overflow-hidden " +
+        (className || "")
+      }
+    />
+  );
+}
+
 interface DynamicTableProps {
   config: TableConfig;
   data: any;
