@@ -242,7 +242,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                   </th>
                 ))}
               </tr>
-              <tr className="bg-secondary/60 text-secondary-foreground">
+              <tr className="bg-muted/60 text-foreground">
                 <th className="px-3 py-1 text-left font-medium text-[11px] text-muted-foreground" colSpan={2}>
                   Nombre de la actividad ↓
                 </th>
@@ -257,7 +257,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                       }}
                       readOnly={readOnly}
                       placeholder={readOnly ? "" : `Nombre de la actividad ${i + 1}`}
-                      className="border border-input bg-background h-7 text-xs font-normal text-center"
+                      className="border border-input bg-background text-foreground h-7 text-xs font-normal text-center placeholder:text-muted-foreground"
                     />
                   </th>
                 ))}
