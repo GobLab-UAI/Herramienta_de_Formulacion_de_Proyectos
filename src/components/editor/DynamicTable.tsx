@@ -65,7 +65,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                     key={i}
                     className={
                       h === "#"
-                        ? "px-2 py-2 text-center font-medium text-xs w-10"
+                        ? "px-2 py-2 text-center font-medium text-xs w-px whitespace-nowrap"
                         : "px-3 py-2 text-left font-medium text-xs"
                     }
                   >
@@ -88,7 +88,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                   {row.map((cell, ci) => (
                     <td
                       key={ci}
-                      className={td.headers[ci] === "#" ? "px-1 py-1 w-10" : "px-1 py-1"}
+                      className={td.headers[ci] === "#" ? "px-1 py-1 w-px whitespace-nowrap" : "px-1 py-1"}
                     >
                       <Input
                         value={cell}
@@ -101,7 +101,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
                         readOnly={readOnly || (td.headers[ci] === "#")}
                         className={
                           td.headers[ci] === "#"
-                            ? "border-0 bg-transparent h-8 text-xs text-center px-1 w-10 text-muted-foreground"
+                            ? "border-0 bg-transparent h-8 text-xs text-center px-1 w-8 text-muted-foreground"
                             : "border-0 bg-transparent h-8 text-xs"
                         }
                         placeholder={readOnly ? "" : "..."}
