@@ -244,7 +244,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
               </tr>
               <tr className="bg-muted/60 text-foreground">
                 <th className="px-3 py-1 text-left font-medium text-[11px] text-muted-foreground" colSpan={2}>
-                  Nombre de la actividad ↓
+                  Nombre de la actividad
                 </th>
                 {Array.from({ length: td.activityCount }, (_, i) => (
                   <th key={i} className="px-1 py-1 min-w-[160px]">
