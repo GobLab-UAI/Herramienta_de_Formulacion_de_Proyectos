@@ -134,5 +134,5 @@
   .text-6xl  { font-size: 3.875rem;  line-height: 1;       }  /* 62px */
 }
 
-/* Bump inline/base font-size too (covers elements without a text-* class) */
-html { font-size: 18px; }
+/* Bump base body font-size by ~2px for unclassed text (16px → 18px) */
+body { font-size: 1.125rem; }
