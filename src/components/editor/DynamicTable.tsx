@@ -88,7 +88,7 @@ export function DynamicTable({ config, data, onChange, readOnly }: DynamicTableP
 
   if (config.type === "dynamic-rows") {
     const td = tableData as { headers: string[]; rows: string[][] };
-    const isNumCol = (h: string) => h === "#" || /n°|n º|nro\.?|num(ero)?/i.test(h);
+    const isNumCol = (h: string) => h === "#" || /^\s*(n°|n\s*º|nro\.?|num(ero)?)\s*$/i.test(h.trim());
     return (
       <div className="space-y-2">
         <div className="overflow-x-auto rounded-md border">
