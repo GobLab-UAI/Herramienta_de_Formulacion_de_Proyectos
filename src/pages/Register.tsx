@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const nextParam = searchParams.get("next");
+  const safeNext = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard";
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -59,7 +62,7 @@ export default function Register() {
           tool_name: "herramienta formulacion",
         } as any);
         toast({ title: "¡Cuenta creada!", description: "Bienvenido/a a GobLab Ficha." });
-        navigate("/dashboard");
+        navigate(safeNext);
       }
     } catch {
       toast({ title: "Error", description: "Ocurrió un error inesperado.", variant: "destructive" });
