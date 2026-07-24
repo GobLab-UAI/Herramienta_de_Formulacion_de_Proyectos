@@ -9,6 +9,7 @@ import ProjectEditor from "./pages/ProjectEditor";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import OAuthConsent from "./pages/OAuthConsent";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ function AppRoutes() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/projects/:id/edit" element={<ProtectedRoute><ProjectEditor /></ProtectedRoute>} />
       <Route path="/projects/:id/review" element={<ProtectedRoute><ProjectEditor reviewMode /></ProtectedRoute>} />
