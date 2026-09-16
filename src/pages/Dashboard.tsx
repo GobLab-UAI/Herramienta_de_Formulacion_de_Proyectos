@@ -229,7 +229,8 @@ export default function Dashboard() {
                 {showDeleted ? "Ver activos" : "Ver eliminados"}
               </Button>
             )}
-            {!isConsultor && (
+            {isDocente && <JoinProjectDialog />}
+            {canCreate && (
               <>
                 <JoinProjectDialog />
                 <Button onClick={() => createProject.mutate()} disabled={createProject.isPending}>
@@ -274,9 +275,11 @@ export default function Dashboard() {
                 ? "Ningún formulador ha eliminado proyectos."
                 : isConsultor
                   ? "Aún no hay proyectos formulados para revisar."
-                  : "Crea tu primer proyecto para comenzar a formular con la metodología GobLab UAI."}
+                  : isDocente
+                    ? "Únete a un proyecto con el código que te comparta el equipo."
+                    : "Crea tu primer proyecto para comenzar a formular con la metodología GobLab UAI."}
             </p>
-            {!isConsultor && !showDeleted && (
+            {canCreate && !showDeleted && (
               <Button onClick={() => createProject.mutate()}>
                 Formular proyecto
               </Button>
