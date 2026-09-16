@@ -23,13 +23,13 @@ type SaveStatus = "saved" | "saving" | "error" | "unsaved";
 
 export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boolean }) {
   const { id: projectId } = useParams<{ id: string }>();
-  const { user, isConsultor: roleIsConsultor } = useAuth();
+  const { user, isConsultor: roleIsConsultor, isDocente, isSuperadmin } = useAuth();
   const currentUserId = user?.id || "";
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const isConsultor = reviewMode || roleIsConsultor;
+  const isConsultor = (reviewMode || roleIsConsultor) && !isDocente;
 
   // Membership of the current user in this project (for COMENTARISTA role)
   const { data: myMembership } = useQuery({
@@ -47,8 +47,9 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     enabled: !!projectId && !!currentUserId,
   });
   const isCommenter = myMembership?.role === "COMENTARISTA";
-  const isReadOnly = isConsultor || isCommenter;
-  const canComment = isConsultor || isCommenter;
+  // Docentes always browse in read-only mode, but they can comment.
+  const isReadOnly = isConsultor || isCommenter || isDocente;
+  const canComment = isConsultor || isCommenter || isDocente;
 
   const [activeSection, setActiveSection] = useState(FORM_SECTIONS[0].id);
   const [title, setTitle] = useState("");
