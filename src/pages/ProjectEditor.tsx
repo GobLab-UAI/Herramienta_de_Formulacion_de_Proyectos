@@ -377,7 +377,7 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
 
   const projectStatus = project?.status || "DRAFT";
   const statusInfo = statusConfig[projectStatus] || statusConfig.DRAFT;
-  const canSendToReview = !isConsultor && !isCommenter && (projectStatus === "DRAFT" || projectStatus === "WITH_OBSERVATIONS");
+  const canSendToReview = !isReadOnly && (projectStatus === "DRAFT" || projectStatus === "WITH_OBSERVATIONS");
   const canApprove = isConsultor && projectStatus === "IN_REVIEW";
 
   const changeStatusMutation = useMutation({
@@ -446,11 +446,11 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
           isConsultor
             ? "bg-amber-bg text-amber border border-amber/30"
-            : isCommenter
+            : isDocente || isCommenter
               ? "bg-muted text-muted-foreground border border-border"
               : "bg-accent text-accent-foreground"
         }`}>
-          {isConsultor ? "Consultor" : isCommenter ? "Comentarista" : "Formulador"}
+          {isDocente ? "Docente" : isConsultor ? "Consultor" : isCommenter ? "Comentarista" : "Formulador"}
         </span>
 
         {/* Project status + action */}
