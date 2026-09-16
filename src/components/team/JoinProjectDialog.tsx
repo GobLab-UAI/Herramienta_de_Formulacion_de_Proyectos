@@ -36,6 +36,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
 
   const join = useMutation({
     mutationFn: async () => {
+      if (isDocente && joinAs !== "COMENTARISTA") setJoinAs("COMENTARISTA");
       const upper = code.trim().toUpperCase();
       if (!CODE_REGEX.test(upper)) throw new Error("El código debe tener 3 letras y 3 números (ej. ABC123).");
       if (!customRole.trim()) throw new Error("Indica tu rol en el proyecto.");
