@@ -20,7 +20,10 @@ const STATUS_FILTERS = [
 ];
 
 export default function Dashboard() {
-  const { user, isConsultor, profile } = useAuth();
+  const { user, isConsultor: hasConsultorRole, isDocente, isSuperadmin, profile } = useAuth();
+  // Consultor and Superadmin see every project; docentes and formuladores only their own memberships.
+  const isConsultor = hasConsultorRole || isSuperadmin;
+  const canCreate = !isConsultor && !isDocente;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [showDeleted, setShowDeleted] = useState(false);
@@ -204,14 +207,20 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-display text-foreground">
-              {isConsultor ? (showDeleted ? "Proyectos Eliminados" : "Todos los Proyectos") : "Mis Proyectos"}
+              {isConsultor
+                ? (showDeleted ? "Proyectos Eliminados" : "Todos los Proyectos")
+                : isDocente
+                  ? "Proyectos asignados"
+                  : "Mis Proyectos"}
             </h1>
             <p className="text-muted-foreground mt-1">
               {isConsultor
                 ? showDeleted
                   ? "Proyectos que han sido eliminados por los formuladores"
                   : "Revisa y comenta los proyectos formulados"
-                : "Formula tus proyectos de IA y Ciencia de Datos"}
+                : isDocente
+                  ? "Proyectos a los que te uniste con el código de invitación"
+                  : "Formula tus proyectos de IA y Ciencia de Datos"}
             </p>
           </div>
           <div className="flex gap-2">
