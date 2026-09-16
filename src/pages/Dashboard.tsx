@@ -297,7 +297,7 @@ export default function Dashboard() {
                 completionPct={p.completionPct ?? p.completion_pct}
                 updatedAt={p.updated_at}
                 commentCount={p.commentCount}
-                role={isConsultor ? "CONSULTOR" : "FORMULADOR"}
+                role={isConsultor ? "CONSULTOR" : isDocente ? "DOCENTE" : "FORMULADOR"}
                 creatorName={p.creatorName}
                 isDeleted={p.isDeleted}
                 joinCode={p.join_code}
