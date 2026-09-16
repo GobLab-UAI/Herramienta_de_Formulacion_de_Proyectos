@@ -25,7 +25,7 @@ const ROLE_SUGGESTIONS = [
 const CODE_REGEX = /^[A-Z]{3}\d{3}$/;
 
 export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, isDocente } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -108,7 +108,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
               maxLength={6}
             />
           </div>
-          <div className="space-y-1.5">
+          <div className={cn("space-y-1.5", isDocente && "hidden")}>
             <Label>¿Cómo quieres unirte?</Label>
             <div className="grid grid-cols-2 gap-2">
               <button
