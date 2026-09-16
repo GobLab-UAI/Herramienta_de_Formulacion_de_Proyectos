@@ -593,6 +593,10 @@ export type Database = {
     }
     Functions: {
       can_join_project: { Args: { _project_id: string }; Returns: boolean }
+      can_view_project: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       find_project_by_join_code: {
         Args: { _code: string }
         Returns: {
@@ -609,13 +613,14 @@ export type Database = {
         Returns: boolean
       }
       is_consultor: { Args: { _user_id: string }; Returns: boolean }
+      is_docente: { Args: { _user_id: string }; Returns: boolean }
       is_project_member: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      app_role: "ADMIN" | "USER" | "FORMULADOR" | "CONSULTOR"
+      app_role: "ADMIN" | "USER" | "FORMULADOR" | "CONSULTOR" | "DOCENTE"
       comment_status: "PENDING" | "RESOLVED"
       feedback_type:
         | "Comentario general"
@@ -770,7 +775,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["ADMIN", "USER", "FORMULADOR", "CONSULTOR"],
+      app_role: ["ADMIN", "USER", "FORMULADOR", "CONSULTOR", "DOCENTE"],
       comment_status: ["PENDING", "RESOLVED"],
       feedback_type: [
         "Comentario general",
