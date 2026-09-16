@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -353,6 +353,11 @@ export type Database = {
           feedback_type: Database["public"]["Enums"]["feedback_type"]
           id: string
           organization: string | null
+          pantalla: string | null
+          pregunta: string | null
+          progreso: number | null
+          question_id: string | null
+          seccion: string | null
           tool: Database["public"]["Enums"]["tool_name"]
         }
         Insert: {
@@ -362,6 +367,11 @@ export type Database = {
           feedback_type: Database["public"]["Enums"]["feedback_type"]
           id?: string
           organization?: string | null
+          pantalla?: string | null
+          pregunta?: string | null
+          progreso?: number | null
+          question_id?: string | null
+          seccion?: string | null
           tool: Database["public"]["Enums"]["tool_name"]
         }
         Update: {
@@ -371,7 +381,111 @@ export type Database = {
           feedback_type?: Database["public"]["Enums"]["feedback_type"]
           id?: string
           organization?: string | null
+          pantalla?: string | null
+          pregunta?: string | null
+          progreso?: number | null
+          question_id?: string | null
+          seccion?: string | null
           tool?: Database["public"]["Enums"]["tool_name"]
+        }
+        Relationships: []
+      }
+      tool_question_vote: {
+        Row: {
+          created_at: string
+          helpful: boolean
+          id: string
+          pregunta: string | null
+          question_id: string | null
+          seccion: string | null
+          tool: string | null
+        }
+        Insert: {
+          created_at?: string
+          helpful: boolean
+          id?: string
+          pregunta?: string | null
+          question_id?: string | null
+          seccion?: string | null
+          tool?: string | null
+        }
+        Update: {
+          created_at?: string
+          helpful?: boolean
+          id?: string
+          pregunta?: string | null
+          question_id?: string | null
+          seccion?: string | null
+          tool?: string | null
+        }
+        Relationships: []
+      }
+      tool_survey: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          p1_institucion: string | null
+          p10_comentario: string | null
+          p11_acompanamiento: string | null
+          p11_apellido: string | null
+          p11_correo: string | null
+          p11_nombre: string | null
+          p2_facilidad_uso: number | null
+          p3_orientacion: number | null
+          p4_participacion: number | null
+          p5_adecuacion: number | null
+          p6_lenguaje: number | null
+          p7_recomendaciones: number | null
+          p8_recomendaria: string | null
+          p9_detalle: string | null
+          p9_falta_tema: string | null
+          progreso: number | null
+          tool: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          p1_institucion?: string | null
+          p10_comentario?: string | null
+          p11_acompanamiento?: string | null
+          p11_apellido?: string | null
+          p11_correo?: string | null
+          p11_nombre?: string | null
+          p2_facilidad_uso?: number | null
+          p3_orientacion?: number | null
+          p4_participacion?: number | null
+          p5_adecuacion?: number | null
+          p6_lenguaje?: number | null
+          p7_recomendaciones?: number | null
+          p8_recomendaria?: string | null
+          p9_detalle?: string | null
+          p9_falta_tema?: string | null
+          progreso?: number | null
+          tool?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          p1_institucion?: string | null
+          p10_comentario?: string | null
+          p11_acompanamiento?: string | null
+          p11_apellido?: string | null
+          p11_correo?: string | null
+          p11_nombre?: string | null
+          p2_facilidad_uso?: number | null
+          p3_orientacion?: number | null
+          p4_participacion?: number | null
+          p5_adecuacion?: number | null
+          p6_lenguaje?: number | null
+          p7_recomendaciones?: number | null
+          p8_recomendaria?: string | null
+          p9_detalle?: string | null
+          p9_falta_tema?: string | null
+          progreso?: number | null
+          tool?: string | null
         }
         Relationships: []
       }
@@ -380,18 +494,21 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          origin: string | null
           tool_name: string
         }
         Insert: {
           created_at?: string
           email: string
           id?: string
+          origin?: string | null
           tool_name: string
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          origin?: string | null
           tool_name?: string
         }
         Relationships: []
@@ -416,7 +533,63 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      tool_survey_reporte: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string | null
+          p10_comentario: string | null
+          p11_acompanamiento: string | null
+          p2_facilidad_uso: number | null
+          p3_orientacion: number | null
+          p4_participacion: number | null
+          p5_adecuacion: number | null
+          p6_lenguaje: number | null
+          p7_recomendaciones: number | null
+          p8_recomendaria: string | null
+          p9_detalle: string | null
+          p9_falta_tema: string | null
+          progreso: number | null
+          tool: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          p10_comentario?: string | null
+          p11_acompanamiento?: string | null
+          p2_facilidad_uso?: number | null
+          p3_orientacion?: number | null
+          p4_participacion?: number | null
+          p5_adecuacion?: number | null
+          p6_lenguaje?: number | null
+          p7_recomendaciones?: number | null
+          p8_recomendaria?: string | null
+          p9_detalle?: string | null
+          p9_falta_tema?: string | null
+          progreso?: number | null
+          tool?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          p10_comentario?: string | null
+          p11_acompanamiento?: string | null
+          p2_facilidad_uso?: number | null
+          p3_orientacion?: number | null
+          p4_participacion?: number | null
+          p5_adecuacion?: number | null
+          p6_lenguaje?: number | null
+          p7_recomendaciones?: number | null
+          p8_recomendaria?: string | null
+          p9_detalle?: string | null
+          p9_falta_tema?: string | null
+          progreso?: number | null
+          tool?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_join_project: { Args: { _project_id: string }; Returns: boolean }
@@ -485,12 +658,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -514,11 +687,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -539,11 +712,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -564,11 +737,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -581,11 +754,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
