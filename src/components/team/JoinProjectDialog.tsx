@@ -63,7 +63,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
         .insert({
           project_id: project.id,
           user_id: user!.id,
-          role: joinAs,
+          role: isDocente ? "COMENTARISTA" : joinAs,
           custom_role: customRole.trim(),
           joined_at: new Date().toISOString(),
         });
