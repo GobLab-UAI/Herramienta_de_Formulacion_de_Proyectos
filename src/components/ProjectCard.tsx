@@ -50,9 +50,9 @@ export function ProjectCard({
   const editUrl = role === "CONSULTOR" ? `/projects/${id}/review` : `/projects/${id}/edit`;
   const { toast } = useToast();
 
-  const isFormulador = role !== "CONSULTOR";
+  const isFormulador = role !== "CONSULTOR" && role !== "DOCENTE";
   const canSendToReview = isFormulador && (status === "DRAFT" || status === "WITH_OBSERVATIONS");
-  const canApprove = !isFormulador && status === "IN_REVIEW";
+  const canApprove = role === "CONSULTOR" && status === "IN_REVIEW";
 
   const handleCopyCode = (e: React.MouseEvent) => {
     e.preventDefault();

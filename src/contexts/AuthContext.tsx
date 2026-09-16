@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
-type AppRole = "FORMULADOR" | "CONSULTOR";
+type AppRole = "FORMULADOR" | "CONSULTOR" | "DOCENTE" | "ADMIN" | "USER";
 
 interface Profile {
   id: string;
@@ -19,6 +19,8 @@ interface AuthContextType {
   profile: Profile | null;
   role: AppRole;
   isConsultor: boolean;
+  isDocente: boolean;
+  isSuperadmin: boolean;
   loading: boolean;
   logout: () => Promise<void>;
 }
@@ -29,6 +31,8 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   role: "FORMULADOR",
   isConsultor: false,
+  isDocente: false,
+  isSuperadmin: false,
   loading: true,
   logout: async () => {},
 });
@@ -99,7 +103,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, role, isConsultor: role === "CONSULTOR", loading, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        profile,
+        role,
+        isConsultor: role === "CONSULTOR",
+        isDocente: role === "DOCENTE",
+        isSuperadmin: role === "ADMIN",
+        loading,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

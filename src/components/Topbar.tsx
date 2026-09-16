@@ -1,12 +1,19 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { LogOut, GraduationCap } from "lucide-react";
 import logoGoblab from "@/assets/logo-goblab-uai.png";
 import logoHerramientas from "@/assets/logo-herramientas-eticas.png";
 
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Superadmin",
+  CONSULTOR: "Consultor",
+  DOCENTE: "Docente",
+  FORMULADOR: "Formulador",
+};
+
 export function Topbar() {
-  const { profile, role, logout } = useAuth();
+  const { profile, role, isSuperadmin, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -24,12 +31,22 @@ export function Topbar() {
       </Link>
 
       <div className="flex items-center gap-3">
+        {isSuperadmin && (
+          <Button variant="ghost" size="sm" asChild className="text-xs">
+            <Link to="/admin/docentes">
+              <GraduationCap className="h-4 w-4 mr-1" />
+              Docentes
+            </Link>
+          </Button>
+        )}
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-          role === "CONSULTOR"
+          role === "CONSULTOR" || role === "ADMIN"
             ? "bg-amber-bg text-amber border border-amber/30"
-            : "bg-accent text-accent-foreground"
+            : role === "DOCENTE"
+              ? "bg-muted text-muted-foreground border border-border"
+              : "bg-accent text-accent-foreground"
         }`}>
-          {role === "CONSULTOR" ? "Consultor" : "Formulador"}
+          {ROLE_LABELS[role] || "Formulador"}
         </span>
         <span className="text-sm text-foreground font-medium hidden sm:inline">
           {profile?.full_name || profile?.username || "Usuario"}

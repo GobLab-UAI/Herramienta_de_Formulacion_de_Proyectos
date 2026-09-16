@@ -25,7 +25,7 @@ const ROLE_SUGGESTIONS = [
 const CODE_REGEX = /^[A-Z]{3}\d{3}$/;
 
 export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, isDocente } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -36,6 +36,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
 
   const join = useMutation({
     mutationFn: async () => {
+      if (isDocente && joinAs !== "COMENTARISTA") setJoinAs("COMENTARISTA");
       const upper = code.trim().toUpperCase();
       if (!CODE_REGEX.test(upper)) throw new Error("El código debe tener 3 letras y 3 números (ej. ABC123).");
       if (!customRole.trim()) throw new Error("Indica tu rol en el proyecto.");
@@ -62,7 +63,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
         .insert({
           project_id: project.id,
           user_id: user!.id,
-          role: joinAs,
+          role: isDocente ? "COMENTARISTA" : joinAs,
           custom_role: customRole.trim(),
           joined_at: new Date().toISOString(),
         });
@@ -108,7 +109,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
               maxLength={6}
             />
           </div>
-          <div className="space-y-1.5">
+          <div className={cn("space-y-1.5", isDocente && "hidden")}>
             <Label>¿Cómo quieres unirte?</Label>
             <div className="grid grid-cols-2 gap-2">
               <button
