@@ -593,6 +593,10 @@ export type Database = {
     }
     Functions: {
       can_join_project: { Args: { _project_id: string }; Returns: boolean }
+      can_view_project: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
       find_project_by_join_code: {
         Args: { _code: string }
         Returns: {
