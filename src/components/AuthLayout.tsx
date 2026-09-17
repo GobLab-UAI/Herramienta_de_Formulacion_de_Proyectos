@@ -63,11 +63,11 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             </div>
             <p className="text-sm text-secondary-foreground/70 leading-relaxed">
               Esta herramienta es desarrollada por GobLab UAI con el apoyo de la Agencia Nacional de Investigación y
-              Desarrollo (ANID) — Subdirección de Investigación Aplicada / Concurso IDeA I+D 2023, proyecto{" "}
+              Desarrollo (ANID) — Subdirección de Investigación Aplicada, proyecto{" "}
               <span className="font-semibold text-secondary-foreground">
                 Plataforma Algoritmos Públicos: Hacia una IA Generativa Responsable y Ética
               </span>{" "}
-              (código ANID IT25I0161).
+              (ANID IT25I0161).
             </p>
           </div>
         </div>
