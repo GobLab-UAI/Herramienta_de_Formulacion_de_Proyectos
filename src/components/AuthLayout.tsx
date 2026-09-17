@@ -53,23 +53,23 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           </p>
         </div>
         <div className="space-y-6">
-        <div className="pt-4 space-y-3 max-w-md">
-          <p className="text-sm text-secondary-foreground/70 leading-relaxed">
-            Esta herramienta es desarrollada por GobLab UAI con el apoyo de la Agencia Nacional de Investigación y
-            Desarrollo (ANID) — Subdirección de Investigación Aplicada / Concurso IDeA I+D 2023, proyecto{" "}
-            <span className="font-semibold text-secondary-foreground">
-              Plataforma Algoritmos Públicos: Hacia una IA Generativa Responsable y Ética
-            </span>{" "}
-            (código ANID IT25I0161).
-          </p>
-          <div className="bg-white rounded-md p-3 inline-block">
-            <img
-              src={logoAnid}
-              alt="Agencia Nacional de Investigación y Desarrollo (ANID)"
-              className="h-16 w-auto object-contain"
-            />
+          <div className="pt-4 flex items-center gap-5 max-w-xl">
+            <div className="bg-white rounded-md p-3 shrink-0">
+              <img
+                src={logoAnid}
+                alt="Agencia Nacional de Investigación y Desarrollo (ANID)"
+                className="h-16 w-auto object-contain"
+              />
+            </div>
+            <p className="text-sm text-secondary-foreground/70 leading-relaxed">
+              Esta herramienta es desarrollada por GobLab UAI con el apoyo de la Agencia Nacional de Investigación y
+              Desarrollo (ANID) — Subdirección de Investigación Aplicada / Concurso IDeA I+D 2023, proyecto{" "}
+              <span className="font-semibold text-secondary-foreground">
+                Plataforma Algoritmos Públicos: Hacia una IA Generativa Responsable y Ética
+              </span>{" "}
+              (código ANID IT25I0161).
+            </p>
           </div>
-        </div>
         </div>
       </div>
 
