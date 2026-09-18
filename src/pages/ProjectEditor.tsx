@@ -69,15 +69,31 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<Record<string, any>>({});
 
-  const handleExportPdf = () => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportPdf = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
     try {
-      generateProjectPDF(title, responses);
-    } catch {
+      const { base64, fileName } = generateProjectPDF(title, responses);
+      const { data, error } = await supabase.functions.invoke("export-project-pdf", {
+        body: { project_id: projectId, file_name: fileName, pdf_base64: base64 },
+      });
+      if (error) throw error;
+      const url = (data as { url?: string })?.url;
+      if (!url) throw new Error("Sin enlace de descarga");
+      // The signed URL is served with Content-Disposition: attachment, so this
+      // downloads the file in every browser (Chrome, Safari, Safari iOS) without
+      // opening a tab, navigating away, or relying on blob URLs.
+      window.location.href = url;
+    } catch (e: any) {
       toast({
         title: "No se pudo generar el PDF",
-        description: "Vuelve a intentarlo en unos segundos.",
+        description: e?.message || "Vuelve a intentarlo en unos segundos.",
         variant: "destructive",
       });
+    } finally {
+      setIsExporting(false);
     }
   };
 
