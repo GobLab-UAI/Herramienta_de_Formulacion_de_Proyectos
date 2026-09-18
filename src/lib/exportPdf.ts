@@ -315,7 +315,35 @@ export function generateProjectPDF(
   addFooter(doc);
 
   const safeName = (title || "proyecto").replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g, "").trim().replace(/\s+/g, "_");
-  doc.save(`Ficha_${safeName}.pdf`);
+  const fileName = `Ficha_${safeName}.pdf`;
+
+  // Safari (Mac/iOS) blocks the <a download> trigger used by doc.save().
+  // Use an anchor click with a Blob URL; if the download attribute is
+  // ignored, open the PDF in a new tab as fallback.
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  if (isSafari) {
+    const win = window.open(url, "_blank");
+    if (!win) {
+      // Pop-up blocked: try the classic anchor approach as last resort
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } else {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
 }
 
 function renderTextField(
