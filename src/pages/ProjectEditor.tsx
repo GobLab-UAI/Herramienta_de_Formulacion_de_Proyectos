@@ -65,28 +65,17 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
   const [activeCommentField, setActiveCommentField] = useState<string | null>(null);
   const [showHistorySidebar, setShowHistorySidebar] = useState(false);
-  const [preparedPdf, setPreparedPdf] = useState<{ url: string; fileName: string } | null>(null);
   const pendingChanges = useRef<Set<string>>(new Set());
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedRef = useRef<Record<string, any>>({});
 
-  const closePreparedPdf = useCallback(() => {
-    setPreparedPdf((current) => {
-      if (current) URL.revokeObjectURL(current.url);
-      return null;
-    });
-  }, []);
-
-  useEffect(() => closePreparedPdf, [closePreparedPdf]);
-
   const handleExportPdf = () => {
     try {
-      const prepared = generateProjectPDF(title, responses);
-      if (prepared) setPreparedPdf(prepared);
+      generateProjectPDF(title, responses);
     } catch {
       toast({
-        title: "No se pudo preparar el PDF",
-        description: "Intenta abrir la herramienta fuera de la vista previa y vuelve a exportar.",
+        title: "No se pudo generar el PDF",
+        description: "Vuelve a intentarlo en unos segundos.",
         variant: "destructive",
       });
     }
@@ -558,34 +547,6 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           Exportar PDF
         </Button>
 
-        <Dialog open={preparedPdf !== null} onOpenChange={(open) => !open && closePreparedPdf()}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Tu PDF está listo</DialogTitle>
-              <DialogDescription>
-                Safari necesita un segundo clic para guardar archivos desde la vista previa.
-              </DialogDescription>
-            </DialogHeader>
-            {preparedPdf && (
-              <DialogFooter className="gap-2 sm:space-x-0">
-                <Button variant="outline" asChild>
-                  <a href={preparedPdf.url} target="_blank" rel="noopener noreferrer">
-                    Abrir PDF
-                  </a>
-                </Button>
-                <Button asChild>
-                  <a href={preparedPdf.url} download={preparedPdf.fileName}>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    Descargar PDF
-                  </a>
-                </Button>
-              </DialogFooter>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Si Safari bloquea ambas opciones, abre la página publicada directamente y vuelve a intentarlo.
-            </p>
-          </DialogContent>
-        </Dialog>
 
         <Button
           variant={showHistorySidebar ? "default" : "outline"}
