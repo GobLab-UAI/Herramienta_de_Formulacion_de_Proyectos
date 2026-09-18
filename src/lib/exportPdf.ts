@@ -317,19 +317,34 @@ export function generateProjectPDF(
   const safeName = (title || "proyecto").replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g, "").trim().replace(/\s+/g, "_");
   const fileName = `Ficha_${safeName}.pdf`;
 
-  // Download via a Blob URL + anchor click (works in Chrome, Edge, Firefox
-  // and modern Safari). window.open(blobUrl) is NOT used because Safari
-  // fails with WebKitBlobResource:1 when the app runs inside an iframe.
   const blob = doc.output("blob");
+  const file = new File([blob], fileName, { type: "application/pdf" });
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+  // Safari can silently block programmatic Blob downloads when the app is
+  // displayed inside the preview iframe. Its native share sheet accepts the
+  // PDF as a real file and offers “Save to Downloads” without a popup.
+  if (isSafari && navigator.share && navigator.canShare?.({ files: [file] })) {
+    void navigator.share({ files: [file], title: fileName }).catch((error: unknown) => {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      downloadBlob(blob, fileName);
+    });
+    return;
+  }
+
+  downloadBlob(blob, fileName);
+}
+
+function downloadBlob(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  a.rel = "noopener";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  // Revoke later so Safari has time to start the download
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  anchor.rel = "noopener";
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
