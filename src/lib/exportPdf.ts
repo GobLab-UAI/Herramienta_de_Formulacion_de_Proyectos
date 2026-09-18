@@ -317,31 +317,8 @@ export function generateProjectPDF(
   const safeName = (title || "proyecto").replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g, "").trim().replace(/\s+/g, "_");
   const fileName = `Ficha_${safeName}.pdf`;
 
-  const blob = doc.output("blob");
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-  // Inside the Lovable preview iframe, Safari blocks synthetic downloads and
-  // the share sheet. Return a prepared URL so the UI can offer a visible link
-  // that Safari receives as a second, direct user gesture.
-  if (isSafari) {
-    return { url: URL.createObjectURL(blob), fileName };
-  }
-
-  downloadBlob(blob, fileName);
+  doc.save(fileName);
   return null;
-}
-
-function downloadBlob(blob: Blob, fileName: string) {
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = fileName;
-  anchor.rel = "noopener";
-  anchor.style.display = "none";
-  document.body.appendChild(anchor);
-  anchor.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
-  anchor.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 function renderTextField(
