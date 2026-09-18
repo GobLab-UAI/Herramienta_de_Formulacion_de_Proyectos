@@ -563,12 +563,12 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           variant="outline"
           size="sm"
           onClick={handleExportPdf}
-          disabled={!canExportPdf}
+          disabled={!canExportPdf || isExporting}
           title={canExportPdf ? "Exportar PDF" : "Disponible cuando el proyecto esté aprobado"}
           className="text-xs"
         >
           <FileDown className="h-3.5 w-3.5 mr-1" />
-          Exportar PDF
+          {isExporting ? "Generando..." : "Exportar PDF"}
         </Button>
 
 
