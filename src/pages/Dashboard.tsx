@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { JoinProjectDialog } from "@/components/team/JoinProjectDialog";
+import { FolderBar, useFolders } from "@/components/folders/FolderBar";
 
 const STATUS_FILTERS = [
   { value: "ALL", label: "Todos" },
@@ -27,6 +28,8 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [showDeleted, setShowDeleted] = useState(false);
+  const [activeFolder, setActiveFolder] = useState<string | null>(null);
+  const { folders, projectFolder } = useFolders(isDocente ? user?.id : undefined);
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
