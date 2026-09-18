@@ -13,3 +13,10 @@
 - [x] Edge function `create-docente` validando que el llamante sea Superadmin
 - [x] Convertir `profeDiplomado2026` a DOCENTE
 - [x] Validar los 6 casos de prueba (probados directo contra la base de datos)
+
+## Exportación PDF fiable en Chrome y Safari
+- [x] Fecha (`portada-fecha`) se inicializa en local y se persiste; aparece siempre en el PDF
+- [x] Función de servidor valida sesión (401), permiso (403), estado Aprobado (403) y UUID (400) antes de generar enlace
+- [x] Bucket privado `project-pdfs` con enlace firmado de 5 min y descarga forzada (Content-Disposition attachment)
+- [x] Limpieza: borra PDFs previos del proyecto al generar uno nuevo + cron cada hora borra archivos >1h
+- [x] Verificado: descarga OK y Fecha 2026-09-17 en Chromium, WebKit escritorio y WebKit tamaño iPhone

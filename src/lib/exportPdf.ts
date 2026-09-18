@@ -67,12 +67,15 @@ function addFooter(doc: jsPDF) {
   }
 }
 
+export type GeneratedPdf = { base64: string; fileName: string };
+
 export function generateProjectPDF(
   title: string,
   rawResponses: Record<string, any>
-): { url: string; fileName: string } | null {
-  // Fields with a defaultValue (e.g. the cover date) may never be persisted if
-  // the user didn't touch them, so fall back to their default here.
+): GeneratedPdf {
+  // Fields with a defaultValue (e.g. the cover date) may never be persisted on
+  // older projects, so fall back to their default here. Fresh projects now
+  // persist the cover date like any other answer.
   const responses: Record<string, any> = { ...rawResponses };
   FORM_SECTIONS.forEach((s) => {
     s.fields.forEach((f: any) => {
@@ -325,10 +328,13 @@ export function generateProjectPDF(
   addFooter(doc);
 
   const safeName = (title || "proyecto").replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g, "").trim().replace(/\s+/g, "_");
-  const fileName = `Ficha_${safeName}.pdf`;
+  const fileName = `Ficha_${safeName || "proyecto"}.pdf`;
 
-  doc.save(fileName);
-  return null;
+  // Return the raw document instead of triggering a download here: delivery is
+  // handled by the caller (see uploadAndGetDownloadUrl) so that every browser
+  // — including Safari and Safari iOS — gets a real HTTPS attachment URL.
+  const base64 = doc.output("datauristring").split(",")[1] || "";
+  return { base64, fileName };
 }
 
 function renderTextField(
