@@ -12,7 +12,7 @@ import { QuestionBlock } from "@/components/editor/QuestionBlock";
 import { DynamicTable } from "@/components/editor/DynamicTable";
 import { CommentBubble } from "@/components/editor/CommentBubble";
 import { CommentHistorySidebar } from "@/components/editor/CommentHistorySidebar";
-import { FORM_SECTIONS, REQUIRED_FIELDS, type FormField, type TableConfig } from "@/lib/formSections";
+import { FORM_SECTIONS, REQUIRED_FIELDS, todayLocalISO, type FormField, type TableConfig } from "@/lib/formSections";
 import { Save, ArrowLeft, MessageSquare, PanelRightOpen, FileDown, Send, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { generateProjectPDF } from "@/lib/exportPdf";
@@ -244,10 +244,18 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
       formResponses.forEach((r) => {
         resp[r.field_key] = r.table_data || r.field_value || "";
       });
-      setResponses(resp);
       lastSavedRef.current = { ...resp };
+
+      // The cover date shows a default value on screen; make it a real stored
+      // answer so the exported PDF always matches what the user sees.
+      if (!resp["portada-fecha"] && !isReadOnly) {
+        resp["portada-fecha"] = todayLocalISO();
+        pendingChanges.current.add("portada-fecha");
+        setSaveStatus("unsaved");
+      }
+      setResponses(resp);
     }
-  }, [formResponses]);
+  }, [formResponses, isReadOnly]);
 
   // Comment counts
   const commentCounts: Record<string, number> = {};
