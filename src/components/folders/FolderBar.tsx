@@ -98,6 +98,13 @@ export function FolderBar({
 
   const deleteFolder = useMutation({
     mutationFn: async (id: string) => {
+      // Los proyectos vuelven a "Sin carpeta"
+      const { error: itemsError } = await db
+        .from("user_folder_projects")
+        .delete()
+        .eq("folder_id", id)
+        .eq("user_id", userId);
+      if (itemsError) throw itemsError;
       const { error } = await db.from("user_folders").delete().eq("id", id);
       if (error) throw error;
     },
