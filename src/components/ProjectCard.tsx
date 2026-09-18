@@ -169,7 +169,14 @@ export function ProjectCard({
           </Button>
         )}
         {!isDeleted && canApprove && onApprove && (
-          <Button size="sm" variant="default" onClick={() => onApprove(id)} className="text-xs">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => onApprove(id)}
+            disabled={approveBlocked}
+            title={approveBlocked ? "Resuelve todos los comentarios para poder aprobar" : "Aprobar proyecto"}
+            className="text-xs"
+          >
             <CheckCircle2 className="h-3 w-3 mr-1" /> Aprobar
           </Button>
         )}
