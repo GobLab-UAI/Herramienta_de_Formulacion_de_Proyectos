@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { JoinProjectDialog } from "@/components/team/JoinProjectDialog";
+import { FolderBar, useFolders } from "@/components/folders/FolderBar";
 
 const STATUS_FILTERS = [
   { value: "ALL", label: "Todos" },
@@ -27,6 +28,8 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [showDeleted, setShowDeleted] = useState(false);
+  const [activeFolder, setActiveFolder] = useState<string | null>(null);
+  const { folders, projectFolder } = useFolders(isDocente ? user?.id : undefined);
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -197,7 +200,8 @@ export default function Dashboard() {
   const filtered = projects.filter((p: any) => {
     const matchesSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "ALL" || p.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesFolder = !isDocente || !activeFolder || projectFolder[p.id] === activeFolder;
+    return matchesSearch && matchesStatus && matchesFolder;
   });
 
   return (
@@ -258,6 +262,16 @@ export default function Dashboard() {
           )}
         </div>
 
+        {isDocente && user && (
+          <FolderBar
+            userId={user.id}
+            folders={folders}
+            projectFolder={projectFolder}
+            activeFolder={activeFolder}
+            onSelectFolder={setActiveFolder}
+          />
+        )}
+
         {/* Project grid */}
         {isLoading ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -288,8 +302,17 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p: any) => (
-              <ProjectCard
+              <div
                 key={p.id}
+                draggable={isDocente}
+                onDragStart={(e) => {
+                  if (!isDocente) return;
+                  e.dataTransfer.setData("text/project-id", p.id);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                className={isDocente ? "cursor-grab active:cursor-grabbing" : undefined}
+              >
+              <ProjectCard
                 id={p.id}
                 title={p.title}
                 organizationName={p.organizationName}
@@ -309,6 +332,7 @@ export default function Dashboard() {
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}
                 onApprove={(id) => changeStatus.mutate({ projectId: id, status: "APPROVED" })}
               />
+              </div>
             ))}
           </div>
         )}
