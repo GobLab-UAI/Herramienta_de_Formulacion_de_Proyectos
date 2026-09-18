@@ -34,6 +34,17 @@ export interface FormSection {
   fields: (FormField | TableConfig)[];
 }
 
+/**
+ * Today's date as YYYY-MM-DD in the *local* timezone.
+ * `new Date().toISOString()` is UTC and would show tomorrow's date late at
+ * night in Chile/Colombia (UTC-3/UTC-5).
+ */
+export function todayLocalISO(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export const REQUIRED_FIELDS = [
   "portada-nombre", "portada-org",
   "ans-4-1", "ans-4-2", "ans-4-3", "ans-4-4", "ans-4-6", "table-2-7",
@@ -51,7 +62,7 @@ export const FORM_SECTIONS: FormSection[] = [
     fields: [
       { key: "portada-nombre", label: "Nombre del proyecto", type: "text", required: true },
       { key: "portada-org", label: "Organización", type: "text", required: true },
-      { key: "portada-fecha", label: "Fecha", type: "date", defaultValue: new Date().toISOString().split("T")[0], hint: "Fecha inicio de formulación de proyecto" },
+      { key: "portada-fecha", label: "Fecha", type: "date", defaultValue: todayLocalISO(), hint: "Fecha inicio de formulación de proyecto" },
       {
         key: "portada-equipo",
         label: "Integrantes del Equipo de Diseño del Proyecto",
