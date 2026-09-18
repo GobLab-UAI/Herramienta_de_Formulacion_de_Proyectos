@@ -9,7 +9,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, UserPlus } from "lucide-react";
+import { GraduationCap, UserPlus, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function AdminDocentes() {
   const { isSuperadmin, loading } = useAuth();
@@ -55,6 +66,27 @@ export default function AdminDocentes() {
     },
     onError: (e: any) => {
       toast({ title: "No se pudo crear la cuenta", description: e.message, variant: "destructive" });
+    },
+  });
+
+  const remove = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.functions.invoke("delete-docente", {
+        body: { user_id: userId },
+      });
+      if (error) {
+        const detail = (data as any)?.error;
+        throw new Error(detail || error.message);
+      }
+      if ((data as any)?.error) throw new Error((data as any).error);
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: "Cuenta docente eliminada" });
+      queryClient.invalidateQueries({ queryKey: ["docentes"] });
+    },
+    onError: (e: any) => {
+      toast({ title: "No se pudo eliminar la cuenta", description: e.message, variant: "destructive" });
     },
   });
 
