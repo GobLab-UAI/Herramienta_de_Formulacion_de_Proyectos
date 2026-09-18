@@ -70,7 +70,7 @@ function addFooter(doc: jsPDF) {
 export function generateProjectPDF(
   title: string,
   responses: Record<string, any>
-) {
+): { url: string; fileName: string } | null {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
   // ── Cover page ──
@@ -318,21 +318,17 @@ export function generateProjectPDF(
   const fileName = `Ficha_${safeName}.pdf`;
 
   const blob = doc.output("blob");
-  const file = new File([blob], fileName, { type: "application/pdf" });
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-  // Safari can silently block programmatic Blob downloads when the app is
-  // displayed inside the preview iframe. Its native share sheet accepts the
-  // PDF as a real file and offers “Save to Downloads” without a popup.
-  if (isSafari && navigator.share && navigator.canShare?.({ files: [file] })) {
-    void navigator.share({ files: [file], title: fileName }).catch((error: unknown) => {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      downloadBlob(blob, fileName);
-    });
-    return;
+  // Inside the Lovable preview iframe, Safari blocks synthetic downloads and
+  // the share sheet. Return a prepared URL so the UI can offer a visible link
+  // that Safari receives as a second, direct user gesture.
+  if (isSafari) {
+    return { url: URL.createObjectURL(blob), fileName };
   }
 
   downloadBlob(blob, fileName);
+  return null;
 }
 
 function downloadBlob(blob: Blob, fileName: string) {
