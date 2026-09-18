@@ -348,7 +348,7 @@ export default function Dashboard() {
                 onDelete={(id) => softDelete.mutate(id)}
                 onRestore={(id) => restoreProject.mutate(id)}
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}
-                onApprove={(id) => changeStatus.mutate({ projectId: id, status: "APPROVED" })}
+                onApprove={(id) => approveProject.mutate(id)}
               />
               </div>
             ))}
