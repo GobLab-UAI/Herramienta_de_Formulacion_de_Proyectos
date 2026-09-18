@@ -302,8 +302,17 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p: any) => (
-              <ProjectCard
+              <div
                 key={p.id}
+                draggable={isDocente}
+                onDragStart={(e) => {
+                  if (!isDocente) return;
+                  e.dataTransfer.setData("text/project-id", p.id);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+                className={isDocente ? "cursor-grab active:cursor-grabbing" : undefined}
+              >
+              <ProjectCard
                 id={p.id}
                 title={p.title}
                 organizationName={p.organizationName}
