@@ -52,7 +52,10 @@ export function ProjectCard({
 
   const isFormulador = role !== "CONSULTOR" && role !== "DOCENTE";
   const canSendToReview = isFormulador && (status === "DRAFT" || status === "WITH_OBSERVATIONS");
-  const canApprove = role === "CONSULTOR" && status === "IN_REVIEW";
+  const canApprove =
+    (role === "CONSULTOR" || role === "DOCENTE") &&
+    (status === "IN_REVIEW" || status === "WITH_OBSERVATIONS");
+  const approveBlocked = commentCount > 0;
 
   const handleCopyCode = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -166,7 +169,14 @@ export function ProjectCard({
           </Button>
         )}
         {!isDeleted && canApprove && onApprove && (
-          <Button size="sm" variant="default" onClick={() => onApprove(id)} className="text-xs">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => onApprove(id)}
+            disabled={approveBlocked}
+            title={approveBlocked ? "Resuelve todos los comentarios para poder aprobar" : "Aprobar proyecto"}
+            className="text-xs"
+          >
             <CheckCircle2 className="h-3 w-3 mr-1" /> Aprobar
           </Button>
         )}

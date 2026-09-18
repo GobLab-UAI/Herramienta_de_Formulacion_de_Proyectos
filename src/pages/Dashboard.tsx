@@ -197,6 +197,20 @@ export default function Dashboard() {
     },
   });
 
+  const approveProject = useMutation({
+    mutationFn: async (projectId: string) => {
+      const { error } = await supabase.rpc("approve_project", { _project_id: projectId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({ title: "Proyecto aprobado" });
+    },
+    onError: (error: any) => {
+      toast({ title: "No se pudo aprobar", description: error.message, variant: "destructive" });
+    },
+  });
+
   const filtered = projects.filter((p: any) => {
     const matchesSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "ALL" || p.status === statusFilter;
@@ -334,7 +348,7 @@ export default function Dashboard() {
                 onDelete={(id) => softDelete.mutate(id)}
                 onRestore={(id) => restoreProject.mutate(id)}
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}
-                onApprove={(id) => changeStatus.mutate({ projectId: id, status: "APPROVED" })}
+                onApprove={(id) => approveProject.mutate(id)}
               />
               </div>
             ))}
