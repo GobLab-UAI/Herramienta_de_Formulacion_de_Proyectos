@@ -378,7 +378,11 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
   const projectStatus = project?.status || "DRAFT";
   const statusInfo = statusConfig[projectStatus] || statusConfig.DRAFT;
   const canSendToReview = !isReadOnly && (projectStatus === "DRAFT" || projectStatus === "WITH_OBSERVATIONS");
-  const canApprove = isConsultor && projectStatus === "IN_REVIEW";
+  const isReviewer = isConsultor || isDocente;
+  const canApprove =
+    isReviewer && (projectStatus === "IN_REVIEW" || projectStatus === "WITH_OBSERVATIONS");
+  const approveBlocked = totalPendingComments > 0;
+  const canExportPdf = projectStatus === "APPROVED";
 
   const changeStatusMutation = useMutation({
     mutationFn: async (newStatus: "DRAFT" | "IN_REVIEW" | "WITH_OBSERVATIONS" | "APPROVED" | "ARCHIVED") => {
@@ -391,6 +395,21 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["project", projectId] });
       toast({ title: "Estado actualizado" });
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.rpc("approve_project", { _project_id: projectId! });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({ title: "Proyecto aprobado" });
+    },
+    onError: (error: any) => {
+      toast({ title: "No se pudo aprobar", description: error.message, variant: "destructive" });
     },
   });
 
