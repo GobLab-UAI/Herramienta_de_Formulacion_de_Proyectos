@@ -158,6 +158,26 @@ export default function AdminDocentes() {
                       <p className="font-medium text-foreground">{d.full_name || d.username}</p>
                       <p className="text-xs text-muted-foreground">{d.username} · {d.email}</p>
                     </div>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" disabled={remove.isPending}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>¿Eliminar la cuenta docente?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Se eliminará la cuenta de {d.full_name || d.username} ({d.username}) y perderá el acceso a los proyectos
+                            a los que se había unido. Los comentarios que dejó se conservan. Esta acción no se puede deshacer.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => remove.mutate(d.id)}>Eliminar</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </li>
                 ))}
               </ul>
