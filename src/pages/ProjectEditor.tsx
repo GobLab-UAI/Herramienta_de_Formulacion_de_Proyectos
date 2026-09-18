@@ -484,7 +484,14 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
         )}
 
         {canApprove && (
-          <Button size="sm" variant="default" onClick={() => changeStatusMutation.mutate("APPROVED")} disabled={changeStatusMutation.isPending} className="text-xs shrink-0">
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => approveMutation.mutate()}
+            disabled={approveBlocked || approveMutation.isPending}
+            title={approveBlocked ? "Resuelve todos los comentarios para poder aprobar" : "Aprobar proyecto"}
+            className="text-xs shrink-0"
+          >
             <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Aprobar
           </Button>
         )}
