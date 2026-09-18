@@ -69,8 +69,18 @@ function addFooter(doc: jsPDF) {
 
 export function generateProjectPDF(
   title: string,
-  responses: Record<string, any>
+  rawResponses: Record<string, any>
 ): { url: string; fileName: string } | null {
+  // Fields with a defaultValue (e.g. the cover date) may never be persisted if
+  // the user didn't touch them, so fall back to their default here.
+  const responses: Record<string, any> = { ...rawResponses };
+  FORM_SECTIONS.forEach((s) => {
+    s.fields.forEach((f: any) => {
+      const empty = responses[f.key] === undefined || responses[f.key] === null || responses[f.key] === "";
+      if (empty && f.defaultValue !== undefined) responses[f.key] = f.defaultValue;
+    });
+  });
+
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
   // ── Cover page ──
