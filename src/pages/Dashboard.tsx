@@ -200,7 +200,8 @@ export default function Dashboard() {
   const filtered = projects.filter((p: any) => {
     const matchesSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "ALL" || p.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesFolder = !isDocente || !activeFolder || projectFolder[p.id] === activeFolder;
+    return matchesSearch && matchesStatus && matchesFolder;
   });
 
   return (
@@ -260,6 +261,16 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
+        {isDocente && user && (
+          <FolderBar
+            userId={user.id}
+            folders={folders}
+            projectFolder={projectFolder}
+            activeFolder={activeFolder}
+            onSelectFolder={setActiveFolder}
+          />
+        )}
 
         {/* Project grid */}
         {isLoading ? (
