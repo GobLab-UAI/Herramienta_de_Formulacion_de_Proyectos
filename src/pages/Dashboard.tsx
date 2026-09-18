@@ -200,7 +200,11 @@ export default function Dashboard() {
   const filtered = projects.filter((p: any) => {
     const matchesSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "ALL" || p.status === statusFilter;
-    const matchesFolder = !isDocente || !activeFolder || projectFolder[p.id] === activeFolder;
+    const matchesFolder = !isDocente
+      ? true
+      : activeFolder
+        ? projectFolder[p.id] === activeFolder
+        : !projectFolder[p.id];
     return matchesSearch && matchesStatus && matchesFolder;
   });
 
