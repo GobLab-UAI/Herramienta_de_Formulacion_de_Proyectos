@@ -332,6 +332,7 @@ export default function Dashboard() {
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}
                 onApprove={(id) => changeStatus.mutate({ projectId: id, status: "APPROVED" })}
               />
+              </div>
             ))}
           </div>
         )}
