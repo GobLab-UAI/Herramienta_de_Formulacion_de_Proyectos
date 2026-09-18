@@ -57,3 +57,28 @@ Dado que ya fallaron la descarga sintética, la pestaña con Blob y el segundo c
 5. Probar un proyecto antiguo sin Fecha guardada y uno con Fecha editada.
 
 La sandbox permite probar Chromium y WebKit, pero no ejecutar Safari real sobre macOS ni un iPhone físico. Antes de declararlo resuelto, entregaré los resultados automatizados; la confirmación final en Safari de Apple requerirá una prueba corta en tus dispositivos sobre la versión publicada.
+
+## Aclaraciones solicitadas
+
+### 1. Autorización en el servidor
+
+La validación no dependerá de ocultar el botón. La función de servidor exigirá, en este orden:
+
+- Sesión válida: sin token de usuario, respuesta 401.
+- Permiso sobre el proyecto: se comprueba contra la regla de visibilidad existente en la base de datos, con la identidad del usuario que llama. Un proyecto ajeno responde 403/404 según corresponda.
+- Estado Aprobado: si el proyecto no está aprobado, responde 403 y no se emite ningún enlace.
+- El identificador de proyecto se valida como UUID antes de cualquier consulta.
+
+Llamar la función directamente con el ID de un proyecto ajeno o no aprobado será rechazado, incluso desde fuera de la aplicación.
+
+### 2. Expiración y limpieza
+
+- El PDF vive en un bucket privado, nunca público.
+- El enlace firmado durará 5 minutos.
+- Al generar un PDF nuevo para un proyecto, se borran primero los archivos anteriores de ese mismo proyecto, de modo que solo exista la copia vigente.
+- Además, una limpieza programada cada hora elimina cualquier archivo con más de una hora de antigüedad, para cubrir generaciones interrumpidas.
+
+### 3. Descarga forzada
+
+- El enlace firmado se emitirá con descarga forzada y nombre de archivo, es decir el servidor responde con `Content-Disposition: attachment; filename="Ficha_<proyecto>.pdf"`.
+- Por eso el navegador guarda el archivo en vez de abrirlo o navegar sobre la pestaña actual, y el comportamiento es el mismo en Chrome y en Safari, incluido iPhone.
