@@ -558,34 +558,6 @@ export default function ProjectEditor({ reviewMode = false }: { reviewMode?: boo
           Exportar PDF
         </Button>
 
-        <Dialog open={preparedPdf !== null} onOpenChange={(open) => !open && closePreparedPdf()}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Tu PDF está listo</DialogTitle>
-              <DialogDescription>
-                Safari necesita un segundo clic para guardar archivos desde la vista previa.
-              </DialogDescription>
-            </DialogHeader>
-            {preparedPdf && (
-              <DialogFooter className="gap-2 sm:space-x-0">
-                <Button variant="outline" asChild>
-                  <a href={preparedPdf.url} target="_blank" rel="noopener noreferrer">
-                    Abrir PDF
-                  </a>
-                </Button>
-                <Button asChild>
-                  <a href={preparedPdf.url} download={preparedPdf.fileName}>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    Descargar PDF
-                  </a>
-                </Button>
-              </DialogFooter>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Si Safari bloquea ambas opciones, abre la página publicada directamente y vuelve a intentarlo.
-            </p>
-          </DialogContent>
-        </Dialog>
 
         <Button
           variant={showHistorySidebar ? "default" : "outline"}
