@@ -172,7 +172,7 @@ export function FolderBar({
           className={zoneClass("__none__", activeFolder === null)}
         >
           <Inbox className="h-4 w-4 shrink-0" />
-          <span>Todos / sin carpeta</span>
+          <span>Sin carpeta</span>
         </button>
 
         {folders.map((f) => {
