@@ -205,6 +205,30 @@ export function ProjectCard({
             </AlertDialogContent>
           </AlertDialog>
         )}
+        {canHardDelete && onHardDelete && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="ghost" className="text-xs text-destructive hover:text-destructive ml-auto">
+                <Trash2 className="h-3 w-3 mr-1" /> Eliminar definitivamente
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Eliminar el proyecto para siempre?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Se borrará "{title || "Sin título"}" con todas sus respuestas, comentarios, historial y miembros.
+                  Esta acción no se puede deshacer.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => onHardDelete(id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Eliminar definitivamente
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </Card>
   );
