@@ -183,6 +183,23 @@ export default function Dashboard() {
     },
   });
 
+  const hardDeleteProject = useMutation({
+    mutationFn: async (projectId: string) => {
+      const { data, error } = await supabase.functions.invoke("admin-delete-project", {
+        body: { project_id: projectId },
+      });
+      if (error) throw new Error((data as any)?.error || error.message);
+      if ((data as any)?.error) throw new Error((data as any).error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      toast({ title: "Proyecto eliminado definitivamente" });
+    },
+    onError: (error: any) => {
+      toast({ title: "No se pudo eliminar el proyecto", description: error.message, variant: "destructive" });
+    },
+  });
+
   const changeStatus = useMutation({
     mutationFn: async ({ projectId, status }: { projectId: string; status: "DRAFT" | "IN_REVIEW" | "WITH_OBSERVATIONS" | "APPROVED" | "ARCHIVED" }) => {
       const { error } = await supabase
@@ -349,6 +366,8 @@ export default function Dashboard() {
                 onRestore={(id) => restoreProject.mutate(id)}
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}
                 onApprove={(id) => approveProject.mutate(id)}
+                canHardDelete={isSuperadmin}
+                onHardDelete={(id) => hardDeleteProject.mutate(id)}
               />
               </div>
             ))}
