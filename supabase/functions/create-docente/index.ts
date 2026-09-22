@@ -38,25 +38,55 @@ Deno.serve(async (req) => {
       return json({ error: "Solo el Superadmin puede crear cuentas docente" }, 403);
     }
 
-    const body = await req.json();
-    const full_name = (body.full_name ?? "").trim();
-    const email = (body.email ?? "").trim().toLowerCase();
-    const username = (body.username ?? "").trim();
-    const password = body.password ?? "";
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return json({ error: "No recibimos los datos del formulario. Intenta de nuevo." }, 400);
+    }
 
-    if (!full_name || !email || !username || !password) {
-      return json({ error: "Nombre, correo, usuario y contraseña son obligatorios" }, 400);
+    const full_name = String(body.full_name ?? "").trim();
+    const email = String(body.email ?? "").trim().toLowerCase();
+    const username = String(body.username ?? "").trim().toLowerCase();
+    const password = String(body.password ?? "");
+
+    if (!full_name) return json({ error: "Escribe el nombre completo del docente" }, 400);
+    if (!email) return json({ error: "Escribe el correo del docente" }, 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      return json({ error: "El correo no tiene un formato válido (ej. ana@uai.cl)" }, 400);
+    }
+    if (!username) return json({ error: "Escribe el nombre de usuario" }, 400);
+    if (!/^[a-z0-9._-]{3,30}$/.test(username)) {
+      return json({
+        error: "El usuario debe tener entre 3 y 30 caracteres, sin espacios ni acentos (letras, números, . _ -)",
+      }, 400);
     }
     if (password.length < 8) {
       return json({ error: "La contraseña debe tener al menos 8 caracteres" }, 400);
     }
 
-    const { data: taken } = await admin
+    // Duplicate checks: separate queries so multiple matches never break the lookup
+    const { data: emailTaken, error: emailLookupError } = await admin
       .from("profiles")
       .select("id")
-      .or(`username.eq.${username},email.eq.${email}`)
-      .maybeSingle();
-    if (taken) return json({ error: "Ese usuario o correo ya existe" }, 409);
+      .eq("email", email)
+      .limit(1);
+    if (emailLookupError) {
+      return json({ error: "No pudimos verificar el correo. Intenta de nuevo." }, 500);
+    }
+    if (emailTaken && emailTaken.length > 0) {
+      return json({ error: `Ya existe una cuenta con el correo ${email}` }, 409);
+    }
+
+    const { data: usernameTaken, error: usernameLookupError } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("username", username)
+      .limit(1);
+    if (usernameLookupError) {
+      return json({ error: "No pudimos verificar el usuario. Intenta de nuevo." }, 500);
+    }
+    if (usernameTaken && usernameTaken.length > 0) {
+      return json({ error: `El nombre de usuario "${username}" ya está en uso` }, 409);
+    }
 
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email,
@@ -64,7 +94,19 @@ Deno.serve(async (req) => {
       email_confirm: true,
       user_metadata: { full_name, username },
     });
-    if (createError) return json({ error: createError.message }, 400);
+    if (createError || !created?.user) {
+      const raw = (createError?.message ?? "").toLowerCase();
+      if (raw.includes("already") || raw.includes("registered") || raw.includes("exists")) {
+        return json({ error: `Ya existe una cuenta con el correo ${email}` }, 409);
+      }
+      if (raw.includes("password")) {
+        return json({ error: "La contraseña no cumple los requisitos mínimos" }, 400);
+      }
+      if (raw.includes("email")) {
+        return json({ error: "El correo no es válido o no está permitido" }, 400);
+      }
+      return json({ error: createError?.message || "No se pudo crear la cuenta" }, 400);
+    }
 
     const userId = created.user.id;
 
