@@ -22,6 +22,24 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+async function readFunctionError(error: any, data: unknown): Promise<string> {
+  const inline = (data as any)?.error;
+  if (typeof inline === "string" && inline) return inline;
+  try {
+    const res = error?.context;
+    if (res && typeof res.json === "function") {
+      const body = await res.clone().json();
+      if (body?.error) return String(body.error);
+    }
+  } catch {
+    // ignore parse failures and fall back to the generic message
+  }
+  if (error?.message?.includes("Failed to fetch")) {
+    return "No hay conexión con el servidor. Revisa tu internet e intenta de nuevo.";
+  }
+  return error?.message || "Ocurrió un error inesperado.";
+}
+
 export default function AdminDocentes() {
   const { isSuperadmin, loading } = useAuth();
   const { toast } = useToast();
