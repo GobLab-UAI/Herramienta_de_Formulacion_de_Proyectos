@@ -98,10 +98,7 @@ export default function AdminDocentes() {
       const { data, error } = await supabase.functions.invoke("delete-docente", {
         body: { user_id: userId },
       });
-      if (error) {
-        const detail = (data as any)?.error;
-        throw new Error(detail || error.message);
-      }
+      if (error) throw new Error(await readFunctionError(error, data));
       if ((data as any)?.error) throw new Error((data as any).error);
       return data;
     },
