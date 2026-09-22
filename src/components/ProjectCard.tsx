@@ -35,16 +35,18 @@ interface ProjectCardProps {
   myCustomRole?: string;
   isOwnerOfProject?: boolean;
   members?: { user_id: string; name: string; custom_role: string | null; is_owner: boolean | null }[];
+  canHardDelete?: boolean;
   onDelete?: (id: string) => void;
   onRestore?: (id: string) => void;
   onSendToReview?: (id: string) => void;
   onApprove?: (id: string) => void;
+  onHardDelete?: (id: string) => void;
 }
 
 export function ProjectCard({
   id, title, organizationName, status, completionPct, updatedAt,
   commentCount = 0, role, creatorName, isDeleted, joinCode, myCustomRole, isOwnerOfProject, members = [],
-  onDelete, onRestore, onSendToReview, onApprove,
+  canHardDelete, onDelete, onRestore, onSendToReview, onApprove, onHardDelete,
 }: ProjectCardProps) {
   const statusInfo = statusConfig[status] || statusConfig.DRAFT;
   const editUrl = role === "CONSULTOR" ? `/projects/${id}/review` : `/projects/${id}/edit`;
