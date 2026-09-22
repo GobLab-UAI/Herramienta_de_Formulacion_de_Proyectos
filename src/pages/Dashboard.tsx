@@ -366,6 +366,8 @@ export default function Dashboard() {
                 onRestore={(id) => restoreProject.mutate(id)}
                 onSendToReview={(id) => changeStatus.mutate({ projectId: id, status: "IN_REVIEW" })}
                 onApprove={(id) => approveProject.mutate(id)}
+                canHardDelete={isSuperadmin}
+                onHardDelete={(id) => hardDeleteProject.mutate(id)}
               />
               </div>
             ))}
