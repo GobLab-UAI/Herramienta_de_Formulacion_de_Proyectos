@@ -172,10 +172,10 @@ export default function AdminDocentes() {
       <main className="mx-auto max-w-3xl px-6 py-8">
         <div className="mb-8">
           <h1 className="font-display text-3xl text-foreground flex items-center gap-2">
-            <GraduationCap className="h-7 w-7 text-primary" /> Cuentas docente
+            <Users className="h-7 w-7 text-primary" /> Gestión de usuarios
           </h1>
           <p className="mt-1 text-muted-foreground">
-            Crea las cuentas de docentes. Solo pueden leer y comentar los proyectos a los que se unan con el código de invitación.
+            Crea cuentas docentes y consulta, busca o elimina las cuentas existentes en la plataforma.
           </p>
         </div>
 

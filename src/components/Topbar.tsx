@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, GraduationCap } from "lucide-react";
+import { LogOut, Users } from "lucide-react";
 import logoGoblab from "@/assets/logo-goblab-uai.png";
 import logoHerramientas from "@/assets/logo-herramientas-eticas.png";
 
@@ -34,8 +34,8 @@ export function Topbar() {
         {isSuperadmin && (
           <Button variant="ghost" size="sm" asChild className="text-xs">
             <Link to="/admin/docentes">
-              <GraduationCap className="h-4 w-4 mr-1" />
-              Docentes
+              <Users className="h-4 w-4 mr-1" />
+              Gestión de usuarios
             </Link>
           </Button>
         )}
