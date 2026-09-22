@@ -22,6 +22,24 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+async function readFunctionError(error: any, data: unknown): Promise<string> {
+  const inline = (data as any)?.error;
+  if (typeof inline === "string" && inline) return inline;
+  try {
+    const res = error?.context;
+    if (res && typeof res.json === "function") {
+      const body = await res.clone().json();
+      if (body?.error) return String(body.error);
+    }
+  } catch {
+    // ignore parse failures and fall back to the generic message
+  }
+  if (error?.message?.includes("Failed to fetch")) {
+    return "No hay conexión con el servidor. Revisa tu internet e intenta de nuevo.";
+  }
+  return error?.message || "Ocurrió un error inesperado.";
+}
+
 export default function AdminDocentes() {
   const { isSuperadmin, loading } = useAuth();
   const { toast } = useToast();
@@ -49,13 +67,19 @@ export default function AdminDocentes() {
 
   const create = useMutation({
     mutationFn: async () => {
+      const name = fullName.trim();
+      const mail = email.trim().toLowerCase();
+      const user = username.trim().toLowerCase();
+
+      if (!name) throw new Error("Escribe el nombre completo del docente.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) throw new Error("El correo no tiene un formato válido (ej. ana@uai.cl).");
+      if (!/^[a-z0-9._-]{3,30}$/.test(user)) throw new Error("El usuario debe tener entre 3 y 30 caracteres, sin espacios ni acentos.");
+      if (password.length < 8) throw new Error("La contraseña debe tener al menos 8 caracteres.");
+
       const { data, error } = await supabase.functions.invoke("create-docente", {
-        body: { full_name: fullName, email, username, password },
+        body: { full_name: name, email: mail, username: user, password },
       });
-      if (error) {
-        const detail = (data as any)?.error;
-        throw new Error(detail || error.message);
-      }
+      if (error) throw new Error(await readFunctionError(error, data));
       if ((data as any)?.error) throw new Error((data as any).error);
       return data;
     },
@@ -74,10 +98,7 @@ export default function AdminDocentes() {
       const { data, error } = await supabase.functions.invoke("delete-docente", {
         body: { user_id: userId },
       });
-      if (error) {
-        const detail = (data as any)?.error;
-        throw new Error(detail || error.message);
-      }
+      if (error) throw new Error(await readFunctionError(error, data));
       if ((data as any)?.error) throw new Error((data as any).error);
       return data;
     },

@@ -39,7 +39,8 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
       if (isDocente && joinAs !== "COMENTARISTA") setJoinAs("COMENTARISTA");
       const upper = code.trim().toUpperCase();
       if (!CODE_REGEX.test(upper)) throw new Error("El código debe tener 3 letras y 3 números (ej. ABC123).");
-      if (!customRole.trim()) throw new Error("Indica tu rol en el proyecto.");
+      const roleLabel = isDocente ? "Docente" : customRole.trim();
+      if (!roleLabel) throw new Error("Indica tu rol en el proyecto.");
 
       const { data: matches, error } = await supabase
         .rpc("find_project_by_join_code", { _code: upper });
@@ -64,7 +65,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
           project_id: project.id,
           user_id: user!.id,
           role: isDocente ? "COMENTARISTA" : joinAs,
-          custom_role: customRole.trim(),
+          custom_role: roleLabel,
           joined_at: new Date().toISOString(),
         });
       if (insertError) throw insertError;
@@ -148,21 +149,33 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
               </button>
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label>Mi rol en el proyecto</Label>
-            <Input
-              value={customRole}
-              onChange={(e) => setCustomRole(e.target.value)}
-              placeholder="Ej. Científico de Datos"
-              list="role-suggestions"
-            />
-            <datalist id="role-suggestions">
-              {ROLE_SUGGESTIONS.map((r) => <option key={r} value={r} />)}
-            </datalist>
-            <p className="text-[11px] text-muted-foreground">
-              Sugerencias: {ROLE_SUGGESTIONS.join(" · ")}
-            </p>
-          </div>
+          {isDocente ? (
+            <div className="space-y-1.5">
+              <Label>Mi rol en el proyecto</Label>
+              <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm font-medium">
+                Docente
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Como docente te unes siempre con este rol: puedes leer y comentar, sin editar el formulario.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label>Mi rol en el proyecto</Label>
+              <Input
+                value={customRole}
+                onChange={(e) => setCustomRole(e.target.value)}
+                placeholder="Ej. Científico de Datos"
+                list="role-suggestions"
+              />
+              <datalist id="role-suggestions">
+                {ROLE_SUGGESTIONS.map((r) => <option key={r} value={r} />)}
+              </datalist>
+              <p className="text-[11px] text-muted-foreground">
+                Sugerencias: {ROLE_SUGGESTIONS.join(" · ")}
+              </p>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
