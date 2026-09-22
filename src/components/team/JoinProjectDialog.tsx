@@ -65,7 +65,7 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
           project_id: project.id,
           user_id: user!.id,
           role: isDocente ? "COMENTARISTA" : joinAs,
-          custom_role: customRole.trim(),
+          custom_role: roleLabel,
           joined_at: new Date().toISOString(),
         });
       if (insertError) throw insertError;
