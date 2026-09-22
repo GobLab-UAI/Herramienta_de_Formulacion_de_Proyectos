@@ -39,7 +39,8 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
       if (isDocente && joinAs !== "COMENTARISTA") setJoinAs("COMENTARISTA");
       const upper = code.trim().toUpperCase();
       if (!CODE_REGEX.test(upper)) throw new Error("El código debe tener 3 letras y 3 números (ej. ABC123).");
-      if (!customRole.trim()) throw new Error("Indica tu rol en el proyecto.");
+      const roleLabel = isDocente ? "Docente" : customRole.trim();
+      if (!roleLabel) throw new Error("Indica tu rol en el proyecto.");
 
       const { data: matches, error } = await supabase
         .rpc("find_project_by_join_code", { _code: upper });
