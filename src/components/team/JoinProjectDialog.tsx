@@ -149,21 +149,33 @@ export function JoinProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
               </button>
             </div>
           </div>
-          <div className="space-y-1.5">
-            <Label>Mi rol en el proyecto</Label>
-            <Input
-              value={customRole}
-              onChange={(e) => setCustomRole(e.target.value)}
-              placeholder="Ej. Científico de Datos"
-              list="role-suggestions"
-            />
-            <datalist id="role-suggestions">
-              {ROLE_SUGGESTIONS.map((r) => <option key={r} value={r} />)}
-            </datalist>
-            <p className="text-[11px] text-muted-foreground">
-              Sugerencias: {ROLE_SUGGESTIONS.join(" · ")}
-            </p>
-          </div>
+          {isDocente ? (
+            <div className="space-y-1.5">
+              <Label>Mi rol en el proyecto</Label>
+              <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm font-medium">
+                Docente
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Como docente te unes siempre con este rol: puedes leer y comentar, sin editar el formulario.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label>Mi rol en el proyecto</Label>
+              <Input
+                value={customRole}
+                onChange={(e) => setCustomRole(e.target.value)}
+                placeholder="Ej. Científico de Datos"
+                list="role-suggestions"
+              />
+              <datalist id="role-suggestions">
+                {ROLE_SUGGESTIONS.map((r) => <option key={r} value={r} />)}
+              </datalist>
+              <p className="text-[11px] text-muted-foreground">
+                Sugerencias: {ROLE_SUGGESTIONS.join(" · ")}
+              </p>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
