@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, UserPlus, Trash2 } from "lucide-react";
+import { GraduationCap, UserPlus, Trash2, Users } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +21,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Superadmin",
+  CONSULTOR: "Consultor",
+  DOCENTE: "Docente",
+  FORMULADOR: "Formulador",
+  USER: "Formulador",
+};
 
 async function readFunctionError(error: any, data: unknown): Promise<string> {
   const inline = (data as any)?.error;
@@ -41,7 +49,7 @@ async function readFunctionError(error: any, data: unknown): Promise<string> {
 }
 
 export default function AdminDocentes() {
-  const { isSuperadmin, loading } = useAuth();
+  const { isSuperadmin, loading, user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -49,6 +57,7 @@ export default function AdminDocentes() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [userSearch, setUserSearch] = useState("");
 
   const { data: docentes = [] } = useQuery({
     queryKey: ["docentes"],
@@ -61,6 +70,20 @@ export default function AdminDocentes() {
         .select("id, full_name, username, email, created_at")
         .in("id", ids);
       return data || [];
+    },
+    enabled: isSuperadmin,
+  });
+
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ["all-users"],
+    queryFn: async () => {
+      const [{ data: profiles }, { data: roles }] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, username, email").order("full_name"),
+        supabase.from("user_roles").select("user_id, role"),
+      ]);
+      const roleMap: Record<string, string> = {};
+      (roles || []).forEach((r) => { roleMap[r.user_id] = r.role as string; });
+      return (profiles || []).map((p) => ({ ...p, role: roleMap[p.id] || "FORMULADOR" }));
     },
     enabled: isSuperadmin,
   });
@@ -87,6 +110,7 @@ export default function AdminDocentes() {
       toast({ title: "Cuenta docente creada", description: `${username} ya puede iniciar sesión.` });
       setFullName(""); setEmail(""); setUsername(""); setPassword("");
       queryClient.invalidateQueries({ queryKey: ["docentes"] });
+      queryClient.invalidateQueries({ queryKey: ["all-users"] });
     },
     onError: (e: any) => {
       toast({ title: "No se pudo crear la cuenta", description: e.message, variant: "destructive" });
@@ -105,6 +129,26 @@ export default function AdminDocentes() {
     onSuccess: () => {
       toast({ title: "Cuenta docente eliminada" });
       queryClient.invalidateQueries({ queryKey: ["docentes"] });
+      queryClient.invalidateQueries({ queryKey: ["all-users"] });
+    },
+    onError: (e: any) => {
+      toast({ title: "No se pudo eliminar la cuenta", description: e.message, variant: "destructive" });
+    },
+  });
+
+  const removeUser = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+        body: { user_id: userId },
+      });
+      if (error) throw new Error(await readFunctionError(error, data));
+      if ((data as any)?.error) throw new Error((data as any).error);
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: "Cuenta eliminada" });
+      queryClient.invalidateQueries({ queryKey: ["docentes"] });
+      queryClient.invalidateQueries({ queryKey: ["all-users"] });
     },
     onError: (e: any) => {
       toast({ title: "No se pudo eliminar la cuenta", description: e.message, variant: "destructive" });
@@ -115,6 +159,12 @@ export default function AdminDocentes() {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Cargando...</div>;
   }
   if (!isSuperadmin) return <Navigate to="/dashboard" replace />;
+
+  const filteredUsers = allUsers.filter((u: any) => {
+    const q = userSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [u.full_name, u.username, u.email].some((v) => (v || "").toLowerCase().includes(q));
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,7 +214,7 @@ export default function AdminDocentes() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-lg font-display">Docentes registrados ({docentes.length})</CardTitle>
           </CardHeader>
@@ -199,6 +249,65 @@ export default function AdminDocentes() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-display flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" /> Todas las cuentas ({allUsers.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input
+              value={userSearch}
+              onChange={(e) => setUserSearch(e.target.value)}
+              placeholder="Buscar por nombre, usuario o correo"
+              className="mb-4"
+            />
+            {filteredUsers.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No hay cuentas que coincidan con la búsqueda.</p>
+            ) : (
+              <ul className="divide-y max-h-[28rem] overflow-y-auto">
+                {filteredUsers.map((u: any) => (
+                  <li key={u.id} className="flex items-center justify-between gap-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground truncate">{u.full_name || u.username}</p>
+                      <p className="text-xs text-muted-foreground truncate">{u.username} · {u.email}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
+                        {ROLE_LABELS[u.role] || u.role}
+                      </span>
+                      {u.id !== user?.id && u.role !== "ADMIN" && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" disabled={removeUser.isPending}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>¿Eliminar la cuenta?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Se eliminará la cuenta de {u.full_name || u.username} ({u.username}) y su acceso a los proyectos.
+                                Los proyectos y comentarios se conservan. Esta acción no se puede deshacer.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => removeUser.mutate(u.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>

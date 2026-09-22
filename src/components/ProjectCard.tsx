@@ -35,16 +35,18 @@ interface ProjectCardProps {
   myCustomRole?: string;
   isOwnerOfProject?: boolean;
   members?: { user_id: string; name: string; custom_role: string | null; is_owner: boolean | null }[];
+  canHardDelete?: boolean;
   onDelete?: (id: string) => void;
   onRestore?: (id: string) => void;
   onSendToReview?: (id: string) => void;
   onApprove?: (id: string) => void;
+  onHardDelete?: (id: string) => void;
 }
 
 export function ProjectCard({
   id, title, organizationName, status, completionPct, updatedAt,
   commentCount = 0, role, creatorName, isDeleted, joinCode, myCustomRole, isOwnerOfProject, members = [],
-  onDelete, onRestore, onSendToReview, onApprove,
+  canHardDelete, onDelete, onRestore, onSendToReview, onApprove, onHardDelete,
 }: ProjectCardProps) {
   const statusInfo = statusConfig[status] || statusConfig.DRAFT;
   const editUrl = role === "CONSULTOR" ? `/projects/${id}/review` : `/projects/${id}/edit`;
@@ -198,6 +200,30 @@ export function ProjectCard({
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                 <AlertDialogAction onClick={() => onDelete(id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                   Eliminar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        {canHardDelete && onHardDelete && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="ghost" className="text-xs text-destructive hover:text-destructive ml-auto">
+                <Trash2 className="h-3 w-3 mr-1" /> Eliminar definitivamente
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Eliminar el proyecto para siempre?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Se borrará "{title || "Sin título"}" con todas sus respuestas, comentarios, historial y miembros.
+                  Esta acción no se puede deshacer.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => onHardDelete(id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Eliminar definitivamente
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
